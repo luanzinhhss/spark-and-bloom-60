@@ -700,21 +700,23 @@ function Index() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a
-                href="#catalogo"
+              <button
+                type="button"
+                onClick={() => document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.02]"
                 style={{ backgroundColor: YELLOW, color: INK }}
               >
-                Ver catálogo
+                Comprar agora
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </a>
-              <a
-                href="#como-funciona"
+              </button>
+              <button
+                type="button"
+                onClick={() => document.getElementById("como-funciona")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:bg-white/5"
                 style={{ color: WHITE, border: `1px solid ${LINE}` }}
               >
                 Como funciona
-              </a>
+              </button>
             </div>
 
             <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
