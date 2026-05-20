@@ -418,7 +418,7 @@ function Index() {
                     <button
                       type="button"
                       onClick={() => addToCart(p.id)}
-                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase border-3 transition-transform active:scale-95 hover:scale-[1.03]"
+                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
                         backgroundColor: WHITE,
                         color: BLUE,
@@ -430,7 +430,7 @@ function Index() {
                     <button
                       type="button"
                       onClick={() => buyNow(p.id)}
-                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase border-3 transition-transform active:scale-95 hover:scale-[1.03]"
+                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
                         backgroundColor: GREEN,
                         color: YELLOW,
