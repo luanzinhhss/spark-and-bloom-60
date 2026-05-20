@@ -745,7 +745,22 @@ function Index() {
               )}
               {pix.kind === "ok" && (
                 <div>
+                  {paid && (
+                    <div
+                      className="mb-4 rounded-xl border-4 p-4 text-center animate-pop-in"
+                      style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
+                    >
+                      <div className="text-4xl">⚽ 🎉</div>
+                      <div className="font-display text-lg mt-2 tracking-widest">
+                        PAGAMENTO CONFIRMADO!
+                      </div>
+                      <p className="text-xs font-bold mt-1">
+                        Em breve entraremos em contato para a foto.
+                      </p>
+                    </div>
+                  )}
                   <div className="text-center">
+
                     <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN }}>
                       ★ Total
                     </div>
