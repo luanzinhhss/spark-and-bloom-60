@@ -369,6 +369,8 @@ type PixState =
   | { kind: "error"; message: string };
 
 function Index() {
+  const navigate = useNavigate();
+  const currentOrderIdRef = useRef<string | null>(null);
   const [intro, setIntro] = useState(true);
   const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartLine[]>([]);
