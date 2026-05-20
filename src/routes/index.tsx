@@ -684,6 +684,8 @@ function Index() {
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
       .join(", ")
       .slice(0, 200);
+    const orderId = `COPA-${Date.now().toString(36).toUpperCase()}`;
+    currentOrderIdRef.current = orderId;
     setPix({ kind: "loading" });
     setPaid(false);
     let cancelled = false;
@@ -695,7 +697,7 @@ function Index() {
           body: JSON.stringify({
             amount: Number(total.toFixed(2)),
             description: desc || "Copa Album 2026",
-            external_id: `order_${Date.now()}`,
+            external_id: orderId,
             customer: {
               name: customer.name,
               email: customer.email,
@@ -728,6 +730,44 @@ function Index() {
             total: r.total ?? total,
             transaction_id: r.transaction_id,
           });
+          // Persist order for confirmation page
+          try {
+            const order = {
+              id: orderId,
+              createdAt: new Date().toISOString(),
+              status: "pending" as const,
+              items: checkout.items.map((l) => ({
+                id: l.id,
+                name: PRODUCT_MAP[l.id].name,
+                qty: l.qty,
+                price: PRODUCT_MAP[l.id].price,
+              })),
+              subtotal,
+              discount: coupon ? subtotal - total : 0,
+              couponCode: coupon?.code ?? null,
+              total: r.total ?? total,
+              customer: {
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                address: {
+                  cep: customer.cep,
+                  street: customer.street,
+                  number: customer.number,
+                  neighborhood: customer.neighborhood,
+                  city: customer.city,
+                  state: customer.state,
+                },
+              },
+              transactionId: r.transaction_id,
+              paidAt: null as string | null,
+            };
+            localStorage.setItem(`copa.order.${orderId}`, JSON.stringify(order));
+            const list = JSON.parse(localStorage.getItem("copa.orders") ?? "[]") as string[];
+            if (!list.includes(orderId)) localStorage.setItem("copa.orders", JSON.stringify([orderId, ...list]));
+          } catch {
+            // ignore quota errors
+          }
         } else {
           setPix({ kind: "error", message: r.error ?? "Erro desconhecido" });
         }
