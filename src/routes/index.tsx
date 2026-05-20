@@ -61,6 +61,7 @@ type Product = {
   desc: string;
   image: string;
   badge?: string;
+  pinned?: boolean;
   gallery: { src: string; label: string }[];
   details: string[];
   variants?: {
@@ -270,6 +271,7 @@ const PRODUCTS: Product[] = [
     desc: "Maleta organizadora oficial estilo Copa 2026 com até 200 figurinhas, travas reforçadas e chaveiro mini troféu de brinde exclusivo.",
     image: portaFigurinhas1,
     badge: "Lançamento exclusivo",
+    pinned: true,
     gallery: [
       { src: portaFigurinhas1, label: "Apresentação" },
       { src: portaFigurinhas2, label: "Detalhes da tampa" },
@@ -1275,15 +1277,28 @@ function Index() {
           </div>
 
           <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category).map((p) => (
+            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category)
+              .slice()
+              .sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned))
+              .map((p) => (
               <article
                 key={p.id}
                 className="group relative rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1"
                 style={{
                   backgroundColor: SURFACE,
-                  border: `1px solid ${LINE}`,
+                  border: `1px solid ${p.pinned ? YELLOW : LINE}`,
+                  boxShadow: p.pinned ? `0 0 0 1px ${YELLOW}55, 0 20px 50px -25px ${YELLOW}55` : undefined,
                 }}
               >
+                {p.pinned && (
+                  <div
+                    className="absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1"
+                    style={{ backgroundColor: INK, color: YELLOW, border: `1px solid ${YELLOW}` }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 4v6l3 4v2h-6v6l-1 2-1-2v-6H5v-2l3-4V4z"/></svg>
+                    Fixado
+                  </div>
+                )}
                 {p.badge && (
                   <div
                     className="absolute top-3 left-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase"
