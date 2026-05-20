@@ -542,22 +542,23 @@ function Index() {
           <div className="relative h-[340px] sm:h-[460px] flex items-center justify-center">
             <img
               src={cardArthur}
-              alt=""
+              alt="Figurinha personalizada Arthur"
               className="absolute w-32 sm:w-44 rounded-xl shadow-2xl animate-floaty"
-              style={{ transform: "rotate(-10deg)", left: "4%", top: "18%", ["--r" as any]: "-10deg" }}
+              style={{ transform: "rotate(-12deg)", left: "4%", top: "16%", ["--r" as any]: "-12deg" }}
             />
             <img
-              src={albumCover}
-              alt="Álbum Copa 2026"
-              className="relative w-48 sm:w-72 rounded-xl shadow-2xl animate-floaty z-10"
+              src={cardMiguel}
+              alt="Figurinha personalizada Miguel"
+              className="relative w-40 sm:w-56 rounded-xl shadow-2xl animate-floaty z-10"
               style={{ ["--r" as any]: "0deg", animationDelay: "0.3s" }}
             />
             <img
               src={cardHelena}
-              alt=""
+              alt="Figurinha personalizada Helena"
               className="absolute w-32 sm:w-44 rounded-xl shadow-2xl animate-floaty"
-              style={{ transform: "rotate(10deg)", right: "4%", top: "22%", ["--r" as any]: "10deg", animationDelay: "0.6s" }}
+              style={{ transform: "rotate(12deg)", right: "4%", top: "20%", ["--r" as any]: "12deg", animationDelay: "0.6s" }}
             />
+
           </div>
         </div>
       </section>
