@@ -224,6 +224,16 @@ function Index() {
     return () => clearTimeout(t);
   }, []);
 
+  // Lock body scroll while any full-screen overlay is open
+  useEffect(() => {
+    const open = cartOpen || !!checkout || !!confirmBuy || !!detailsId;
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [cartOpen, checkout, confirmBuy]);
+
   // Welcome coupon w/ countdown (2-4 day random expiration, persisted)
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [welcomeExpiry, setWelcomeExpiry] = useState<number | null>(null);
