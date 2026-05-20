@@ -394,6 +394,31 @@ function Index() {
       >
 
 
+      {/* DISCOUNT BANNER */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE}, ${YELLOW})`,
+          backgroundSize: "300% 100%",
+          animation: "gradient-flow 8s ease infinite",
+        }}
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 flex items-center justify-center gap-2 sm:gap-3 text-center">
+          <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
+          <span className="text-[11px] sm:text-xs font-semibold tracking-wide" style={{ color: INK }}>
+            <span className="font-bold">Até 30% OFF</span> na primeira compra · use o cupom{" "}
+            <button
+              type="button"
+              onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
+              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+              style={{ backgroundColor: INK, color: YELLOW }}
+            >
+              NEYVOLTOU26K
+            </button>
+          </span>
+        </div>
+      </div>
+
       {/* HEADER */}
       <header
         className="sticky top-0 z-40 backdrop-blur-xl"
