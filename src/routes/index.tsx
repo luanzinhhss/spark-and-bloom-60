@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import albumCover from "@/assets/album-cover.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
+import { generatePix } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -13,34 +15,30 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Catálogo oficial: álbum da Copa 2026 e figurinhas personalizadas com a foto da sua pessoa favorita.",
-      },
-      { property: "og:title", content: "Copa Album 2026 — Catálogo" },
-      {
-        property: "og:description",
-        content:
-          "Compre o álbum oficial e figurinhas personalizadas com sua foto.",
+          "Catálogo oficial: álbum da Copa 2026 e figurinhas personalizadas com a foto da sua pessoa favorita. Pagamento via PIX.",
       },
     ],
   }),
 });
 
-const YELLOW = "#FFCE00";
+// SUPER bright Copa palette
+const YELLOW = "#FFE600";
 const YELLOW_DEEP = "#FFB400";
-const GREEN = "#009B3A";
-const BLUE = "#002776";
+const GREEN = "#00E558";
+const GREEN_DEEP = "#00A53E";
+const BLUE = "#003BB5";
+const BLUE_DEEP = "#001E73";
 const WHITE = "#FFFFFF";
 
 type Product = {
   id: string;
   name: string;
   tag: string;
-  price: string;
-  oldPrice?: string;
+  price: number;
+  oldPrice?: number;
   installments: string;
   desc: string;
   image: string;
-  color: string;
   badge?: string;
 };
 
@@ -49,54 +47,144 @@ const PRODUCTS: Product[] = [
     id: "album",
     name: "Álbum Oficial Copa 2026",
     tag: "ÁLBUM",
-    price: "R$ 197",
-    oldPrice: "R$ 297",
+    price: 197,
+    oldPrice: 297,
     installments: "ou 12x de R$ 19,90",
-    desc: "Capa dura, 60 espaços para colar suas figurinhas personalizadas. Edição limitada.",
+    desc: "Capa dura, 60 espaços para colar suas figurinhas personalizadas.",
     image: albumCover,
-    color: BLUE,
     badge: "MAIS VENDIDO",
   },
   {
     id: "fig-individual",
     name: "Figurinha Personalizada",
     tag: "FIGURINHA",
-    price: "R$ 9,90",
+    price: 9.9,
     installments: "envie a foto · entrega em 7 dias",
-    desc: "Sua foto, seu nome e seu número como uma figurinha oficial estilo Copa.",
+    desc: "Sua foto, nome e número como uma figurinha oficial estilo Copa.",
     image: cardMiguel,
-    color: GREEN,
   },
   {
     id: "fig-pack-10",
     name: "Pack 10 Figurinhas",
     tag: "PACK",
-    price: "R$ 79",
-    oldPrice: "R$ 99",
+    price: 79,
+    oldPrice: 99,
     installments: "R$ 7,90 cada · economize 20%",
-    desc: "10 figurinhas personalizadas com fotos diferentes. Monte sua seleção.",
+    desc: "10 figurinhas personalizadas. Monte sua seleção do casal.",
     image: cardArthur,
-    color: YELLOW_DEEP,
     badge: "ECONOMIA",
   },
   {
     id: "fig-shiny",
     name: "Figurinha Dourada SHINY",
     tag: "RARA",
-    price: "R$ 24,90",
+    price: 24.9,
     installments: "edição especial brilhante",
     desc: "Acabamento dourado holográfico. A craque do seu álbum.",
     image: cardHelena,
-    color: YELLOW,
     badge: "RARÍSSIMA",
   },
 ];
 
+const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
+const fmt = (n: number) =>
+  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+type CartLine = { id: string; qty: number };
+
+type PixState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | {
+      kind: "ok";
+      copy_paste: string;
+      qr_code_image: string;
+      total: number;
+      transaction_id: string;
+    }
+  | { kind: "error"; message: string };
+
 function Index() {
-  const [cart, setCart] = useState<string[]>([]);
+  const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkout, setCheckout] = useState<{ items: CartLine[] } | null>(null);
+  const [pix, setPix] = useState<PixState>({ kind: "idle" });
+  const [copied, setCopied] = useState(false);
+  const genPix = useServerFn(generatePix);
+
+  const cartCount = cart.reduce((a, l) => a + l.qty, 0);
+  const cartTotal = useMemo(
+    () => cart.reduce((a, l) => a + PRODUCT_MAP[l.id].price * l.qty, 0),
+    [cart],
+  );
 
   const addToCart = (id: string) => {
-    setCart((c) => [...c, id]);
+    setCart((c) => {
+      const existing = c.find((l) => l.id === id);
+      if (existing)
+        return c.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l));
+      return [...c, { id, qty: 1 }];
+    });
+  };
+  const removeLine = (id: string) =>
+    setCart((c) => c.filter((l) => l.id !== id));
+  const setQty = (id: string, qty: number) =>
+    setCart((c) =>
+      qty <= 0
+        ? c.filter((l) => l.id !== id)
+        : c.map((l) => (l.id === id ? { ...l, qty } : l)),
+    );
+
+  const buyNow = (id: string) => {
+    setCheckout({ items: [{ id, qty: 1 }] });
+  };
+  const checkoutCart = () => {
+    if (cart.length === 0) return;
+    setCartOpen(false);
+    setCheckout({ items: cart });
+  };
+
+  // Generate PIX when checkout opens
+  useEffect(() => {
+    if (!checkout) return;
+    const total = checkout.items.reduce(
+      (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
+      0,
+    );
+    const desc = checkout.items
+      .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
+      .join(", ")
+      .slice(0, 200);
+    setPix({ kind: "loading" });
+    genPix({
+      data: {
+        amount: Number(total.toFixed(2)),
+        description: desc || "Copa Album 2026",
+        external_id: `order_${Date.now()}`,
+      },
+    })
+      .then((r) => {
+        if (r.success) {
+          setPix({
+            kind: "ok",
+            copy_paste: r.copy_paste,
+            qr_code_image: r.qr_code_image,
+            total: r.total,
+            transaction_id: r.transaction_id,
+          });
+        } else {
+          setPix({ kind: "error", message: r.error ?? "Erro desconhecido" });
+        }
+      })
+      .catch(() =>
+        setPix({ kind: "error", message: "Falha ao gerar PIX" }),
+      );
+  }, [checkout, genPix]);
+
+  const closeCheckout = () => {
+    setCheckout(null);
+    setPix({ kind: "idle" });
+    setCopied(false);
   };
 
   return (
@@ -106,7 +194,7 @@ function Index() {
     >
       {/* Header */}
       <header
-        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4"
+        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4 shadow-lg"
         style={{ backgroundColor: GREEN, borderColor: YELLOW }}
       >
         <div
@@ -116,21 +204,26 @@ function Index() {
           <span className="animate-spin-slow inline-block">★</span>
           COPA 2026
         </div>
-        <a
-          href="#catalogo"
-          className="relative rounded-full px-3 sm:px-5 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-transform hover:scale-105"
-          style={{ backgroundColor: YELLOW, color: BLUE }}
+        <button
+          type="button"
+          onClick={() => setCartOpen(true)}
+          className="relative rounded-full px-3 sm:px-5 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-transform hover:scale-105 active:scale-95"
+          style={{ backgroundColor: YELLOW, color: BLUE, boxShadow: `0 4px 0 ${YELLOW_DEEP}` }}
         >
           🛒 Carrinho
-          {cart.length > 0 && (
+          {cartCount > 0 && (
             <span
               className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-xs font-black animate-bounce-soft"
-              style={{ backgroundColor: GREEN, color: YELLOW, border: `2px solid ${BLUE}` }}
+              style={{
+                backgroundColor: "#FF1744",
+                color: WHITE,
+                border: `2px solid ${WHITE}`,
+              }}
             >
-              {cart.length}
+              {cartCount}
             </span>
           )}
-        </a>
+        </button>
       </header>
 
       {/* Marquee */}
@@ -138,11 +231,22 @@ function Index() {
         className="overflow-hidden border-b-4 py-2"
         style={{ backgroundColor: BLUE, borderColor: YELLOW }}
       >
-        <div className="flex animate-marquee whitespace-nowrap font-display text-sm tracking-widest" style={{ color: YELLOW }}>
+        <div
+          className="flex animate-marquee whitespace-nowrap font-display text-sm tracking-widest"
+          style={{ color: YELLOW }}
+        >
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex shrink-0">
-              {["⚽ FRETE GRÁTIS ACIMA DE R$ 150", "★ ENTREGA EM 7 DIAS", "⚽ EDIÇÃO LIMITADA 2026", "★ FAÇA SUA FIGURINHA", "⚽ PAGAMENTO SEGURO"].map((t) => (
-                <span key={t} className="px-8">{t}</span>
+              {[
+                "⚽ PAGAMENTO VIA PIX",
+                "★ ENTREGA EM 7 DIAS",
+                "⚽ EDIÇÃO LIMITADA 2026",
+                "★ FAÇA SUA FIGURINHA",
+                "⚽ 100% SEGURO",
+              ].map((t) => (
+                <span key={t} className="px-8">
+                  {t}
+                </span>
               ))}
             </div>
           ))}
@@ -150,18 +254,18 @@ function Index() {
       </div>
 
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-copa-flow">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-10 select-none animate-spin-slow"
-          style={{ color: GREEN }}
+          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-20 select-none animate-spin-slow"
+          style={{ color: WHITE }}
         >
           ★
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-10 select-none animate-spin-slow"
-          style={{ color: BLUE, animationDirection: "reverse" }}
+          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-20 select-none animate-spin-slow"
+          style={{ color: WHITE, animationDirection: "reverse" }}
         >
           ★
         </div>
@@ -170,43 +274,42 @@ function Index() {
           <div className="text-center md:text-left">
             <span
               className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase animate-bounce-soft"
-              style={{ backgroundColor: BLUE, color: YELLOW }}
+              style={{ backgroundColor: BLUE, color: YELLOW, border: `2px solid ${YELLOW}` }}
             >
-              ★ Catálogo Oficial 2026
+              ★ Catálogo Oficial 2026 ⚽
             </span>
             <h1
-              className="font-display mt-5 text-3xl sm:text-5xl md:text-6xl leading-[1.05]"
-              style={{ color: BLUE }}
+              className="font-display mt-5 text-3xl sm:text-5xl md:text-6xl leading-[1.05] drop-shadow-[3px_3px_0_rgba(0,0,0,0.25)]"
+              style={{ color: WHITE }}
             >
-              VIRE <span className="shimmer-text">CRAQUE</span>{" "}
-              <span style={{ color: GREEN }}>DA COPA</span>
+              VIRE <span className="shimmer-text">CRAQUE</span>
+              <br />
+              <span style={{ color: YELLOW }}>DA COPA 2026</span>
             </h1>
             <p
               className="mt-5 text-base sm:text-lg leading-relaxed max-w-md font-semibold mx-auto md:mx-0"
-              style={{ color: BLUE }}
+              style={{ color: WHITE }}
             >
-              Compre o álbum oficial e figurinhas personalizadas com a foto de quem você ama.
-              Monte sua seleção.
+              Compre o álbum oficial e figurinhas personalizadas com a foto de quem você ama. Monte sua seleção.
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3 justify-center md:justify-start">
               <a
                 href="#catalogo"
-                className="rounded-full px-8 sm:px-10 py-3 sm:py-4 font-display text-sm sm:text-base tracking-widest uppercase shadow-lg transition-transform hover:scale-[1.05] border-4 animate-wiggle"
-                style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                className="rounded-full px-8 sm:px-10 py-3 sm:py-4 font-display text-sm sm:text-base tracking-widest uppercase border-4 animate-pulse-glow"
+                style={{ backgroundColor: YELLOW, color: BLUE, borderColor: WHITE }}
               >
                 Ver catálogo ⚽
               </a>
             </div>
           </div>
 
-          {/* Animated stack of cards */}
           <div className="relative h-[320px] sm:h-[420px] flex items-center justify-center">
             <img
               src={cardArthur}
               alt=""
               className="absolute w-32 sm:w-44 rounded-xl shadow-2xl border-4 animate-floaty"
-              style={{ borderColor: WHITE, transform: "rotate(-12deg)", left: "10%", ["--r" as any]: "-12deg", animationDelay: "0s" }}
+              style={{ borderColor: WHITE, transform: "rotate(-12deg)", left: "8%", ["--r" as any]: "-12deg", animationDelay: "0s" }}
             />
             <img
               src={albumCover}
@@ -218,13 +321,13 @@ function Index() {
               src={cardHelena}
               alt=""
               className="absolute w-32 sm:w-44 rounded-xl shadow-2xl border-4 animate-floaty"
-              style={{ borderColor: WHITE, transform: "rotate(12deg)", right: "10%", ["--r" as any]: "12deg", animationDelay: "0.8s" }}
+              style={{ borderColor: WHITE, transform: "rotate(12deg)", right: "8%", ["--r" as any]: "12deg", animationDelay: "0.8s" }}
             />
           </div>
         </div>
       </section>
 
-      {/* Stripe divider */}
+      {/* stripe divider */}
       <div className="flex h-3 sm:h-4 w-full">
         <div className="flex-1" style={{ backgroundColor: GREEN }} />
         <div className="flex-1" style={{ backgroundColor: YELLOW }} />
@@ -243,10 +346,7 @@ function Index() {
             >
               ⚽ Catálogo Oficial
             </span>
-            <h2
-              className="font-display text-3xl sm:text-4xl md:text-5xl mt-4"
-              style={{ color: BLUE }}
-            >
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4" style={{ color: BLUE }}>
               ESCOLHA SUA <span style={{ color: GREEN }}>JOGADA</span>
             </h2>
             <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: BLUE }}>
@@ -258,9 +358,8 @@ function Index() {
             {PRODUCTS.map((p, i) => (
               <article
                 key={p.id}
-                className="group relative rounded-2xl border-4 shadow-lg overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col"
+                className="group relative rounded-2xl border-4 shadow-xl overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col bg-white"
                 style={{
-                  backgroundColor: WHITE,
                   borderColor: BLUE,
                   animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.1}s both`,
                 }}
@@ -268,7 +367,12 @@ function Index() {
                 {p.badge && (
                   <div
                     className="absolute top-3 right-3 z-10 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider animate-bounce-soft"
-                    style={{ backgroundColor: GREEN, color: YELLOW, border: `2px solid ${BLUE}` }}
+                    style={{
+                      backgroundColor: "#FF1744",
+                      color: WHITE,
+                      border: `2px solid ${WHITE}`,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                    }}
                   >
                     {p.badge}
                   </div>
@@ -276,7 +380,7 @@ function Index() {
                 <div
                   className="relative h-48 sm:h-56 flex items-center justify-center overflow-hidden"
                   style={{
-                    background: `repeating-linear-gradient(45deg, ${p.color} 0 14px, ${YELLOW_DEEP} 14px 28px)`,
+                    background: `repeating-linear-gradient(45deg, ${GREEN} 0 14px, ${YELLOW} 14px 28px)`,
                   }}
                 >
                   <img
@@ -287,10 +391,7 @@ function Index() {
                   />
                 </div>
                 <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  <span
-                    className="text-[10px] font-black tracking-[0.2em] uppercase"
-                    style={{ color: GREEN }}
-                  >
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
                     ★ {p.tag}
                   </span>
                   <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: BLUE }}>
@@ -302,24 +403,44 @@ function Index() {
                   <div className="mt-3 flex items-baseline gap-2">
                     {p.oldPrice && (
                       <span className="text-xs line-through opacity-60" style={{ color: BLUE }}>
-                        {p.oldPrice}
+                        {fmt(p.oldPrice)}
                       </span>
                     )}
                     <span className="font-display text-2xl" style={{ color: BLUE }}>
-                      {p.price}
+                      {fmt(p.price)}
                     </span>
                   </div>
                   <div className="text-[11px] mt-0.5 opacity-80" style={{ color: BLUE }}>
                     {p.installments}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => addToCart(p.id)}
-                    className="mt-4 w-full rounded-full px-5 py-3 font-display text-xs sm:text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.03]"
-                    style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
-                  >
-                    + Adicionar
-                  </button>
+
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => addToCart(p.id)}
+                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase border-3 transition-transform active:scale-95 hover:scale-[1.03]"
+                      style={{
+                        backgroundColor: WHITE,
+                        color: BLUE,
+                        border: `3px solid ${BLUE}`,
+                      }}
+                    >
+                      + Carrinho
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => buyNow(p.id)}
+                      className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase border-3 transition-transform active:scale-95 hover:scale-[1.03]"
+                      style={{
+                        backgroundColor: GREEN,
+                        color: YELLOW,
+                        border: `3px solid ${BLUE}`,
+                        boxShadow: `0 3px 0 ${GREEN_DEEP}`,
+                      }}
+                    >
+                      Comprar ⚡
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -343,7 +464,7 @@ function Index() {
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {[
               { n: "1", t: "ESCOLHA", d: "Selecione álbum e figurinhas no catálogo." },
-              { n: "2", t: "ENVIE A FOTO", d: "Após a compra, mande a foto da pessoa." },
+              { n: "2", t: "ENVIE A FOTO", d: "Após o PIX, mande a foto da pessoa." },
               { n: "3", t: "RECEBA EM CASA", d: "Em 7 dias úteis seu kit chega impresso." },
             ].map((s, i) => (
               <div
@@ -373,41 +494,255 @@ function Index() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section
-        className="px-4 sm:px-6 py-16 sm:py-20 text-center relative overflow-hidden"
-        style={{ backgroundColor: BLUE }}
-      >
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: `repeating-linear-gradient(45deg, ${YELLOW} 0 20px, transparent 20px 40px)`,
-          }}
-        />
-        <div className="relative mx-auto max-w-2xl">
-          <h2 className="font-display text-3xl sm:text-5xl leading-tight" style={{ color: YELLOW }}>
-            ENTRE EM <span style={{ color: GREEN }}>CAMPO</span> ⚽
-          </h2>
-          <p className="mt-4 text-base sm:text-lg font-semibold" style={{ color: WHITE }}>
-            Edição limitada. Não fique fora da Copa 2026.
-          </p>
-          <a
-            href="#catalogo"
-            className="inline-block mt-8 rounded-full px-10 py-4 font-display text-sm sm:text-base tracking-widest uppercase border-4 transition-transform hover:scale-105 animate-wiggle"
-            style={{ backgroundColor: YELLOW, color: BLUE, borderColor: GREEN }}
-          >
-            Ver catálogo
-          </a>
-        </div>
-      </section>
-
       <footer
         className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold"
         style={{ backgroundColor: GREEN, color: YELLOW }}
       >
-        © 2026 Copa Album · Edição Oficial Casal de Ouro
+        © 2026 Copa Album · Edição Oficial · Pagamento via PIX
       </footer>
+
+      {/* CART DRAWER */}
+      {cartOpen && (
+        <div className="fixed inset-0 z-50 flex" onClick={() => setCartOpen(false)}>
+          <div className="flex-1 bg-black/50 backdrop-blur-sm animate-pop-in" />
+          <aside
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md h-full overflow-y-auto flex flex-col animate-slide-in-right border-l-4"
+            style={{ backgroundColor: YELLOW, borderColor: BLUE }}
+          >
+            <div
+              className="px-5 py-4 flex items-center justify-between border-b-4"
+              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+            >
+              <div className="font-display text-xl tracking-widest flex items-center gap-2">
+                🛒 SEU CARRINHO
+              </div>
+              <button
+                type="button"
+                onClick={() => setCartOpen(false)}
+                className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
+                style={{ backgroundColor: YELLOW, color: BLUE }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex-1 p-5 space-y-3">
+              {cart.length === 0 && (
+                <div className="text-center py-16">
+                  <div className="text-6xl animate-bounce-soft">⚽</div>
+                  <p className="mt-4 font-display text-xl" style={{ color: BLUE }}>
+                    Carrinho vazio
+                  </p>
+                  <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                    Convoque suas figurinhas!
+                  </p>
+                </div>
+              )}
+              {cart.map((line) => {
+                const p = PRODUCT_MAP[line.id];
+                return (
+                  <div
+                    key={line.id}
+                    className="flex gap-3 rounded-xl border-4 p-3 animate-slide-up"
+                    style={{ backgroundColor: WHITE, borderColor: BLUE }}
+                  >
+                    <img src={p.image} alt="" className="w-16 h-16 rounded-lg object-cover border-2" style={{ borderColor: GREEN }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-display text-sm leading-tight" style={{ color: BLUE }}>
+                        {p.name}
+                      </div>
+                      <div className="font-bold text-sm mt-1" style={{ color: GREEN_DEEP }}>
+                        {fmt(p.price)}
+                      </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setQty(line.id, line.qty - 1)}
+                          className="h-7 w-7 rounded-full font-black border-2"
+                          style={{ backgroundColor: YELLOW, color: BLUE, borderColor: BLUE }}
+                        >
+                          −
+                        </button>
+                        <span className="font-display text-base w-6 text-center" style={{ color: BLUE }}>
+                          {line.qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setQty(line.id, line.qty + 1)}
+                          className="h-7 w-7 rounded-full font-black border-2"
+                          style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeLine(line.id)}
+                          className="ml-auto text-xs font-bold underline"
+                          style={{ color: BLUE_DEEP }}
+                        >
+                          remover
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {cart.length > 0 && (
+              <div
+                className="border-t-4 p-5 space-y-3"
+                style={{ borderColor: BLUE, backgroundColor: WHITE }}
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="font-display text-sm tracking-widest uppercase" style={{ color: BLUE }}>
+                    Total
+                  </span>
+                  <span className="font-display text-3xl" style={{ color: BLUE }}>
+                    {fmt(cartTotal)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={checkoutCart}
+                  className="w-full rounded-full px-5 py-4 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02] animate-pulse-glow"
+                  style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                >
+                  Finalizar com PIX ⚡
+                </button>
+              </div>
+            )}
+          </aside>
+        </div>
+      )}
+
+      {/* CHECKOUT / PIX MODAL */}
+      {checkout && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={closeCheckout}
+        >
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-3xl border-8 shadow-2xl overflow-hidden animate-slide-up"
+            style={{ backgroundColor: WHITE, borderColor: YELLOW }}
+          >
+            <div
+              className="px-5 py-4 flex items-center justify-between border-b-4"
+              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+            >
+              <div className="font-display text-lg tracking-widest">PAGAR COM PIX ⚡</div>
+              <button
+                type="button"
+                onClick={closeCheckout}
+                className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
+                style={{ backgroundColor: YELLOW, color: BLUE }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="p-5">
+              {pix.kind === "loading" && (
+                <div className="text-center py-10">
+                  <div className="text-5xl animate-ball-kick inline-block">⚽</div>
+                  <p className="mt-4 font-display text-lg" style={{ color: BLUE }}>
+                    Gerando seu PIX...
+                  </p>
+                </div>
+              )}
+              {pix.kind === "error" && (
+                <div className="text-center py-8">
+                  <div className="text-5xl">😞</div>
+                  <p className="mt-3 font-display text-lg" style={{ color: BLUE }}>
+                    Não rolou
+                  </p>
+                  <p className="mt-1 text-sm font-semibold" style={{ color: BLUE }}>
+                    {pix.message}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const c = checkout;
+                      setCheckout(null);
+                      setTimeout(() => setCheckout(c), 50);
+                    }}
+                    className="mt-5 rounded-full px-6 py-2 font-display text-xs tracking-widest uppercase border-4"
+                    style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                  >
+                    Tentar de novo
+                  </button>
+                </div>
+              )}
+              {pix.kind === "ok" && (
+                <div>
+                  <div className="text-center">
+                    <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
+                      ★ Total
+                    </div>
+                    <div className="font-display text-4xl mt-1" style={{ color: BLUE }}>
+                      {fmt(pix.total)}
+                    </div>
+                  </div>
+
+                  {pix.qr_code_image && (
+                    <div className="mt-5 flex justify-center">
+                      <div
+                        className="p-3 rounded-2xl border-4"
+                        style={{ borderColor: BLUE, backgroundColor: WHITE }}
+                      >
+                        <img
+                          src={
+                            pix.qr_code_image.startsWith("http") || pix.qr_code_image.startsWith("data:")
+                              ? pix.qr_code_image
+                              : `data:image/png;base64,${pix.qr_code_image}`
+                          }
+                          alt="QR Code PIX"
+                          className="w-56 h-56 object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-5">
+                    <label className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: BLUE }}>
+                      PIX Copia e Cola
+                    </label>
+                    <div
+                      className="mt-1 rounded-lg p-3 text-xs break-all font-mono border-2 max-h-24 overflow-y-auto"
+                      style={{ backgroundColor: "#F5F5F5", borderColor: BLUE, color: BLUE }}
+                    >
+                      {pix.copy_paste}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(pix.copy_paste);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="mt-3 w-full rounded-full px-5 py-3 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02]"
+                      style={{
+                        backgroundColor: copied ? BLUE : GREEN,
+                        color: YELLOW,
+                        borderColor: BLUE,
+                      }}
+                    >
+                      {copied ? "✓ Copiado!" : "Copiar código PIX"}
+                    </button>
+                  </div>
+
+                  <p className="mt-4 text-center text-[11px] font-semibold opacity-80" style={{ color: BLUE }}>
+                    Abra seu app do banco e pague com PIX. A confirmação é automática.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
