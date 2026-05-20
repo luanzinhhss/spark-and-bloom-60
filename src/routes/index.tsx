@@ -30,6 +30,9 @@ const GREEN_DEEP = "#00A53E";
 const BLUE = "#003BB5";
 const BLUE_DEEP = "#001E73";
 const WHITE = "#FFFFFF";
+const DARK = "#08080d";
+const DARK2 = "#13131b";
+const DARK3 = "#1d1d28";
 
 type Product = {
   id: string;
