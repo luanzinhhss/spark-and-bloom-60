@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
 import albumCover from "@/assets/album-cover.png";
 import albumFront from "@/assets/album-front.png";
 import albumInterior from "@/assets/album-interior.png";
@@ -369,6 +369,8 @@ type PixState =
   | { kind: "error"; message: string };
 
 function Index() {
+  const navigate = useNavigate();
+  const currentOrderIdRef = useRef<string | null>(null);
   const [intro, setIntro] = useState(true);
   const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -684,6 +686,8 @@ function Index() {
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
       .join(", ")
       .slice(0, 200);
+    const orderId = `COPA-${Date.now().toString(36).toUpperCase()}`;
+    currentOrderIdRef.current = orderId;
     setPix({ kind: "loading" });
     setPaid(false);
     let cancelled = false;
@@ -695,7 +699,7 @@ function Index() {
           body: JSON.stringify({
             amount: Number(total.toFixed(2)),
             description: desc || "Copa Album 2026",
-            external_id: `order_${Date.now()}`,
+            external_id: orderId,
             customer: {
               name: customer.name,
               email: customer.email,
@@ -728,6 +732,44 @@ function Index() {
             total: r.total ?? total,
             transaction_id: r.transaction_id,
           });
+          // Persist order for confirmation page
+          try {
+            const order = {
+              id: orderId,
+              createdAt: new Date().toISOString(),
+              status: "pending" as const,
+              items: checkout.items.map((l) => ({
+                id: l.id,
+                name: PRODUCT_MAP[l.id].name,
+                qty: l.qty,
+                price: PRODUCT_MAP[l.id].price,
+              })),
+              subtotal,
+              discount: coupon ? subtotal - total : 0,
+              couponCode: coupon?.code ?? null,
+              total: r.total ?? total,
+              customer: {
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                address: {
+                  cep: customer.cep,
+                  street: customer.street,
+                  number: customer.number,
+                  neighborhood: customer.neighborhood,
+                  city: customer.city,
+                  state: customer.state,
+                },
+              },
+              transactionId: r.transaction_id,
+              paidAt: null as string | null,
+            };
+            localStorage.setItem(`copa.order.${orderId}`, JSON.stringify(order));
+            const list = JSON.parse(localStorage.getItem("copa.orders") ?? "[]") as string[];
+            if (!list.includes(orderId)) localStorage.setItem("copa.orders", JSON.stringify([orderId, ...list]));
+          } catch {
+            // ignore quota errors
+          }
         } else {
           setPix({ kind: "error", message: r.error ?? "Erro desconhecido" });
         }
@@ -756,6 +798,27 @@ function Index() {
           setPaid(true);
           setCart([]);
           setCoupon(null);
+          const oid = currentOrderIdRef.current;
+          if (oid) {
+            try {
+              const raw = localStorage.getItem(`copa.order.${oid}`);
+              if (raw) {
+                const o = JSON.parse(raw);
+                o.status = "paid";
+                o.paidAt = new Date().toISOString();
+                localStorage.setItem(`copa.order.${oid}`, JSON.stringify(o));
+              }
+            } catch {
+              // ignore
+            }
+            setTimeout(() => {
+              setCheckout(null);
+              setCheckoutStep("contact");
+              setPix({ kind: "idle" });
+              setPaid(false);
+              navigate({ to: "/pedido/$id", params: { id: oid } });
+            }, 1500);
+          }
         }
       } catch {
         // ignore
