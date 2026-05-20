@@ -112,6 +112,21 @@ function Index() {
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
+  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
+  const [customer, setCustomer] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    cep: "",
+    street: "",
+    number: "",
+    neighborhood: "",
+    city: "",
+    state: "",
+  });
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
@@ -216,9 +231,16 @@ function Index() {
   // Buy-now flow: open confirmation modal first
   const handleBuyClick = (id: string) => setConfirmBuy(id);
 
+  const openCheckout = (items: CartLine[]) => {
+    setCheckoutStep("contact");
+    setFormError(null);
+    setCepError(null);
+    setCheckout({ items });
+  };
+
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
-    setCheckout({ items: [{ id, qty: 1 }] });
+    openCheckout([{ id, qty: 1 }]);
   };
   const addAndKeepShopping = (id: string) => {
     addToCart(id);
@@ -232,13 +254,13 @@ function Index() {
       map.set(id, (map.get(id) ?? 0) + 1);
       return Array.from(map, ([id, qty]) => ({ id, qty }));
     })();
-    setCheckout({ items });
+    openCheckout(items);
   };
 
   const checkoutCart = () => {
     if (cart.length === 0) return;
     setCartOpen(false);
-    setCheckout({ items: cart });
+    openCheckout(cart);
   };
 
   const regeneratePix = () => {
@@ -246,10 +268,65 @@ function Index() {
     setCheckout({ items: checkout.items, nonce: Date.now() });
   };
 
+  // CEP lookup via ViaCEP
+  const lookupCep = async (rawCep: string) => {
+    const cep = rawCep.replace(/\D/g, "");
+    if (cep.length !== 8) return;
+    setCepLoading(true);
+    setCepError(null);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = (await res.json()) as {
+        erro?: boolean;
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+      };
+      if (data.erro) {
+        setCepError("CEP não encontrado");
+        return;
+      }
+      setCustomer((c) => ({
+        ...c,
+        street: data.logradouro ?? c.street,
+        neighborhood: data.bairro ?? c.neighborhood,
+        city: data.localidade ?? c.city,
+        state: data.uf ?? c.state,
+      }));
+    } catch {
+      setCepError("Erro ao buscar CEP");
+    } finally {
+      setCepLoading(false);
+    }
+  };
 
-  // Generate PIX when checkout opens
+  const submitContact = () => {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim());
+    const phoneDigits = customer.phone.replace(/\D/g, "");
+    if (!customer.name.trim()) return setFormError("Informe seu nome");
+    if (!emailOk) return setFormError("Informe um e-mail válido");
+    if (phoneDigits.length < 10) return setFormError("Informe um telefone válido");
+    setFormError(null);
+    setCheckoutStep("address");
+  };
+
+  const submitAddress = () => {
+    const cepOk = customer.cep.replace(/\D/g, "").length === 8;
+    if (!cepOk) return setFormError("Informe um CEP válido");
+    if (!customer.street.trim()) return setFormError("Informe a rua");
+    if (!customer.number.trim()) return setFormError("Informe o número");
+    if (!customer.city.trim() || !customer.state.trim())
+      return setFormError("Endereço incompleto");
+    setFormError(null);
+    setCheckoutStep("pix");
+  };
+
+
+
+  // Generate PIX when checkout reaches pix step
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout || checkoutStep !== "pix") return;
     const subtotal = checkout.items.reduce(
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
@@ -271,6 +348,19 @@ function Index() {
             amount: Number(total.toFixed(2)),
             description: desc || "Copa Album 2026",
             external_id: `order_${Date.now()}`,
+            customer: {
+              name: customer.name,
+              email: customer.email,
+              phone: customer.phone,
+              address: {
+                cep: customer.cep,
+                street: customer.street,
+                number: customer.number,
+                neighborhood: customer.neighborhood,
+                city: customer.city,
+                state: customer.state,
+              },
+            },
           }),
         });
         const r = (await res.json()) as {
@@ -300,7 +390,7 @@ function Index() {
     return () => {
       cancelled = true;
     };
-  }, [checkout]);
+  }, [checkout, checkoutStep]);
 
   // Poll payment confirmation
   useEffect(() => {
@@ -332,9 +422,12 @@ function Index() {
 
   const closeCheckout = () => {
     setCheckout(null);
+    setCheckoutStep("contact");
     setPix({ kind: "idle" });
     setCopied(false);
     setPaid(false);
+    setFormError(null);
+    setCepError(null);
   };
 
   const qrSrc = (img: string) =>
@@ -1028,8 +1121,32 @@ function Index() {
               className="px-5 py-4 flex items-center justify-between"
               style={{ borderBottom: `1px solid ${LINE}` }}
             >
-              <div className="flex items-center gap-2">
-                <span className="font-display text-base" style={{ color: WHITE }}>Pagamento via PIX</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  {(["contact", "address", "pix"] as const).map((s, i) => {
+                    const active = checkoutStep === s;
+                    const done =
+                      (checkoutStep === "address" && i === 0) ||
+                      (checkoutStep === "pix" && i < 2);
+                    return (
+                      <span
+                        key={s}
+                        className="h-1.5 rounded-full transition-all"
+                        style={{
+                          width: active ? 22 : 10,
+                          backgroundColor: active ? YELLOW : done ? GREEN : LINE,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="font-display text-base" style={{ color: WHITE }}>
+                  {checkoutStep === "contact"
+                    ? "Seus dados"
+                    : checkoutStep === "address"
+                      ? "Endereço de entrega"
+                      : "Pagamento via PIX"}
+                </span>
               </div>
               <button
                 type="button"
@@ -1042,6 +1159,138 @@ function Index() {
             </div>
 
             <div className="p-6">
+              {checkoutStep === "contact" && (
+                <div className="space-y-3 animate-fade-in">
+                  <p className="text-xs" style={{ color: MUTED }}>
+                    Usamos para enviar o comprovante e instruções da figurinha.
+                  </p>
+                  <FieldInput
+                    label="Nome completo"
+                    value={customer.name}
+                    onChange={(v) => setCustomer((c) => ({ ...c, name: v }))}
+                    placeholder="Maria Silva"
+                  />
+                  <FieldInput
+                    label="E-mail (Gmail)"
+                    type="email"
+                    value={customer.email}
+                    onChange={(v) => setCustomer((c) => ({ ...c, email: v }))}
+                    placeholder="seuemail@gmail.com"
+                  />
+                  <FieldInput
+                    label="Telefone (WhatsApp)"
+                    value={customer.phone}
+                    onChange={(v) =>
+                      setCustomer((c) => ({ ...c, phone: maskPhone(v) }))
+                    }
+                    placeholder="(11) 99999-9999"
+                    inputMode="tel"
+                  />
+                  {formError && (
+                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={submitContact}
+                    className="mt-2 w-full rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
+                    style={{ backgroundColor: YELLOW, color: INK }}
+                  >
+                    Dados finalizados
+                  </button>
+                </div>
+              )}
+
+              {checkoutStep === "address" && (
+                <div className="space-y-3 animate-fade-in">
+                  <div>
+                    <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                      CEP
+                    </label>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        value={customer.cep}
+                        onChange={(e) => {
+                          const v = maskCep(e.target.value);
+                          setCustomer((c) => ({ ...c, cep: v }));
+                          if (v.replace(/\D/g, "").length === 8) lookupCep(v);
+                        }}
+                        placeholder="00000-000"
+                        inputMode="numeric"
+                        className="flex-1 rounded-lg px-3 py-2.5 text-sm outline-none"
+                        style={{ backgroundColor: INK, border: `1px solid ${LINE}`, color: WHITE }}
+                      />
+                      {cepLoading && (
+                        <div className="h-9 w-9 rounded-full border-2 animate-spin self-center"
+                          style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
+                      )}
+                    </div>
+                    {cepError && (
+                      <p className="mt-1 text-xs" style={{ color: "#ff6b6b" }}>{cepError}</p>
+                    )}
+                  </div>
+                  <FieldInput
+                    label="Rua"
+                    value={customer.street}
+                    onChange={(v) => setCustomer((c) => ({ ...c, street: v }))}
+                    placeholder="preenchido pelo CEP"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <FieldInput
+                      label="Número"
+                      value={customer.number}
+                      onChange={(v) => setCustomer((c) => ({ ...c, number: v }))}
+                      placeholder="123"
+                      inputMode="numeric"
+                    />
+                    <FieldInput
+                      label="Bairro"
+                      value={customer.neighborhood}
+                      onChange={(v) => setCustomer((c) => ({ ...c, neighborhood: v }))}
+                      placeholder=""
+                    />
+                  </div>
+                  <div className="grid grid-cols-[1fr_80px] gap-3">
+                    <FieldInput
+                      label="Cidade"
+                      value={customer.city}
+                      onChange={(v) => setCustomer((c) => ({ ...c, city: v }))}
+                      placeholder=""
+                    />
+                    <FieldInput
+                      label="UF"
+                      value={customer.state}
+                      onChange={(v) =>
+                        setCustomer((c) => ({ ...c, state: v.toUpperCase().slice(0, 2) }))
+                      }
+                      placeholder=""
+                    />
+                  </div>
+                  {formError && (
+                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                  )}
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setCheckoutStep("contact")}
+                      className="rounded-full px-5 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
+                      style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                    >
+                      Voltar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={submitAddress}
+                      className="flex-1 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
+                      style={{ backgroundColor: YELLOW, color: INK }}
+                    >
+                      Confirmar e gerar PIX
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {checkoutStep === "pix" && (
+                <>
               {pix.kind === "loading" && (
                 <div className="text-center py-14">
                   <div className="mx-auto h-10 w-10 rounded-full border-2 animate-spin" style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
@@ -1164,6 +1413,8 @@ function Index() {
                   )}
                 </div>
               )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1172,3 +1423,51 @@ function Index() {
     </main>
   );
 }
+
+function maskPhone(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+function maskCep(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 5) return d;
+  return `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+function FieldInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "tel" | "email" | "numeric" | "search" | "url" | "none" | "decimal";
+}) {
+  return (
+    <div>
+      <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#7a7a85" }}>
+        {label}
+      </label>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1 w-full rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+        style={{ backgroundColor: "#08080d", border: "1px solid #1f1f28", color: "#fff" }}
+      />
+    </div>
+  );
+}
+
