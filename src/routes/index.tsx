@@ -530,28 +530,44 @@ function Index() {
       >
 
 
-      {/* DISCOUNT BANNER */}
+      {/* DISCOUNT BANNER — marquee with both coupons */}
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden border-b"
         style={{
           background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE}, ${YELLOW})`,
           backgroundSize: "300% 100%",
-          animation: "gradient-flow 8s ease infinite",
+          animation: "gradient-flow 10s ease infinite",
+          borderColor: `${INK}`,
         }}
       >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 flex items-center justify-center gap-2 sm:gap-3 text-center">
-          <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
-          <span className="text-[11px] sm:text-xs font-semibold tracking-wide" style={{ color: INK }}>
-            <span className="font-bold">Até 30% OFF</span> na primeira compra · use o cupom{" "}
-            <button
-              type="button"
-              onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
-              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
-              style={{ backgroundColor: INK, color: YELLOW }}
-            >
-              NEYVOLTOU26K
-            </button>
-          </span>
+        <div className="relative py-2">
+          <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 text-[12px] sm:text-[13px] font-semibold" style={{ color: INK }}>
+                <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
+                <span>Até <span className="font-extrabold">30% OFF</span> na primeira compra</span>
+                <button
+                  type="button"
+                  onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+                  style={{ backgroundColor: INK, color: YELLOW }}
+                >
+                  NEYVOLTOU26K · −25%
+                </button>
+                <span className="opacity-60">•</span>
+                <span>Cupom de boas-vindas</span>
+                <button
+                  type="button"
+                  onClick={() => { applyCoupon("COPA10"); setCartOpen(true); }}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+                  style={{ backgroundColor: INK, color: GREEN }}
+                >
+                  COPA10 · −15%
+                </button>
+                <span className="opacity-60 mr-2">•</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
