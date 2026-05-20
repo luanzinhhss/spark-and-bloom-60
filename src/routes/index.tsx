@@ -6,6 +6,7 @@ import albumInterior from "@/assets/album-interior.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
+import pack10Figurinhas from "@/assets/pack-10-figurinhas.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
