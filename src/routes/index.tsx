@@ -924,13 +924,74 @@ function Index() {
                 className="p-5 space-y-4 sticky bottom-0"
                 style={{ borderTop: `1px solid ${LINE}`, backgroundColor: INK }}
               >
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs uppercase tracking-[0.2em]" style={{ color: MUTED }}>
-                    Total
-                  </span>
-                  <span className="font-display text-3xl" style={{ color: WHITE }}>
-                    {fmt(cartTotal)}
-                  </span>
+                {/* COUPON */}
+                <div>
+                  {coupon ? (
+                    <div
+                      className="flex items-center justify-between rounded-lg px-3 py-2.5 animate-fade-in"
+                      style={{ backgroundColor: `${GREEN}1a`, border: `1px solid ${GREEN}55` }}
+                    >
+                      <div className="flex items-center gap-2 text-xs">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        <span className="font-mono font-bold" style={{ color: WHITE }}>{coupon.code}</span>
+                        <span style={{ color: GREEN }}>−{Math.round(coupon.pct * 100)}%</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCoupon(null)}
+                        className="text-[11px]"
+                        style={{ color: MUTED }}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => { setCouponInput(e.target.value); setCouponError(null); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(couponInput); }}
+                          placeholder="Cupom de desconto"
+                          className="flex-1 rounded-lg px-3 py-2.5 text-xs font-mono uppercase tracking-wider outline-none focus:border-white/30 transition-colors"
+                          style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}`, color: WHITE }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => applyCoupon(couponInput)}
+                          className="rounded-lg px-4 text-xs font-semibold transition-colors hover:bg-white/5"
+                          style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+                      {couponError && (
+                        <p className="mt-1.5 text-[11px]" style={{ color: "#ff6b6b" }}>{couponError}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-baseline justify-between text-xs" style={{ color: MUTED }}>
+                    <span>Subtotal</span>
+                    <span>{fmt(cartSubtotal)}</span>
+                  </div>
+                  {coupon && (
+                    <div className="flex items-baseline justify-between text-xs" style={{ color: GREEN }}>
+                      <span>Desconto ({coupon.code})</span>
+                      <span>−{fmt(cartDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline justify-between pt-2" style={{ borderTop: `1px solid ${LINE}` }}>
+                    <span className="text-xs uppercase tracking-[0.2em]" style={{ color: MUTED }}>
+                      Total
+                    </span>
+                    <span className="font-display text-3xl" style={{ color: WHITE }}>
+                      {fmt(cartTotal)}
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
