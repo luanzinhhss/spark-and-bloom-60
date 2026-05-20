@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import albumCover from "@/assets/album-cover.png";
+import albumFront from "@/assets/album-front.png";
+import albumInterior from "@/assets/album-interior.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
@@ -41,6 +43,8 @@ type Product = {
   desc: string;
   image: string;
   badge?: string;
+  gallery: { src: string; label: string }[];
+  details: string[];
 };
 
 const PRODUCTS: Product[] = [
@@ -52,8 +56,19 @@ const PRODUCTS: Product[] = [
     oldPrice: 297,
     installments: "ou 12x de R$ 19,90 sem juros",
     desc: "Capa dura, 60 espaços numerados para colar suas figurinhas personalizadas.",
-    image: albumCover,
+    image: albumFront,
     badge: "Mais vendido",
+    gallery: [
+      { src: albumFront, label: "Capa" },
+      { src: albumInterior, label: "Interior" },
+      { src: albumCover, label: "Detalhe" },
+    ],
+    details: [
+      "Formato A4 — 60 espaços numerados",
+      "Capa dura com acabamento foil dourado",
+      "Páginas internas em papel couché 170g",
+      "Inclui adesivos de identificação por jogador",
+    ],
   },
   {
     id: "fig-individual",
@@ -63,6 +78,15 @@ const PRODUCTS: Product[] = [
     installments: "Envio em até 7 dias úteis",
     desc: "Sua foto, nome e número impressos no estilo oficial da Copa.",
     image: cardMiguel,
+    gallery: [
+      { src: cardMiguel, label: "Frente" },
+      { src: albumInterior, label: "No álbum" },
+    ],
+    details: [
+      "Impressão em alta resolução, papel cartonado",
+      "Nome, posição e número personalizados",
+      "Verso com escudo e número de coleção",
+    ],
   },
   {
     id: "fig-pack-10",
@@ -74,6 +98,16 @@ const PRODUCTS: Product[] = [
     desc: "Monte sua seleção do casal, da família ou do time.",
     image: cardArthur,
     badge: "Economia",
+    gallery: [
+      { src: cardArthur, label: "Frente" },
+      { src: cardMiguel, label: "Variações" },
+      { src: albumInterior, label: "Coleção" },
+    ],
+    details: [
+      "10 figurinhas personalizadas no mesmo pedido",
+      "Misture pessoas, fotos e números",
+      "Embalagem premium em estilo coleção",
+    ],
   },
   {
     id: "fig-shiny",
@@ -84,6 +118,15 @@ const PRODUCTS: Product[] = [
     desc: "Edição limitada com brilho dourado. A craque do seu álbum.",
     image: cardHelena,
     badge: "Limitada",
+    gallery: [
+      { src: cardHelena, label: "Frente Shiny" },
+      { src: albumInterior, label: "No álbum" },
+    ],
+    details: [
+      "Acabamento holográfico foil dourado",
+      "Numeração limitada por edição",
+      "Embalagem individual em sleeve protetor",
+    ],
   },
 ];
 
@@ -111,6 +154,8 @@ function Index() {
   const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [detailsImg, setDetailsImg] = useState(0);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
   const [customer, setCustomer] = useState({
@@ -736,11 +781,12 @@ function Index() {
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => addToCart(p.id)}
-                      className="rounded-full px-3 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5"
+                      onClick={() => { setDetailsId(p.id); setDetailsImg(0); }}
+                      className="rounded-full px-3 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center justify-center gap-1.5"
                       style={{ color: WHITE, border: `1px solid ${LINE}` }}
                     >
-                      Carrinho
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      Detalhes
                     </button>
                     <button
                       type="button"
@@ -825,6 +871,160 @@ function Index() {
           </div>
         </div>
       </footer>
+
+      {/* PRODUCT DETAILS MODAL */}
+      {detailsId && (() => {
+        const p = PRODUCT_MAP[detailsId];
+        if (!p) return null;
+        const img = p.gallery[detailsImg] ?? p.gallery[0];
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setDetailsId(null)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-5xl max-h-[92vh] overflow-y-auto rounded-2xl animate-slide-up"
+              style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}
+            >
+              <button
+                type="button"
+                onClick={() => setDetailsId(null)}
+                aria-label="Fechar"
+                className="absolute top-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center text-lg transition-colors hover:bg-white/10"
+                style={{ color: WHITE, backgroundColor: `${INK}CC`, border: `1px solid ${LINE}` }}
+              >
+                ×
+              </button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                <div
+                  className="relative flex flex-col"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, ${SURFACE_2}, ${INK}), url(${fifaBackdrop})`,
+                    backgroundSize: "cover, 360px",
+                    backgroundBlendMode: "normal, overlay",
+                    borderRight: `1px solid ${LINE}`,
+                  }}
+                >
+                  <div className="relative flex-1 flex items-center justify-center min-h-[320px] sm:min-h-[440px] p-8">
+                    <img
+                      key={img.src}
+                      src={img.src}
+                      alt={`${p.name} — ${img.label}`}
+                      className="max-h-[420px] w-auto object-contain drop-shadow-2xl animate-fade-in"
+                    />
+                    <span
+                      className="absolute top-4 left-4 rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.25em] uppercase"
+                      style={{ backgroundColor: `${INK}E6`, color: YELLOW, border: `1px solid ${LINE}` }}
+                    >
+                      {img.label}
+                    </span>
+                    {p.gallery.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setDetailsImg((i) => (i - 1 + p.gallery.length) % p.gallery.length)}
+                          aria-label="Anterior"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
+                          style={{ color: WHITE, backgroundColor: `${INK}CC`, border: `1px solid ${LINE}` }}
+                        >
+                          ‹
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDetailsImg((i) => (i + 1) % p.gallery.length)}
+                          aria-label="Próxima"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
+                          style={{ color: WHITE, backgroundColor: `${INK}CC`, border: `1px solid ${LINE}` }}
+                        >
+                          ›
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex gap-2 p-4" style={{ borderTop: `1px solid ${LINE}` }}>
+                    {p.gallery.map((g, i) => (
+                      <button
+                        key={g.src + i}
+                        type="button"
+                        onClick={() => setDetailsImg(i)}
+                        className="relative h-16 w-16 rounded-lg overflow-hidden transition-all"
+                        style={{
+                          border: `2px solid ${i === detailsImg ? YELLOW : LINE}`,
+                          opacity: i === detailsImg ? 1 : 0.6,
+                        }}
+                      >
+                        <img src={g.src} alt={g.label} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 sm:p-8 flex flex-col">
+                  <span className="text-[10px] font-semibold tracking-[0.3em] uppercase" style={{ color: GREEN }}>
+                    {p.tag}
+                  </span>
+                  <h2 className="font-display text-2xl sm:text-3xl mt-2 leading-tight" style={{ color: WHITE }}>
+                    {p.name}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed" style={{ color: MUTED }}>
+                    {p.desc}
+                  </p>
+
+                  <ul className="mt-5 space-y-2.5">
+                    {p.details.map((d) => (
+                      <li key={d} className="flex items-start gap-2.5 text-sm" style={{ color: WHITE }}>
+                        <span
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: `${YELLOW}22`, color: YELLOW }}
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        </span>
+                        <span>{d}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-6 pt-5 flex items-baseline gap-3" style={{ borderTop: `1px solid ${LINE}` }}>
+                    {p.oldPrice && (
+                      <span className="text-sm line-through" style={{ color: MUTED }}>
+                        {fmt(p.oldPrice)}
+                      </span>
+                    )}
+                    <span className="font-display text-3xl sm:text-4xl" style={{ color: WHITE }}>
+                      {fmt(p.price)}
+                    </span>
+                  </div>
+                  <div className="text-[11px] mt-1" style={{ color: MUTED }}>
+                    {p.installments}
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { addToCart(p.id); setDetailsId(null); setCartOpen(true); }}
+                      className="rounded-full px-4 py-3 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5"
+                      style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                    >
+                      Adicionar ao carrinho
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setDetailsId(null); handleBuyClick(p.id); }}
+                      className="rounded-full px-4 py-3 text-xs font-bold tracking-wide transition-transform hover:scale-[1.02]"
+                      style={{ backgroundColor: YELLOW, color: INK }}
+                    >
+                      Comprar agora
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* BUY-NOW CONFIRMATION MODAL */}
       {confirmBuy && (
