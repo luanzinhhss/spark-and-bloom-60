@@ -7,6 +7,7 @@ import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
 import pack10Figurinhas from "@/assets/pack-10-figurinhas.jpg";
+import miniTacaPortaFoto from "@/assets/mini-taca-porta-foto.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -123,6 +124,25 @@ const PRODUCTS: Product[] = [
       "Acabamento holográfico foil dourado",
       "Numeração limitada por edição",
       "Embalagem individual em sleeve protetor",
+    ],
+  },
+  {
+    id: "mini-taca-porta-foto",
+    name: "Mini Taça Porta Foto",
+    tag: "Decoração 3D",
+    price: 49.9,
+    installments: "Acompanha uma MiniPic pronta para encaixe",
+    desc: "Mini taça em 3D que transforma uma foto especial em destaque na sua mesa ou estante.",
+    image: miniTacaPortaFoto,
+    gallery: [
+      { src: miniTacaPortaFoto, label: "Mini Taça" },
+    ],
+    details: [
+      "Impressão 3D — altura aproximada 7,5 cm",
+      "Base entre 2,5 e 3 cm",
+      "Funciona como porta-foto, acompanha 1 MiniPic no tamanho ideal",
+      "Foto totalmente personalizável — escolha a sua na hora do pedido",
+      "MiniPics e tamanhos adicionais podem ser pedidos separadamente",
     ],
   },
 ];
