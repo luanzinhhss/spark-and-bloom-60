@@ -1423,3 +1423,51 @@ function Index() {
     </main>
   );
 }
+
+function maskPhone(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+function maskCep(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 5) return d;
+  return `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+function FieldInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "tel" | "email" | "numeric" | "search" | "url" | "none" | "decimal";
+}) {
+  return (
+    <div>
+      <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#7a7a85" }}>
+        {label}
+      </label>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1 w-full rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+        style={{ backgroundColor: "#08080d", border: "1px solid #1f1f28", color: "#fff" }}
+      />
+    </div>
+  );
+}
+
