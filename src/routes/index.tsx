@@ -112,6 +112,21 @@ function Index() {
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
+  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
+  const [customer, setCustomer] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    cep: "",
+    street: "",
+    number: "",
+    neighborhood: "",
+    city: "",
+    state: "",
+  });
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
