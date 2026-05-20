@@ -218,6 +218,15 @@
 .animate-slide-in-right { animation: slide-in-right 0.3s cubic-bezier(.2,.9,.3,1.2) both; }
 .animate-ball-kick { animation: ball-kick 1.6s ease-in-out infinite; }
 
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.animate-fade-in { animation: fade-in 0.25s ease-out both; }
+
+@keyframes intro {
+  0% { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.animate-intro { animation: intro 0.9s cubic-bezier(.2,.8,.2,1) both; }
+
 .shimmer-text {
   background: linear-gradient(90deg, #FFE600 0%, #FFFAA0 25%, #FFE600 50%, #FFFAA0 75%, #FFE600 100%);
   background-size: 200% auto;
