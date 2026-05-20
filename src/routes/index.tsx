@@ -1313,7 +1313,7 @@ function Index() {
           <div className="flex-1 bg-black/60 backdrop-blur-sm animate-fade-in" />
           <aside
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md h-full overflow-y-auto flex flex-col animate-slide-in-right"
+            className="w-full max-w-md h-full overflow-y-auto animate-slide-in-right"
             style={{ backgroundColor: INK, borderLeft: `1px solid ${LINE}` }}
           >
             <div
