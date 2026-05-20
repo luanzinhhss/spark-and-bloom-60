@@ -108,24 +108,93 @@ type PixState =
 function Index() {
   const [intro, setIntro] = useState(true);
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
-  const [checkout, setCheckout] = useState<{ items: CartLine[] } | null>(null);
+  const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [coupon, setCoupon] = useState<{ code: string; pct: number } | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
 
-  // Auto-dismiss intro
+  // Hydrate cart + coupon from localStorage
   useEffect(() => {
-    const t = setTimeout(() => setIntro(false), 2400);
+    try {
+      const raw = localStorage.getItem("copa_cart_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw) as CartLine[];
+        if (Array.isArray(parsed)) {
+          setCart(parsed.filter((l) => l && PRODUCT_MAP[l.id] && l.qty > 0));
+        }
+      }
+      const couponRaw = localStorage.getItem("copa_coupon_v1");
+      if (couponRaw) {
+        const c = JSON.parse(couponRaw) as { code: string; pct: number };
+        if (c?.code && typeof c.pct === "number") setCoupon(c);
+      }
+    } catch {
+      // ignore
+    }
+    setCartHydrated(true);
+  }, []);
+
+  // Persist cart
+  useEffect(() => {
+    if (!cartHydrated) return;
+    try {
+      localStorage.setItem("copa_cart_v1", JSON.stringify(cart));
+    } catch {
+      // ignore
+    }
+  }, [cart, cartHydrated]);
+
+  // Persist coupon
+  useEffect(() => {
+    if (!cartHydrated) return;
+    try {
+      if (coupon) localStorage.setItem("copa_coupon_v1", JSON.stringify(coupon));
+      else localStorage.removeItem("copa_coupon_v1");
+    } catch {
+      // ignore
+    }
+  }, [coupon, cartHydrated]);
+
+  // Auto-dismiss intro (no click required)
+  useEffect(() => {
+    const t = setTimeout(() => setIntro(false), 1600);
     return () => clearTimeout(t);
   }, []);
 
   const cartCount = cart.reduce((a, l) => a + l.qty, 0);
-  const cartTotal = useMemo(
+  const cartSubtotal = useMemo(
     () => cart.reduce((a, l) => a + PRODUCT_MAP[l.id].price * l.qty, 0),
     [cart],
   );
+  const cartDiscount = coupon ? cartSubtotal * coupon.pct : 0;
+  const cartTotal = cartSubtotal - cartDiscount;
+
+  const applyCoupon = (raw: string) => {
+    const code = raw.trim().toUpperCase();
+    setCouponError(null);
+    if (!code) {
+      setCoupon(null);
+      return;
+    }
+    const map: Record<string, number> = {
+      COPA10: 0.15,
+      NEYVOLTOU26K: 0.25,
+    };
+    const pct = map[code];
+    if (!pct) {
+      setCouponError("Cupom inválido");
+      setCoupon(null);
+      return;
+    }
+    setCoupon({ code, pct });
+    setCouponInput("");
+  };
 
   const addToCart = (id: string) => {
     setCart((c) => {
@@ -158,7 +227,6 @@ function Index() {
   const addAndCheckout = (id: string) => {
     addToCart(id);
     setConfirmBuy(null);
-    // include current cart + this product
     const items = (() => {
       const map = new Map(cart.map((l) => [l.id, l.qty]));
       map.set(id, (map.get(id) ?? 0) + 1);
@@ -173,13 +241,20 @@ function Index() {
     setCheckout({ items: cart });
   };
 
+  const regeneratePix = () => {
+    if (!checkout) return;
+    setCheckout({ items: checkout.items, nonce: Date.now() });
+  };
+
+
   // Generate PIX when checkout opens
   useEffect(() => {
     if (!checkout) return;
-    const total = checkout.items.reduce(
+    const subtotal = checkout.items.reduce(
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
     );
+    const total = coupon ? subtotal * (1 - coupon.pct) : subtotal;
     const desc = checkout.items
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
       .join(", ")
@@ -242,6 +317,7 @@ function Index() {
         if (r.status === "paid" || r.status === "approved" || r.status === "completed") {
           setPaid(true);
           setCart([]);
+          setCoupon(null);
         }
       } catch {
         // ignore
@@ -271,21 +347,25 @@ function Index() {
       className="min-h-screen font-sans overflow-x-hidden antialiased"
       style={{ backgroundColor: INK, color: WHITE }}
     >
-      {/* INTRO SPLASH */}
-      {intro && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer"
-          style={{ backgroundColor: INK }}
-          onClick={() => setIntro(false)}
-        >
-          <div className="absolute inset-0 opacity-20"
+      {/* INTRO FADE/BLUR REVEAL — auto-dismiss, no click required */}
+      <div
+        aria-hidden
+        className="fixed inset-0 z-[100] pointer-events-none transition-all duration-[1100ms] ease-out"
+        style={{
+          backgroundColor: INK,
+          opacity: intro ? 1 : 0,
+          backdropFilter: intro ? "blur(20px)" : "blur(0px)",
+        }}
+      >
+        <div className="h-full w-full flex items-center justify-center">
+          <div
+            className="text-center px-6 transition-all duration-700"
             style={{
-              backgroundImage: `url(${fifaBackdrop})`,
-              backgroundSize: "500px",
-              backgroundRepeat: "repeat",
+              opacity: intro ? 1 : 0,
+              transform: intro ? "translateY(0) scale(1)" : "translateY(-20px) scale(0.96)",
+              filter: intro ? "blur(0px)" : "blur(8px)",
             }}
-          />
-          <div className="relative text-center px-6 animate-intro">
+          >
             <div className="flex items-center justify-center gap-2 mb-5">
               <span className="h-px w-10" style={{ backgroundColor: YELLOW }} />
               <span className="text-[11px] tracking-[0.4em] font-semibold" style={{ color: YELLOW }}>
@@ -300,16 +380,45 @@ function Index() {
               Bem-vindo à<br />
               <span style={{ color: YELLOW }}>edição 2026</span>
             </h1>
-            <p className="mt-6 text-sm sm:text-base" style={{ color: MUTED }}>
-              Álbum oficial e figurinhas personalizadas.
-            </p>
-            <div className="mt-8 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase" style={{ color: MUTED }}>
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
-              Entrando no estádio
-            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
+      <div
+        className="transition-all duration-[1100ms] ease-out"
+        style={{
+          opacity: intro ? 0 : 1,
+          filter: intro ? "blur(14px)" : "blur(0px)",
+          transform: intro ? "scale(1.02)" : "scale(1)",
+        }}
+      >
+
+
+      {/* DISCOUNT BANNER */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE}, ${YELLOW})`,
+          backgroundSize: "300% 100%",
+          animation: "gradient-flow 8s ease infinite",
+        }}
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 flex items-center justify-center gap-2 sm:gap-3 text-center">
+          <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
+          <span className="text-[11px] sm:text-xs font-semibold tracking-wide" style={{ color: INK }}>
+            <span className="font-bold">Até 30% OFF</span> na primeira compra · use o cupom{" "}
+            <button
+              type="button"
+              onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
+              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+              style={{ backgroundColor: INK, color: YELLOW }}
+            >
+              NEYVOLTOU26K
+            </button>
+          </span>
+        </div>
+      </div>
 
       {/* HEADER */}
       <header
@@ -816,13 +925,74 @@ function Index() {
                 className="p-5 space-y-4 sticky bottom-0"
                 style={{ borderTop: `1px solid ${LINE}`, backgroundColor: INK }}
               >
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs uppercase tracking-[0.2em]" style={{ color: MUTED }}>
-                    Total
-                  </span>
-                  <span className="font-display text-3xl" style={{ color: WHITE }}>
-                    {fmt(cartTotal)}
-                  </span>
+                {/* COUPON */}
+                <div>
+                  {coupon ? (
+                    <div
+                      className="flex items-center justify-between rounded-lg px-3 py-2.5 animate-fade-in"
+                      style={{ backgroundColor: `${GREEN}1a`, border: `1px solid ${GREEN}55` }}
+                    >
+                      <div className="flex items-center gap-2 text-xs">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        <span className="font-mono font-bold" style={{ color: WHITE }}>{coupon.code}</span>
+                        <span style={{ color: GREEN }}>−{Math.round(coupon.pct * 100)}%</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCoupon(null)}
+                        className="text-[11px]"
+                        style={{ color: MUTED }}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => { setCouponInput(e.target.value); setCouponError(null); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") applyCoupon(couponInput); }}
+                          placeholder="Cupom de desconto"
+                          className="flex-1 rounded-lg px-3 py-2.5 text-xs font-mono uppercase tracking-wider outline-none focus:border-white/30 transition-colors"
+                          style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}`, color: WHITE }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => applyCoupon(couponInput)}
+                          className="rounded-lg px-4 text-xs font-semibold transition-colors hover:bg-white/5"
+                          style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+                      {couponError && (
+                        <p className="mt-1.5 text-[11px]" style={{ color: "#ff6b6b" }}>{couponError}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-baseline justify-between text-xs" style={{ color: MUTED }}>
+                    <span>Subtotal</span>
+                    <span>{fmt(cartSubtotal)}</span>
+                  </div>
+                  {coupon && (
+                    <div className="flex items-baseline justify-between text-xs" style={{ color: GREEN }}>
+                      <span>Desconto ({coupon.code})</span>
+                      <span>−{fmt(cartDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline justify-between pt-2" style={{ borderTop: `1px solid ${LINE}` }}>
+                    <span className="text-xs uppercase tracking-[0.2em]" style={{ color: MUTED }}>
+                      Total
+                    </span>
+                    <span className="font-display text-3xl" style={{ color: WHITE }}>
+                      {fmt(cartTotal)}
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -974,6 +1144,16 @@ function Index() {
                           {copied ? "Código copiado" : "Copiar código PIX"}
                         </button>
 
+                        <button
+                          type="button"
+                          onClick={regeneratePix}
+                          className="mt-3 w-full rounded-full px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center justify-center gap-2"
+                          style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                          Gerar novo QR Code
+                        </button>
+
                         <div className="mt-4 flex items-center justify-center gap-2 text-[11px]" style={{ color: MUTED }}>
                           <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
                           Aguardando confirmação automática
@@ -987,6 +1167,7 @@ function Index() {
           </div>
         </div>
       )}
+      </div>
     </main>
   );
 }
