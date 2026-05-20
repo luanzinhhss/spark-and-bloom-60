@@ -1277,7 +1277,10 @@ function Index() {
           </div>
 
           <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category).map((p) => (
+            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category)
+              .slice()
+              .sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned))
+              .map((p) => (
               <article
                 key={p.id}
                 className="group relative rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1"
