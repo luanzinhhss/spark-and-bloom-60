@@ -349,16 +349,6 @@ function Index() {
       </div>
 
       {/* CATALOG */}
-      <section id="catalogo" style={{ backgroundColor: WHITE }}>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
-          <div className="text-center">
-            <span
-              className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase"
-              style={{ backgroundColor: GREEN, color: YELLOW }}
-            >
-              ⚽ Catálogo Oficial
-            </span>
-      {/* CATALOG */}
       <section id="catalogo" style={{ backgroundColor: DARK }}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
           <div className="text-center">
