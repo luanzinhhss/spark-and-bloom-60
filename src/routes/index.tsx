@@ -5,6 +5,7 @@ import albumCover from "@/assets/album-cover.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
+import fifaBackdrop from "@/assets/fifa-backdrop.png";
 import { generatePix } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/")({
