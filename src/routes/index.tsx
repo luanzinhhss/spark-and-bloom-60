@@ -194,12 +194,12 @@ function Index() {
   return (
     <main
       className="min-h-screen font-sans overflow-x-hidden"
-      style={{ backgroundColor: YELLOW, color: BLUE }}
+      style={{ backgroundColor: DARK, color: WHITE }}
     >
       {/* Header */}
       <header
-        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4 shadow-lg"
-        style={{ backgroundColor: GREEN, borderColor: YELLOW }}
+        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4 shadow-lg backdrop-blur-md"
+        style={{ backgroundColor: `${DARK2}ee`, borderColor: YELLOW }}
       >
         <div
           className="font-display text-sm sm:text-xl tracking-widest flex items-center gap-2"
