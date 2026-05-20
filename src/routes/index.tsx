@@ -272,6 +272,7 @@ type PixState =
 
 function Index() {
   const [intro, setIntro] = useState(true);
+  const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
