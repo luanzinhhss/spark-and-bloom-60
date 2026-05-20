@@ -346,21 +346,25 @@ function Index() {
       className="min-h-screen font-sans overflow-x-hidden antialiased"
       style={{ backgroundColor: INK, color: WHITE }}
     >
-      {/* INTRO SPLASH */}
-      {intro && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer"
-          style={{ backgroundColor: INK }}
-          onClick={() => setIntro(false)}
-        >
-          <div className="absolute inset-0 opacity-20"
+      {/* INTRO FADE/BLUR REVEAL — auto-dismiss, no click required */}
+      <div
+        aria-hidden
+        className="fixed inset-0 z-[100] pointer-events-none transition-all duration-[1100ms] ease-out"
+        style={{
+          backgroundColor: INK,
+          opacity: intro ? 1 : 0,
+          backdropFilter: intro ? "blur(20px)" : "blur(0px)",
+        }}
+      >
+        <div className="h-full w-full flex items-center justify-center">
+          <div
+            className="text-center px-6 transition-all duration-700"
             style={{
-              backgroundImage: `url(${fifaBackdrop})`,
-              backgroundSize: "500px",
-              backgroundRepeat: "repeat",
+              opacity: intro ? 1 : 0,
+              transform: intro ? "translateY(0) scale(1)" : "translateY(-20px) scale(0.96)",
+              filter: intro ? "blur(0px)" : "blur(8px)",
             }}
-          />
-          <div className="relative text-center px-6 animate-intro">
+          >
             <div className="flex items-center justify-center gap-2 mb-5">
               <span className="h-px w-10" style={{ backgroundColor: YELLOW }} />
               <span className="text-[11px] tracking-[0.4em] font-semibold" style={{ color: YELLOW }}>
@@ -375,16 +379,20 @@ function Index() {
               Bem-vindo à<br />
               <span style={{ color: YELLOW }}>edição 2026</span>
             </h1>
-            <p className="mt-6 text-sm sm:text-base" style={{ color: MUTED }}>
-              Álbum oficial e figurinhas personalizadas.
-            </p>
-            <div className="mt-8 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase" style={{ color: MUTED }}>
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
-              Entrando no estádio
-            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
+      <div
+        className="transition-all duration-[1100ms] ease-out"
+        style={{
+          opacity: intro ? 0 : 1,
+          filter: intro ? "blur(14px)" : "blur(0px)",
+          transform: intro ? "scale(1.02)" : "scale(1)",
+        }}
+      >
+
 
       {/* HEADER */}
       <header
