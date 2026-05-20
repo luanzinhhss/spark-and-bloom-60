@@ -560,6 +560,85 @@ function Index() {
         </div>
       </div>
 
+      {/* WELCOME COUPON MODAL with countdown */}
+      {welcomeOpen && countdown && !countdown.expired && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setWelcomeOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-2xl overflow-hidden animate-slide-up"
+            style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}
+          >
+            <div
+              className="h-2"
+              style={{
+                background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE})`,
+                backgroundSize: "200% 100%",
+                animation: "gradient-flow 6s ease infinite",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setWelcomeOpen(false)}
+              className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+              style={{ color: MUTED }}
+              aria-label="Fechar"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+            <div className="p-7 text-center">
+              <div className="text-[10px] font-semibold tracking-[0.35em] uppercase" style={{ color: YELLOW }}>
+                Presente de boas-vindas
+              </div>
+              <h3 className="font-display text-3xl sm:text-4xl mt-3 leading-[1.05]" style={{ color: WHITE }}>
+                25% OFF na sua<br />primeira compra
+              </h3>
+              <p className="mt-3 text-sm" style={{ color: MUTED }}>
+                Use o cupom abaixo no carrinho. Oferta por tempo limitado.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => { applyCoupon("NEYVOLTOU26K"); setWelcomeOpen(false); setCartOpen(true); }}
+                className="mt-5 w-full rounded-xl px-4 py-4 font-mono font-bold text-lg tracking-wider transition-transform hover:scale-[1.02]"
+                style={{ backgroundColor: YELLOW, color: INK }}
+              >
+                NEYVOLTOU26K
+              </button>
+              <div className="mt-2 text-[10px] tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                Toque para aplicar
+              </div>
+
+              <div className="mt-6">
+                <div className="text-[10px] tracking-[0.3em] uppercase mb-2" style={{ color: MUTED }}>
+                  Expira em
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { v: countdown.d, l: "Dias" },
+                    { v: countdown.h, l: "Horas" },
+                    { v: countdown.m, l: "Min" },
+                    { v: countdown.s, l: "Seg" },
+                  ].map((t) => (
+                    <div key={t.l} className="rounded-lg py-2.5" style={{ backgroundColor: INK, border: `1px solid ${LINE}` }}>
+                      <div className="font-display text-2xl tabular-nums" style={{ color: WHITE }}>
+                        {String(t.v).padStart(2, "0")}
+                      </div>
+                      <div className="text-[9px] tracking-[0.2em] uppercase mt-0.5" style={{ color: MUTED }}>{t.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
       {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
       <div
         className="transition-all duration-[1100ms] ease-out"
