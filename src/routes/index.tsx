@@ -390,7 +390,7 @@ function Index() {
     return () => {
       cancelled = true;
     };
-  }, [checkout]);
+  }, [checkout, checkoutStep]);
 
   // Poll payment confirmation
   useEffect(() => {
