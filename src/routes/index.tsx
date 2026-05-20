@@ -12,6 +12,9 @@ import figurinhaCanvaMain from "@/assets/figurinha-canva-main.png";
 import figurinhaCanvaFolha from "@/assets/figurinha-canva-folha.png";
 import figurinhaCanvaCards from "@/assets/figurinha-canva-cards.png";
 import figurinhaCanvaTemplate from "@/assets/figurinha-canva-template.png";
+import albumCasalMain from "@/assets/album-casal-main.png";
+import albumCasalInterior from "@/assets/album-casal-interior.png";
+import capinhaNeymar from "@/assets/capinha-neymar.png";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -51,6 +54,10 @@ type Product = {
   badge?: string;
   gallery: { src: string; label: string }[];
   details: string[];
+  variants?: {
+    colors?: string[];
+    models?: string[];
+  };
 };
 
 const PRODUCTS: Product[] = [
@@ -174,6 +181,73 @@ const PRODUCTS: Product[] = [
       "Você mesmo personaliza foto e dados — pronto em minutos",
     ],
   },
+  {
+    id: "album-casal-50",
+    name: "Álbum do Casal — 50 Figurinhas em 3 Tamanhos",
+    tag: "Edição Casal",
+    price: 247,
+    oldPrice: 347,
+    installments: "ou 12x de R$ 24,90 sem juros",
+    desc: "Memory Album Copa 2026: álbum personalizado para casal com 50 figurinhas em 3 tamanhos diferentes.",
+    image: albumCasalMain,
+    badge: "Novo",
+    gallery: [
+      { src: albumCasalMain, label: "Kit completo" },
+      { src: albumCasalInterior, label: "Páginas internas" },
+    ],
+    details: [
+      "Álbum capa dura no estilo Memory Album 2026",
+      "50 figurinhas personalizadas em 3 tamanhos diferentes",
+      "Páginas internas temáticas: 'Sobre o casal', 'I Love You' e mais",
+      "Detalhes em vermelho, azul e amarelo da Copa",
+      "Espaço para texto personalizado e fotos do casal",
+      "Acabamento Limited Edition com selo exclusivo",
+    ],
+  },
+  {
+    id: "capinha-neymar",
+    name: "Capinha Neymar Anti-impacto — Samsung & iPhone",
+    tag: "Capinha · Edição Copa",
+    price: 79.9,
+    oldPrice: 119.9,
+    installments: "ou 6x de R$ 13,32 sem juros",
+    desc: "Capa de silicone fosco anti-impacto com estampa exclusiva do Neymar Jr. Compatível com Samsung Galaxy A/S e iPhone 7 ao 17 Pro Max.",
+    image: capinhaNeymar,
+    badge: "Lançamento",
+    gallery: [
+      { src: capinhaNeymar, label: "Estampa Neymar Jr" },
+    ],
+    details: [
+      "Material: silicone fosco premium com tecnologia anti-impacto",
+      "Estampa exclusiva oficial estilo Onside Original",
+      "Bordas reforçadas e proteção elevada para câmera",
+      "Toque sedoso, antiderrapante e resistente a manchas",
+      "Compatível com mais de 40 modelos Samsung e iPhone",
+      "Escolha cor (J1 / J2) e modelo do aparelho no pedido",
+    ],
+    variants: {
+      colors: ["J1", "J2"],
+      models: [
+        "Samsung A03", "Samsung A04", "Samsung A04E", "Samsung A04S/A13 5G",
+        "Samsung A05", "Samsung A05S", "Samsung A10", "Samsung A10S",
+        "Samsung A11 / M11", "Samsung A12", "Samsung A13 4G", "Samsung A14",
+        "Samsung A15", "Samsung A16", "Samsung A17", "Samsung A20 / A30",
+        "Samsung A23", "Samsung A32", "Samsung A34", "Samsung A54",
+        "Samsung A72", "Samsung S23", "Samsung S23 FE", "Samsung S23 Ultra",
+        "Samsung S24", "Samsung S24 FE", "Samsung S24 Ultra",
+        "Samsung S25", "Samsung S25 Ultra",
+        "iPhone 7", "iPhone 7 Plus", "iPhone 8", "iPhone 8 Plus",
+        "iPhone X / XS", "iPhone XR", "iPhone XS Max",
+        "iPhone 11", "iPhone 11 Pro", "iPhone 11 Pro Max",
+        "iPhone 12 mini", "iPhone 12", "iPhone 12 Pro", "iPhone 12 Pro Max",
+        "iPhone 13 mini", "iPhone 13", "iPhone 13 Pro", "iPhone 13 Pro Max",
+        "iPhone 14", "iPhone 14 Plus", "iPhone 14 Pro", "iPhone 14 Pro Max",
+        "iPhone 15", "iPhone 15 Plus", "iPhone 15 Pro", "iPhone 15 Pro Max",
+        "iPhone 16", "iPhone 16 Plus", "iPhone 16 Pro", "iPhone 16 Pro Max",
+        "iPhone 17", "iPhone 17 Pro", "iPhone 17 Pro Max",
+      ],
+    },
+  },
 ];
 
 const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
@@ -202,6 +276,9 @@ function Index() {
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [detailsImg, setDetailsImg] = useState(0);
+  const [variantColor, setVariantColor] = useState<string | null>(null);
+  const [variantModel, setVariantModel] = useState<string | null>(null);
+  useEffect(() => { setVariantColor(null); setVariantModel(null); }, [detailsId]);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
   const [customer, setCustomer] = useState({
@@ -1059,7 +1136,58 @@ function Index() {
         </div>
       </section>
 
+      {/* TRUST / BENEFITS */}
+      <section style={{ backgroundColor: INK, borderTop: `1px solid ${LINE}` }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: LINE }}>
+            {[
+              {
+                title: "Frete Grátis",
+                sub: "Compras acima de R$ 199",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7h11v9H3z" /><path d="M14 10h4l3 3v3h-7" />
+                    <circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" />
+                  </svg>
+                ),
+              },
+              {
+                title: "Parcelamento 6x",
+                sub: "Sem juros no cartão",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2.5" y="6" width="19" height="13" rx="2" />
+                    <path d="M2.5 10h19" /><path d="M6 15.5h4" />
+                  </svg>
+                ),
+              },
+              {
+                title: "4.9 de 5 estrelas",
+                sub: "avaliações reais",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                ),
+              },
+            ].map((b) => (
+              <div
+                key={b.title}
+                className="flex flex-col items-center text-center py-10 px-6"
+                style={{ backgroundColor: INK }}
+              >
+                <div style={{ color: YELLOW }}>{b.icon}</div>
+                <div className="font-display text-lg mt-4" style={{ color: WHITE }}>{b.title}</div>
+                <div className="text-xs mt-1" style={{ color: MUTED }}>{b.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
+
       <section id="como-funciona" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-24">
           <div className="text-center max-w-xl mx-auto mb-14">
@@ -1241,6 +1369,74 @@ function Index() {
                       </li>
                     ))}
                   </ul>
+
+                  {p.variants && (
+                    <div className="mt-6 space-y-4">
+                      {p.variants.colors && (
+                        <div>
+                          <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: MUTED }}>
+                            Cor
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {p.variants.colors.map((c) => {
+                              const active = variantColor === c;
+                              return (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => setVariantColor(c)}
+                                  className="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : "transparent",
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {c}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {p.variants.models && (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                              Modelo
+                            </div>
+                            {variantModel && (
+                              <div className="text-[11px]" style={{ color: GREEN }}>{variantModel}</div>
+                            )}
+                          </div>
+                          <div
+                            className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto pr-2 rounded-lg p-2"
+                            style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
+                          >
+                            {p.variants.models.map((m) => {
+                              const active = variantModel === m;
+                              return (
+                                <button
+                                  key={m}
+                                  type="button"
+                                  onClick={() => setVariantModel(m)}
+                                  className="px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : SURFACE_2,
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {m}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
 
                   <div className="mt-6 pt-5 flex items-baseline gap-3" style={{ borderTop: `1px solid ${LINE}` }}>
                     {p.oldPrice && (
