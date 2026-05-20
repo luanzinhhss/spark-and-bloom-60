@@ -1621,7 +1621,7 @@ function Index() {
           </div>
 
           {/* Body */}
-          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-12">
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-10 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 lg:gap-10 lg:items-start">
             {/* Left: form */}
             <div>
               <div className="max-w-xl">
