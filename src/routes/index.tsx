@@ -262,9 +262,9 @@ function Index() {
   };
 
 
-  // Generate PIX when checkout opens
+  // Generate PIX when checkout reaches pix step
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout || checkoutStep !== "pix") return;
     const subtotal = checkout.items.reduce(
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
