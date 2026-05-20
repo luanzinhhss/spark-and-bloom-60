@@ -348,6 +348,19 @@ function Index() {
             amount: Number(total.toFixed(2)),
             description: desc || "Copa Album 2026",
             external_id: `order_${Date.now()}`,
+            customer: {
+              name: customer.name,
+              email: customer.email,
+              phone: customer.phone,
+              address: {
+                cep: customer.cep,
+                street: customer.street,
+                number: customer.number,
+                neighborhood: customer.neighborhood,
+                city: customer.city,
+                state: customer.state,
+              },
+            },
           }),
         });
         const r = (await res.json()) as {
