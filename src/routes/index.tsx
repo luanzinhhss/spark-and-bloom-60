@@ -43,6 +43,8 @@ type Product = {
   desc: string;
   image: string;
   badge?: string;
+  gallery: { src: string; label: string }[];
+  details: string[];
 };
 
 const PRODUCTS: Product[] = [
@@ -54,8 +56,19 @@ const PRODUCTS: Product[] = [
     oldPrice: 297,
     installments: "ou 12x de R$ 19,90 sem juros",
     desc: "Capa dura, 60 espaços numerados para colar suas figurinhas personalizadas.",
-    image: albumCover,
+    image: albumFront,
     badge: "Mais vendido",
+    gallery: [
+      { src: albumFront, label: "Capa" },
+      { src: albumInterior, label: "Interior" },
+      { src: albumCover, label: "Detalhe" },
+    ],
+    details: [
+      "Formato A4 — 60 espaços numerados",
+      "Capa dura com acabamento foil dourado",
+      "Páginas internas em papel couché 170g",
+      "Inclui adesivos de identificação por jogador",
+    ],
   },
   {
     id: "fig-individual",
@@ -65,6 +78,15 @@ const PRODUCTS: Product[] = [
     installments: "Envio em até 7 dias úteis",
     desc: "Sua foto, nome e número impressos no estilo oficial da Copa.",
     image: cardMiguel,
+    gallery: [
+      { src: cardMiguel, label: "Frente" },
+      { src: albumInterior, label: "No álbum" },
+    ],
+    details: [
+      "Impressão em alta resolução, papel cartonado",
+      "Nome, posição e número personalizados",
+      "Verso com escudo e número de coleção",
+    ],
   },
   {
     id: "fig-pack-10",
@@ -76,6 +98,16 @@ const PRODUCTS: Product[] = [
     desc: "Monte sua seleção do casal, da família ou do time.",
     image: cardArthur,
     badge: "Economia",
+    gallery: [
+      { src: cardArthur, label: "Frente" },
+      { src: cardMiguel, label: "Variações" },
+      { src: albumInterior, label: "Coleção" },
+    ],
+    details: [
+      "10 figurinhas personalizadas no mesmo pedido",
+      "Misture pessoas, fotos e números",
+      "Embalagem premium em estilo coleção",
+    ],
   },
   {
     id: "fig-shiny",
@@ -86,6 +118,15 @@ const PRODUCTS: Product[] = [
     desc: "Edição limitada com brilho dourado. A craque do seu álbum.",
     image: cardHelena,
     badge: "Limitada",
+    gallery: [
+      { src: cardHelena, label: "Frente Shiny" },
+      { src: albumInterior, label: "No álbum" },
+    ],
+    details: [
+      "Acabamento holográfico foil dourado",
+      "Numeração limitada por edição",
+      "Embalagem individual em sleeve protetor",
+    ],
   },
 ];
 
