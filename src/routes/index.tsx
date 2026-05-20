@@ -1290,6 +1290,15 @@ function Index() {
                   boxShadow: p.pinned ? `0 0 0 1px ${YELLOW}55, 0 20px 50px -25px ${YELLOW}55` : undefined,
                 }}
               >
+                {p.pinned && (
+                  <div
+                    className="absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1"
+                    style={{ backgroundColor: INK, color: YELLOW, border: `1px solid ${YELLOW}` }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 4v6l3 4v2h-6v6l-1 2-1-2v-6H5v-2l3-4V4z"/></svg>
+                    Fixado
+                  </div>
+                )}
                 {p.badge && (
                   <div
                     className="absolute top-3 left-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase"
