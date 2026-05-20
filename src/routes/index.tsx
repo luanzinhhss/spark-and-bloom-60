@@ -54,6 +54,10 @@ type Product = {
   badge?: string;
   gallery: { src: string; label: string }[];
   details: string[];
+  variants?: {
+    colors?: string[];
+    models?: string[];
+  };
 };
 
 const PRODUCTS: Product[] = [
