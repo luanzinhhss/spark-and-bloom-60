@@ -1638,6 +1638,73 @@ function Index() {
                     </div>
                   )}
 
+                  {p.options && p.options.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      {p.options.map((opt) => (
+                        <div key={opt.name}>
+                          <div className="text-[11px] mb-2" style={{ color: MUTED }}>
+                            <span className="font-semibold tracking-[0.2em] uppercase" style={{ color: MUTED }}>{opt.name}:</span>{" "}
+                            <span style={{ color: WHITE }}>{variantOptions[opt.name] ?? opt.values[0]}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {opt.values.map((v) => {
+                              const active = (variantOptions[opt.name] ?? opt.default ?? opt.values[0]) === v;
+                              return (
+                                <button
+                                  key={v}
+                                  type="button"
+                                  onClick={() => setVariantOptions((prev) => ({ ...prev, [opt.name]: v }))}
+                                  className="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all leading-tight max-w-[140px]"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : "transparent",
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {v}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {p.specs && p.specs.length > 0 && (
+                    <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${LINE}` }}>
+                      <div className="font-display text-lg mb-4" style={{ color: WHITE }}>
+                        Características do produto
+                      </div>
+                      <div className="space-y-5">
+                        {p.specs.map((g) => (
+                          <div key={g.group}>
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: GREEN }}>
+                              {g.group}
+                            </div>
+                            <div
+                              className="rounded-lg overflow-hidden"
+                              style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
+                            >
+                              {g.items.map((it, i) => (
+                                <div
+                                  key={it.label}
+                                  className="flex items-start justify-between gap-4 px-3.5 py-2.5 text-xs"
+                                  style={{
+                                    borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
+                                  }}
+                                >
+                                  <span style={{ color: MUTED }}>{it.label}</span>
+                                  <span className="text-right font-medium" style={{ color: WHITE }}>{it.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
 
                   <div className="mt-6 pt-5 flex items-baseline gap-3" style={{ borderTop: `1px solid ${LINE}` }}>
                     {p.oldPrice && (
