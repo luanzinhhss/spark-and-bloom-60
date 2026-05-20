@@ -1286,7 +1286,8 @@ function Index() {
                 className="group relative rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1"
                 style={{
                   backgroundColor: SURFACE,
-                  border: `1px solid ${LINE}`,
+                  border: `1px solid ${p.pinned ? YELLOW : LINE}`,
+                  boxShadow: p.pinned ? `0 0 0 1px ${YELLOW}55, 0 20px 50px -25px ${YELLOW}55` : undefined,
                 }}
               >
                 {p.badge && (
