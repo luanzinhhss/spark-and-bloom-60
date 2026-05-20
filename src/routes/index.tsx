@@ -281,7 +281,7 @@ function Index() {
   const [variantColor, setVariantColor] = useState<string | null>(null);
   const [variantSystem, setVariantSystem] = useState<"android" | "ios" | null>(null);
   const [variantModel, setVariantModel] = useState<string | null>(null);
-  useEffect(() => { setVariantColor(null); setVariantModel(null); }, [detailsId]);
+  useEffect(() => { setVariantColor(null); setVariantSystem(null); setVariantModel(null); }, [detailsId]);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
   const [customer, setCustomer] = useState({
