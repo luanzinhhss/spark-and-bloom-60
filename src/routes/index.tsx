@@ -224,6 +224,16 @@ function Index() {
     return () => clearTimeout(t);
   }, []);
 
+  // Lock body scroll while any full-screen overlay is open
+  useEffect(() => {
+    const open = cartOpen || !!checkout || !!confirmBuy || !!detailsId;
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [cartOpen, checkout, confirmBuy, detailsId]);
+
   // Welcome coupon w/ countdown (2-4 day random expiration, persisted)
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [welcomeExpiry, setWelcomeExpiry] = useState<number | null>(null);
@@ -639,14 +649,21 @@ function Index() {
 
 
 
-      {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
+      {/* PAGE CONTENT WRAPPER — fade-blur in on mount.
+          IMPORTANT: only apply transform/filter while intro is active.
+          Leaving them on after the intro creates a containing block that
+          breaks `position: fixed` for the checkout/cart overlays. */}
       <div
         className="transition-all duration-[1100ms] ease-out"
-        style={{
-          opacity: intro ? 0 : 1,
-          filter: intro ? "blur(14px)" : "blur(0px)",
-          transform: intro ? "scale(1.02)" : "scale(1)",
-        }}
+        style={
+          intro
+            ? {
+                opacity: 0,
+                filter: "blur(14px)",
+                transform: "scale(1.02)",
+              }
+            : { opacity: 1 }
+        }
       >
 
 
@@ -1306,7 +1323,7 @@ function Index() {
           <div className="flex-1 bg-black/60 backdrop-blur-sm animate-fade-in" />
           <aside
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md h-full overflow-y-auto flex flex-col animate-slide-in-right"
+            className="w-full max-w-md h-full overflow-y-auto animate-slide-in-right"
             style={{ backgroundColor: INK, borderLeft: `1px solid ${LINE}` }}
           >
             <div
@@ -1326,7 +1343,7 @@ function Index() {
               </button>
             </div>
 
-            <div className="flex-1 p-5 space-y-3">
+            <div className="p-5 space-y-3">
               {cart.length === 0 && (
                 <div className="text-center py-20">
                   <div className="mx-auto h-14 w-14 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}>
@@ -1405,7 +1422,7 @@ function Index() {
 
             {cart.length > 0 && (
               <div
-                className="p-5 space-y-4 sticky bottom-0"
+                className="p-5 space-y-4"
                 style={{ borderTop: `1px solid ${LINE}`, backgroundColor: INK }}
               >
                 {/* COUPON */}
