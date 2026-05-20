@@ -530,11 +530,11 @@ function Index() {
           <aside
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md h-full overflow-y-auto flex flex-col animate-slide-in-right border-l-4"
-            style={{ backgroundColor: YELLOW, borderColor: BLUE }}
+            style={{ backgroundColor: DARK, borderColor: YELLOW }}
           >
             <div
               className="px-5 py-4 flex items-center justify-between border-b-4"
-              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+              style={{ backgroundColor: DARK2, borderColor: YELLOW, color: YELLOW }}
             >
               <div className="font-display text-xl tracking-widest flex items-center gap-2">
                 🛒 SEU CARRINHO
@@ -543,7 +543,7 @@ function Index() {
                 type="button"
                 onClick={() => setCartOpen(false)}
                 className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
-                style={{ backgroundColor: YELLOW, color: BLUE }}
+                style={{ backgroundColor: YELLOW, color: DARK }}
               >
                 ×
               </button>
@@ -553,10 +553,10 @@ function Index() {
               {cart.length === 0 && (
                 <div className="text-center py-16">
                   <div className="text-6xl animate-bounce-soft">⚽</div>
-                  <p className="mt-4 font-display text-xl" style={{ color: BLUE }}>
+                  <p className="mt-4 font-display text-xl" style={{ color: YELLOW }}>
                     Carrinho vazio
                   </p>
-                  <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                  <p className="mt-2 font-semibold text-sm" style={{ color: "#b8bcc8" }}>
                     Convoque suas figurinhas!
                   </p>
                 </div>
@@ -567,14 +567,14 @@ function Index() {
                   <div
                     key={line.id}
                     className="flex gap-3 rounded-xl border-4 p-3 animate-slide-up"
-                    style={{ backgroundColor: WHITE, borderColor: BLUE }}
+                    style={{ backgroundColor: DARK2, borderColor: YELLOW }}
                   >
                     <img src={p.image} alt="" className="w-16 h-16 rounded-lg object-cover border-2" style={{ borderColor: GREEN }} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-display text-sm leading-tight" style={{ color: BLUE }}>
+                      <div className="font-display text-sm leading-tight" style={{ color: WHITE }}>
                         {p.name}
                       </div>
-                      <div className="font-bold text-sm mt-1" style={{ color: GREEN_DEEP }}>
+                      <div className="font-bold text-sm mt-1" style={{ color: GREEN }}>
                         {fmt(p.price)}
                       </div>
                       <div className="mt-2 flex items-center gap-2">
@@ -582,18 +582,18 @@ function Index() {
                           type="button"
                           onClick={() => setQty(line.id, line.qty - 1)}
                           className="h-7 w-7 rounded-full font-black border-2"
-                          style={{ backgroundColor: YELLOW, color: BLUE, borderColor: BLUE }}
+                          style={{ backgroundColor: DARK3, color: YELLOW, borderColor: YELLOW }}
                         >
                           −
                         </button>
-                        <span className="font-display text-base w-6 text-center" style={{ color: BLUE }}>
+                        <span className="font-display text-base w-6 text-center" style={{ color: WHITE }}>
                           {line.qty}
                         </span>
                         <button
                           type="button"
                           onClick={() => setQty(line.id, line.qty + 1)}
                           className="h-7 w-7 rounded-full font-black border-2"
-                          style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                          style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                         >
                           +
                         </button>
@@ -601,7 +601,7 @@ function Index() {
                           type="button"
                           onClick={() => removeLine(line.id)}
                           className="ml-auto text-xs font-bold underline"
-                          style={{ color: BLUE_DEEP }}
+                          style={{ color: "#FF6B6B" }}
                         >
                           remover
                         </button>
@@ -615,13 +615,13 @@ function Index() {
             {cart.length > 0 && (
               <div
                 className="border-t-4 p-5 space-y-3"
-                style={{ borderColor: BLUE, backgroundColor: WHITE }}
+                style={{ borderColor: YELLOW, backgroundColor: DARK2 }}
               >
                 <div className="flex items-baseline justify-between">
-                  <span className="font-display text-sm tracking-widest uppercase" style={{ color: BLUE }}>
+                  <span className="font-display text-sm tracking-widest uppercase" style={{ color: "#b8bcc8" }}>
                     Total
                   </span>
-                  <span className="font-display text-3xl" style={{ color: BLUE }}>
+                  <span className="font-display text-3xl" style={{ color: YELLOW }}>
                     {fmt(cartTotal)}
                   </span>
                 </div>
@@ -629,7 +629,7 @@ function Index() {
                   type="button"
                   onClick={checkoutCart}
                   className="w-full rounded-full px-5 py-4 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02] animate-pulse-glow"
-                  style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                  style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                 >
                   Finalizar com PIX ⚡
                 </button>
