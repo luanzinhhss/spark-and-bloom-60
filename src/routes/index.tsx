@@ -107,25 +107,95 @@ type PixState =
 
 function Index() {
   const [intro, setIntro] = useState(true);
+  const [intro, setIntro] = useState(true);
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
-  const [checkout, setCheckout] = useState<{ items: CartLine[] } | null>(null);
+  const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [coupon, setCoupon] = useState<{ code: string; pct: number } | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
 
-  // Auto-dismiss intro
+  // Hydrate cart + coupon from localStorage
   useEffect(() => {
-    const t = setTimeout(() => setIntro(false), 2400);
+    try {
+      const raw = localStorage.getItem("copa_cart_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw) as CartLine[];
+        if (Array.isArray(parsed)) {
+          setCart(parsed.filter((l) => l && PRODUCT_MAP[l.id] && l.qty > 0));
+        }
+      }
+      const couponRaw = localStorage.getItem("copa_coupon_v1");
+      if (couponRaw) {
+        const c = JSON.parse(couponRaw) as { code: string; pct: number };
+        if (c?.code && typeof c.pct === "number") setCoupon(c);
+      }
+    } catch {
+      // ignore
+    }
+    setCartHydrated(true);
+  }, []);
+
+  // Persist cart
+  useEffect(() => {
+    if (!cartHydrated) return;
+    try {
+      localStorage.setItem("copa_cart_v1", JSON.stringify(cart));
+    } catch {
+      // ignore
+    }
+  }, [cart, cartHydrated]);
+
+  // Persist coupon
+  useEffect(() => {
+    if (!cartHydrated) return;
+    try {
+      if (coupon) localStorage.setItem("copa_coupon_v1", JSON.stringify(coupon));
+      else localStorage.removeItem("copa_coupon_v1");
+    } catch {
+      // ignore
+    }
+  }, [coupon, cartHydrated]);
+
+  // Auto-dismiss intro (no click required)
+  useEffect(() => {
+    const t = setTimeout(() => setIntro(false), 1600);
     return () => clearTimeout(t);
   }, []);
 
   const cartCount = cart.reduce((a, l) => a + l.qty, 0);
-  const cartTotal = useMemo(
+  const cartSubtotal = useMemo(
     () => cart.reduce((a, l) => a + PRODUCT_MAP[l.id].price * l.qty, 0),
     [cart],
   );
+  const cartDiscount = coupon ? cartSubtotal * coupon.pct : 0;
+  const cartTotal = cartSubtotal - cartDiscount;
+
+  const applyCoupon = (raw: string) => {
+    const code = raw.trim().toUpperCase();
+    setCouponError(null);
+    if (!code) {
+      setCoupon(null);
+      return;
+    }
+    const map: Record<string, number> = {
+      COPA10: 0.15,
+      NEYVOLTOU26K: 0.25,
+    };
+    const pct = map[code];
+    if (!pct) {
+      setCouponError("Cupom inválido");
+      setCoupon(null);
+      return;
+    }
+    setCoupon({ code, pct });
+    setCouponInput("");
+  };
 
   const addToCart = (id: string) => {
     setCart((c) => {
@@ -158,7 +228,6 @@ function Index() {
   const addAndCheckout = (id: string) => {
     addToCart(id);
     setConfirmBuy(null);
-    // include current cart + this product
     const items = (() => {
       const map = new Map(cart.map((l) => [l.id, l.qty]));
       map.set(id, (map.get(id) ?? 0) + 1);
@@ -172,6 +241,12 @@ function Index() {
     setCartOpen(false);
     setCheckout({ items: cart });
   };
+
+  const regeneratePix = () => {
+    if (!checkout) return;
+    setCheckout({ items: checkout.items, nonce: Date.now() });
+  };
+
 
   // Generate PIX when checkout opens
   useEffect(() => {
