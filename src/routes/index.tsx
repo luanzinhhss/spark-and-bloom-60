@@ -639,14 +639,21 @@ function Index() {
 
 
 
-      {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
+      {/* PAGE CONTENT WRAPPER — fade-blur in on mount.
+          IMPORTANT: only apply transform/filter while intro is active.
+          Leaving them on after the intro creates a containing block that
+          breaks `position: fixed` for the checkout/cart overlays. */}
       <div
         className="transition-all duration-[1100ms] ease-out"
-        style={{
-          opacity: intro ? 0 : 1,
-          filter: intro ? "blur(14px)" : "blur(0px)",
-          transform: intro ? "scale(1.02)" : "scale(1)",
-        }}
+        style={
+          intro
+            ? {
+                opacity: 0,
+                filter: "blur(14px)",
+                transform: "scale(1.02)",
+              }
+            : { opacity: 1 }
+        }
       >
 
 
