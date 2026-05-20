@@ -5,6 +5,7 @@ import albumCover from "@/assets/album-cover.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
+import fifaBackdrop from "@/assets/fifa-backdrop.png";
 import { generatePix } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/")({
@@ -29,6 +30,9 @@ const GREEN_DEEP = "#00A53E";
 const BLUE = "#003BB5";
 const BLUE_DEEP = "#001E73";
 const WHITE = "#FFFFFF";
+const DARK = "#08080d";
+const DARK2 = "#13131b";
+const DARK3 = "#1d1d28";
 
 type Product = {
   id: string;
@@ -190,12 +194,12 @@ function Index() {
   return (
     <main
       className="min-h-screen font-sans overflow-x-hidden"
-      style={{ backgroundColor: YELLOW, color: BLUE }}
+      style={{ backgroundColor: DARK, color: WHITE }}
     >
       {/* Header */}
       <header
-        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4 shadow-lg"
-        style={{ backgroundColor: GREEN, borderColor: YELLOW }}
+        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4 shadow-lg backdrop-blur-md"
+        style={{ backgroundColor: `${DARK2}ee`, borderColor: YELLOW }}
       >
         <div
           className="font-display text-sm sm:text-xl tracking-widest flex items-center gap-2"
@@ -254,18 +258,26 @@ function Index() {
       </div>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-copa-flow">
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, ${DARK}f2, ${DARK2}e6, ${BLUE_DEEP}cc), url(${fifaBackdrop})`,
+          backgroundSize: "cover, 600px auto",
+          backgroundPosition: "center, center",
+          backgroundRepeat: "no-repeat, repeat",
+        }}
+      >
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-20 select-none animate-spin-slow"
-          style={{ color: WHITE }}
+          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-[0.06] select-none animate-spin-slow"
+          style={{ color: YELLOW }}
         >
           ★
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-20 select-none animate-spin-slow"
-          style={{ color: WHITE, animationDirection: "reverse" }}
+          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-[0.06] select-none animate-spin-slow"
+          style={{ color: GREEN, animationDirection: "reverse" }}
         >
           ★
         </div>
@@ -337,19 +349,19 @@ function Index() {
       </div>
 
       {/* CATALOG */}
-      <section id="catalogo" style={{ backgroundColor: WHITE }}>
+      <section id="catalogo" style={{ backgroundColor: DARK }}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
           <div className="text-center">
             <span
               className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase"
-              style={{ backgroundColor: GREEN, color: YELLOW }}
+              style={{ backgroundColor: GREEN, color: DARK }}
             >
               ⚽ Catálogo Oficial
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4" style={{ color: BLUE }}>
-              ESCOLHA SUA <span style={{ color: GREEN }}>JOGADA</span>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4" style={{ color: WHITE }}>
+              ESCOLHA SUA <span style={{ color: YELLOW }}>JOGADA</span>
             </h2>
-            <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: BLUE }}>
+            <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: "#cfd2dc" }}>
               Álbum, figurinhas individuais, pacotes e a rara dourada. Tudo personalizado.
             </p>
           </div>
@@ -358,9 +370,10 @@ function Index() {
             {PRODUCTS.map((p, i) => (
               <article
                 key={p.id}
-                className="group relative rounded-2xl border-4 shadow-xl overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col bg-white"
+                className="group relative rounded-2xl border-4 shadow-xl overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col"
                 style={{
-                  borderColor: BLUE,
+                  backgroundColor: DARK2,
+                  borderColor: YELLOW,
                   animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.1}s both`,
                 }}
               >
@@ -380,37 +393,39 @@ function Index() {
                 <div
                   className="relative h-48 sm:h-56 flex items-center justify-center overflow-hidden"
                   style={{
-                    background: `repeating-linear-gradient(45deg, ${GREEN} 0 14px, ${YELLOW} 14px 28px)`,
+                    backgroundImage: `linear-gradient(135deg, ${DARK}cc, ${DARK2}aa), url(${fifaBackdrop})`,
+                    backgroundSize: "cover, cover",
+                    backgroundPosition: "center, center",
                   }}
                 >
                   <img
                     src={p.image}
                     alt={p.name}
-                    className="max-h-[85%] w-auto drop-shadow-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                    className="max-h-[85%] w-auto drop-shadow-[0_10px_30px_rgba(255,230,0,0.35)] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
                     loading="lazy"
                   />
                 </div>
-                <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  <span className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
+                <div className="p-4 sm:p-5 flex flex-col flex-1" style={{ backgroundColor: DARK2 }}>
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: GREEN }}>
                     ★ {p.tag}
                   </span>
-                  <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: BLUE }}>
+                  <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: WHITE }}>
                     {p.name}
                   </h3>
-                  <p className="mt-2 text-sm font-medium flex-1" style={{ color: BLUE }}>
+                  <p className="mt-2 text-sm font-medium flex-1" style={{ color: "#b8bcc8" }}>
                     {p.desc}
                   </p>
                   <div className="mt-3 flex items-baseline gap-2">
                     {p.oldPrice && (
-                      <span className="text-xs line-through opacity-60" style={{ color: BLUE }}>
+                      <span className="text-xs line-through opacity-60" style={{ color: "#b8bcc8" }}>
                         {fmt(p.oldPrice)}
                       </span>
                     )}
-                    <span className="font-display text-2xl" style={{ color: BLUE }}>
+                    <span className="font-display text-2xl" style={{ color: YELLOW }}>
                       {fmt(p.price)}
                     </span>
                   </div>
-                  <div className="text-[11px] mt-0.5 opacity-80" style={{ color: BLUE }}>
+                  <div className="text-[11px] mt-0.5 opacity-80" style={{ color: "#b8bcc8" }}>
                     {p.installments}
                   </div>
 
@@ -420,9 +435,9 @@ function Index() {
                       onClick={() => addToCart(p.id)}
                       className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
-                        backgroundColor: WHITE,
-                        color: BLUE,
-                        border: `3px solid ${BLUE}`,
+                        backgroundColor: "transparent",
+                        color: YELLOW,
+                        border: `3px solid ${YELLOW}`,
                       }}
                     >
                       + Carrinho
@@ -433,8 +448,8 @@ function Index() {
                       className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
                         backgroundColor: GREEN,
-                        color: YELLOW,
-                        border: `3px solid ${BLUE}`,
+                        color: DARK,
+                        border: `3px solid ${YELLOW}`,
                         boxShadow: `0 3px 0 ${GREEN_DEEP}`,
                       }}
                     >
@@ -449,12 +464,19 @@ function Index() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section style={{ backgroundColor: GREEN }} className="relative overflow-hidden">
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(180deg, ${DARK2}, ${DARK})`,
+        }}
+      >
         <div
           aria-hidden
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
-            backgroundImage: `repeating-linear-gradient(45deg, ${YELLOW} 0 20px, transparent 20px 40px)`,
+            backgroundImage: `url(${fifaBackdrop})`,
+            backgroundSize: "500px auto",
+            backgroundRepeat: "repeat",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
@@ -469,23 +491,23 @@ function Index() {
             ].map((s, i) => (
               <div
                 key={s.n}
-                className="rounded-2xl p-6 border-4 text-center"
+                className="rounded-2xl p-6 border-4 text-center backdrop-blur-sm"
                 style={{
-                  backgroundColor: YELLOW,
-                  borderColor: BLUE,
+                  backgroundColor: `${DARK3}cc`,
+                  borderColor: YELLOW,
                   animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.15}s both`,
                 }}
               >
                 <div
                   className="mx-auto flex h-16 w-16 items-center justify-center rounded-full font-display text-2xl border-4 animate-bounce-soft"
-                  style={{ backgroundColor: BLUE, color: YELLOW, borderColor: GREEN }}
+                  style={{ backgroundColor: YELLOW, color: DARK, borderColor: GREEN }}
                 >
                   {s.n}
                 </div>
-                <div className="font-display text-xl mt-4" style={{ color: BLUE }}>
+                <div className="font-display text-xl mt-4" style={{ color: WHITE }}>
                   {s.t}
                 </div>
-                <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                <p className="mt-2 font-semibold text-sm" style={{ color: "#b8bcc8" }}>
                   {s.d}
                 </p>
               </div>
@@ -495,8 +517,8 @@ function Index() {
       </section>
 
       <footer
-        className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold"
-        style={{ backgroundColor: GREEN, color: YELLOW }}
+        className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold border-t-4"
+        style={{ backgroundColor: DARK, color: YELLOW, borderColor: YELLOW }}
       >
         © 2026 Copa Album · Edição Oficial · Pagamento via PIX
       </footer>
@@ -508,11 +530,11 @@ function Index() {
           <aside
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md h-full overflow-y-auto flex flex-col animate-slide-in-right border-l-4"
-            style={{ backgroundColor: YELLOW, borderColor: BLUE }}
+            style={{ backgroundColor: DARK, borderColor: YELLOW }}
           >
             <div
               className="px-5 py-4 flex items-center justify-between border-b-4"
-              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+              style={{ backgroundColor: DARK2, borderColor: YELLOW, color: YELLOW }}
             >
               <div className="font-display text-xl tracking-widest flex items-center gap-2">
                 🛒 SEU CARRINHO
@@ -521,7 +543,7 @@ function Index() {
                 type="button"
                 onClick={() => setCartOpen(false)}
                 className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
-                style={{ backgroundColor: YELLOW, color: BLUE }}
+                style={{ backgroundColor: YELLOW, color: DARK }}
               >
                 ×
               </button>
@@ -531,10 +553,10 @@ function Index() {
               {cart.length === 0 && (
                 <div className="text-center py-16">
                   <div className="text-6xl animate-bounce-soft">⚽</div>
-                  <p className="mt-4 font-display text-xl" style={{ color: BLUE }}>
+                  <p className="mt-4 font-display text-xl" style={{ color: YELLOW }}>
                     Carrinho vazio
                   </p>
-                  <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                  <p className="mt-2 font-semibold text-sm" style={{ color: "#b8bcc8" }}>
                     Convoque suas figurinhas!
                   </p>
                 </div>
@@ -545,14 +567,14 @@ function Index() {
                   <div
                     key={line.id}
                     className="flex gap-3 rounded-xl border-4 p-3 animate-slide-up"
-                    style={{ backgroundColor: WHITE, borderColor: BLUE }}
+                    style={{ backgroundColor: DARK2, borderColor: YELLOW }}
                   >
                     <img src={p.image} alt="" className="w-16 h-16 rounded-lg object-cover border-2" style={{ borderColor: GREEN }} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-display text-sm leading-tight" style={{ color: BLUE }}>
+                      <div className="font-display text-sm leading-tight" style={{ color: WHITE }}>
                         {p.name}
                       </div>
-                      <div className="font-bold text-sm mt-1" style={{ color: GREEN_DEEP }}>
+                      <div className="font-bold text-sm mt-1" style={{ color: GREEN }}>
                         {fmt(p.price)}
                       </div>
                       <div className="mt-2 flex items-center gap-2">
@@ -560,18 +582,18 @@ function Index() {
                           type="button"
                           onClick={() => setQty(line.id, line.qty - 1)}
                           className="h-7 w-7 rounded-full font-black border-2"
-                          style={{ backgroundColor: YELLOW, color: BLUE, borderColor: BLUE }}
+                          style={{ backgroundColor: DARK3, color: YELLOW, borderColor: YELLOW }}
                         >
                           −
                         </button>
-                        <span className="font-display text-base w-6 text-center" style={{ color: BLUE }}>
+                        <span className="font-display text-base w-6 text-center" style={{ color: WHITE }}>
                           {line.qty}
                         </span>
                         <button
                           type="button"
                           onClick={() => setQty(line.id, line.qty + 1)}
                           className="h-7 w-7 rounded-full font-black border-2"
-                          style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                          style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                         >
                           +
                         </button>
@@ -579,7 +601,7 @@ function Index() {
                           type="button"
                           onClick={() => removeLine(line.id)}
                           className="ml-auto text-xs font-bold underline"
-                          style={{ color: BLUE_DEEP }}
+                          style={{ color: "#FF6B6B" }}
                         >
                           remover
                         </button>
@@ -593,13 +615,13 @@ function Index() {
             {cart.length > 0 && (
               <div
                 className="border-t-4 p-5 space-y-3"
-                style={{ borderColor: BLUE, backgroundColor: WHITE }}
+                style={{ borderColor: YELLOW, backgroundColor: DARK2 }}
               >
                 <div className="flex items-baseline justify-between">
-                  <span className="font-display text-sm tracking-widest uppercase" style={{ color: BLUE }}>
+                  <span className="font-display text-sm tracking-widest uppercase" style={{ color: "#b8bcc8" }}>
                     Total
                   </span>
-                  <span className="font-display text-3xl" style={{ color: BLUE }}>
+                  <span className="font-display text-3xl" style={{ color: YELLOW }}>
                     {fmt(cartTotal)}
                   </span>
                 </div>
@@ -607,7 +629,7 @@ function Index() {
                   type="button"
                   onClick={checkoutCart}
                   className="w-full rounded-full px-5 py-4 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02] animate-pulse-glow"
-                  style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                  style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                 >
                   Finalizar com PIX ⚡
                 </button>
@@ -627,18 +649,18 @@ function Index() {
           <div
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-md rounded-3xl border-8 shadow-2xl overflow-hidden animate-slide-up"
-            style={{ backgroundColor: WHITE, borderColor: YELLOW }}
+            style={{ backgroundColor: DARK, borderColor: YELLOW }}
           >
             <div
               className="px-5 py-4 flex items-center justify-between border-b-4"
-              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+              style={{ backgroundColor: DARK2, borderColor: YELLOW, color: YELLOW }}
             >
               <div className="font-display text-lg tracking-widest">PAGAR COM PIX ⚡</div>
               <button
                 type="button"
                 onClick={closeCheckout}
                 className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
-                style={{ backgroundColor: YELLOW, color: BLUE }}
+                style={{ backgroundColor: YELLOW, color: DARK }}
               >
                 ×
               </button>
@@ -648,7 +670,7 @@ function Index() {
               {pix.kind === "loading" && (
                 <div className="text-center py-10">
                   <div className="text-5xl animate-ball-kick inline-block">⚽</div>
-                  <p className="mt-4 font-display text-lg" style={{ color: BLUE }}>
+                  <p className="mt-4 font-display text-lg" style={{ color: YELLOW }}>
                     Gerando seu PIX...
                   </p>
                 </div>
@@ -656,10 +678,10 @@ function Index() {
               {pix.kind === "error" && (
                 <div className="text-center py-8">
                   <div className="text-5xl">😞</div>
-                  <p className="mt-3 font-display text-lg" style={{ color: BLUE }}>
+                  <p className="mt-3 font-display text-lg" style={{ color: WHITE }}>
                     Não rolou
                   </p>
-                  <p className="mt-1 text-sm font-semibold" style={{ color: BLUE }}>
+                  <p className="mt-1 text-sm font-semibold" style={{ color: "#b8bcc8" }}>
                     {pix.message}
                   </p>
                   <button
@@ -670,7 +692,7 @@ function Index() {
                       setTimeout(() => setCheckout(c), 50);
                     }}
                     className="mt-5 rounded-full px-6 py-2 font-display text-xs tracking-widest uppercase border-4"
-                    style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                    style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                   >
                     Tentar de novo
                   </button>
@@ -679,10 +701,10 @@ function Index() {
               {pix.kind === "ok" && (
                 <div>
                   <div className="text-center">
-                    <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
+                    <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN }}>
                       ★ Total
                     </div>
-                    <div className="font-display text-4xl mt-1" style={{ color: BLUE }}>
+                    <div className="font-display text-4xl mt-1" style={{ color: YELLOW }}>
                       {fmt(pix.total)}
                     </div>
                   </div>
@@ -691,7 +713,7 @@ function Index() {
                     <div className="mt-5 flex justify-center">
                       <div
                         className="p-3 rounded-2xl border-4"
-                        style={{ borderColor: BLUE, backgroundColor: WHITE }}
+                        style={{ borderColor: YELLOW, backgroundColor: WHITE }}
                       >
                         <img
                           src={
@@ -707,12 +729,12 @@ function Index() {
                   )}
 
                   <div className="mt-5">
-                    <label className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: BLUE }}>
+                    <label className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: YELLOW }}>
                       PIX Copia e Cola
                     </label>
                     <div
                       className="mt-1 rounded-lg p-3 text-xs break-all font-mono border-2 max-h-24 overflow-y-auto"
-                      style={{ backgroundColor: "#F5F5F5", borderColor: BLUE, color: BLUE }}
+                      style={{ backgroundColor: DARK2, borderColor: YELLOW, color: "#b8bcc8" }}
                     >
                       {pix.copy_paste}
                     </div>
@@ -725,16 +747,16 @@ function Index() {
                       }}
                       className="mt-3 w-full rounded-full px-5 py-3 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02]"
                       style={{
-                        backgroundColor: copied ? BLUE : GREEN,
-                        color: YELLOW,
-                        borderColor: BLUE,
+                        backgroundColor: copied ? YELLOW : GREEN,
+                        color: DARK,
+                        borderColor: YELLOW,
                       }}
                     >
                       {copied ? "✓ Copiado!" : "Copiar código PIX"}
                     </button>
                   </div>
 
-                  <p className="mt-4 text-center text-[11px] font-semibold opacity-80" style={{ color: BLUE }}>
+                  <p className="mt-4 text-center text-[11px] font-semibold opacity-80" style={{ color: "#b8bcc8" }}>
                     Abra seu app do banco e pague com PIX. A confirmação é automática.
                   </p>
                 </div>
