@@ -1,141 +1,231 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import albumCover from "@/assets/album-cover.png";
-import albumEmpty from "@/assets/album-empty.png";
-import albumFilled from "@/assets/album-filled.png";
+import cardMiguel from "@/assets/card-miguel.png";
+import cardArthur from "@/assets/card-arthur.png";
+import cardHelena from "@/assets/card-helena.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Memory Album Copa 2026 — Casal de Ouro" },
+      { title: "Copa Album 2026 — Álbum e Figurinhas Personalizadas" },
       {
         name: "description",
         content:
-          "O álbum de figurinhas oficial do casal para a Copa do Mundo 2026. Personalize, colecione e guarde sua história.",
+          "Catálogo oficial: álbum da Copa 2026 e figurinhas personalizadas com a foto da sua pessoa favorita.",
       },
-      { property: "og:title", content: "Memory Album Copa 2026 — Casal de Ouro" },
+      { property: "og:title", content: "Copa Album 2026 — Catálogo" },
       {
         property: "og:description",
         content:
-          "Álbum de figurinhas personalizado estilo Copa do Mundo 2026 para casais.",
+          "Compre o álbum oficial e figurinhas personalizadas com sua foto.",
       },
     ],
   }),
 });
 
-// Brazil / Copa palette
-const YELLOW = "#FFCE00";       // bright Brazil yellow
+const YELLOW = "#FFCE00";
 const YELLOW_DEEP = "#FFB400";
-const GREEN = "#009B3A";        // Brazil green
-const BLUE = "#002776";         // Brazil blue
+const GREEN = "#009B3A";
+const BLUE = "#002776";
 const WHITE = "#FFFFFF";
 
+type Product = {
+  id: string;
+  name: string;
+  tag: string;
+  price: string;
+  oldPrice?: string;
+  installments: string;
+  desc: string;
+  image: string;
+  color: string;
+  badge?: string;
+};
+
+const PRODUCTS: Product[] = [
+  {
+    id: "album",
+    name: "Álbum Oficial Copa 2026",
+    tag: "ÁLBUM",
+    price: "R$ 197",
+    oldPrice: "R$ 297",
+    installments: "ou 12x de R$ 19,90",
+    desc: "Capa dura, 60 espaços para colar suas figurinhas personalizadas. Edição limitada.",
+    image: albumCover,
+    color: BLUE,
+    badge: "MAIS VENDIDO",
+  },
+  {
+    id: "fig-individual",
+    name: "Figurinha Personalizada",
+    tag: "FIGURINHA",
+    price: "R$ 9,90",
+    installments: "envie a foto · entrega em 7 dias",
+    desc: "Sua foto, seu nome e seu número como uma figurinha oficial estilo Copa.",
+    image: cardMiguel,
+    color: GREEN,
+  },
+  {
+    id: "fig-pack-10",
+    name: "Pack 10 Figurinhas",
+    tag: "PACK",
+    price: "R$ 79",
+    oldPrice: "R$ 99",
+    installments: "R$ 7,90 cada · economize 20%",
+    desc: "10 figurinhas personalizadas com fotos diferentes. Monte sua seleção.",
+    image: cardArthur,
+    color: YELLOW_DEEP,
+    badge: "ECONOMIA",
+  },
+  {
+    id: "fig-shiny",
+    name: "Figurinha Dourada SHINY",
+    tag: "RARA",
+    price: "R$ 24,90",
+    installments: "edição especial brilhante",
+    desc: "Acabamento dourado holográfico. A craque do seu álbum.",
+    image: cardHelena,
+    color: YELLOW,
+    badge: "RARÍSSIMA",
+  },
+];
+
 function Index() {
+  const [cart, setCart] = useState<string[]>([]);
+
+  const addToCart = (id: string) => {
+    setCart((c) => [...c, id]);
+  };
+
   return (
     <main
-      className="min-h-screen font-sans"
+      className="min-h-screen font-sans overflow-x-hidden"
       style={{ backgroundColor: YELLOW, color: BLUE }}
     >
       {/* Header */}
       <header
-        className="px-6 py-3 flex items-center justify-between border-b-4"
+        className="sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between border-b-4"
         style={{ backgroundColor: GREEN, borderColor: YELLOW }}
       >
         <div
-          className="font-display text-xl tracking-widest"
+          className="font-display text-sm sm:text-xl tracking-widest flex items-center gap-2"
           style={{ color: YELLOW }}
         >
-          ★ COPA 2026 ALBUM
+          <span className="animate-spin-slow inline-block">★</span>
+          COPA 2026
         </div>
         <a
-          href="#comprar"
-          className="rounded-full px-5 py-2 text-sm font-bold uppercase tracking-wider"
+          href="#catalogo"
+          className="relative rounded-full px-3 sm:px-5 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider transition-transform hover:scale-105"
           style={{ backgroundColor: YELLOW, color: BLUE }}
         >
-          Garantir o meu
+          🛒 Carrinho
+          {cart.length > 0 && (
+            <span
+              className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-xs font-black animate-bounce-soft"
+              style={{ backgroundColor: GREEN, color: YELLOW, border: `2px solid ${BLUE}` }}
+            >
+              {cart.length}
+            </span>
+          )}
         </a>
       </header>
 
+      {/* Marquee */}
+      <div
+        className="overflow-hidden border-b-4 py-2"
+        style={{ backgroundColor: BLUE, borderColor: YELLOW }}
+      >
+        <div className="flex animate-marquee whitespace-nowrap font-display text-sm tracking-widest" style={{ color: YELLOW }}>
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="flex shrink-0">
+              {["⚽ FRETE GRÁTIS ACIMA DE R$ 150", "★ ENTREGA EM 7 DIAS", "⚽ EDIÇÃO LIMITADA 2026", "★ FAÇA SUA FIGURINHA", "⚽ PAGAMENTO SEGURO"].map((t) => (
+                <span key={t} className="px-8">{t}</span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* HERO */}
       <section className="relative overflow-hidden">
-        {/* decorative giant stars */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 text-[20rem] font-black opacity-10 select-none"
+          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-10 select-none animate-spin-slow"
           style={{ color: GREEN }}
         >
           ★
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 -right-10 text-[24rem] font-black opacity-10 select-none"
-          style={{ color: BLUE }}
+          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-10 select-none animate-spin-slow"
+          style={{ color: BLUE, animationDirection: "reverse" }}
         >
           ★
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 pt-14 pb-20 grid gap-12 md:grid-cols-2 items-center">
-          <div>
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-16 sm:pt-14 sm:pb-20 grid gap-10 md:grid-cols-2 items-center">
+          <div className="text-center md:text-left">
             <span
-              className="inline-block rounded-full px-4 py-1 text-xs font-extrabold tracking-[0.2em] uppercase"
+              className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase animate-bounce-soft"
               style={{ backgroundColor: BLUE, color: YELLOW }}
             >
-              ★ Edição Oficial Copa 2026
+              ★ Catálogo Oficial 2026
             </span>
             <h1
-              className="font-display mt-6 text-4xl sm:text-5xl md:text-6xl leading-[1.05]"
+              className="font-display mt-5 text-3xl sm:text-5xl md:text-6xl leading-[1.05]"
               style={{ color: BLUE }}
             >
-              SEU CASAL NA{" "}
-              <span style={{ color: GREEN }}>COPA DO MUNDO</span>{" "}
-              <span style={{ color: BLUE }}>2026</span>
+              VIRE <span className="shimmer-text">CRAQUE</span>{" "}
+              <span style={{ color: GREEN }}>DA COPA</span>
             </h1>
             <p
-              className="mt-6 text-lg leading-relaxed max-w-md font-semibold"
+              className="mt-5 text-base sm:text-lg leading-relaxed max-w-md font-semibold mx-auto md:mx-0"
               style={{ color: BLUE }}
             >
-              O álbum oficial de figurinhas personalizado. Vocês entram em campo
-              como uma seleção de verdade — com escudo, número e história.
+              Compre o álbum oficial e figurinhas personalizadas com a foto de quem você ama.
+              Monte sua seleção.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-7 flex flex-wrap items-center gap-3 justify-center md:justify-start">
               <a
-                href="#comprar"
-                className="rounded-full px-10 py-4 font-display text-base tracking-widest uppercase shadow-lg transition-transform hover:scale-[1.03] border-4"
+                href="#catalogo"
+                className="rounded-full px-8 sm:px-10 py-3 sm:py-4 font-display text-sm sm:text-base tracking-widest uppercase shadow-lg transition-transform hover:scale-[1.05] border-4 animate-wiggle"
                 style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
               >
-                Quero o meu
+                Ver catálogo ⚽
               </a>
-              <div className="text-sm">
-                <div className="font-extrabold" style={{ color: BLUE }}>
-                  +2.500 casais convocados
-                </div>
-                <div style={{ color: BLUE }} className="opacity-80">
-                  Entrega para todo o Brasil
-                </div>
-              </div>
             </div>
           </div>
 
-          <div className="relative">
-            <div
-              className="absolute -inset-4 rounded-3xl"
-              style={{
-                background: `repeating-linear-gradient(45deg, ${GREEN} 0 14px, ${YELLOW_DEEP} 14px 28px)`,
-              }}
+          {/* Animated stack of cards */}
+          <div className="relative h-[320px] sm:h-[420px] flex items-center justify-center">
+            <img
+              src={cardArthur}
+              alt=""
+              className="absolute w-32 sm:w-44 rounded-xl shadow-2xl border-4 animate-floaty"
+              style={{ borderColor: WHITE, transform: "rotate(-12deg)", left: "10%", ["--r" as any]: "-12deg", animationDelay: "0s" }}
             />
             <img
               src={albumCover}
-              alt="Capa do álbum oficial Copa 2026 Casal de Ouro"
-              className="relative w-full rounded-2xl shadow-2xl border-8"
-              style={{ borderColor: WHITE }}
+              alt="Álbum Copa 2026"
+              className="relative w-44 sm:w-64 rounded-xl shadow-2xl border-4 animate-floaty z-10"
+              style={{ borderColor: YELLOW, ["--r" as any]: "0deg", animationDelay: "0.4s" }}
+            />
+            <img
+              src={cardHelena}
+              alt=""
+              className="absolute w-32 sm:w-44 rounded-xl shadow-2xl border-4 animate-floaty"
+              style={{ borderColor: WHITE, transform: "rotate(12deg)", right: "10%", ["--r" as any]: "12deg", animationDelay: "0.8s" }}
             />
           </div>
         </div>
       </section>
 
       {/* Stripe divider */}
-      <div className="flex h-4 w-full">
+      <div className="flex h-3 sm:h-4 w-full">
         <div className="flex-1" style={{ backgroundColor: GREEN }} />
         <div className="flex-1" style={{ backgroundColor: YELLOW }} />
         <div className="flex-1" style={{ backgroundColor: BLUE }} />
@@ -143,56 +233,139 @@ function Index() {
         <div className="flex-1" style={{ backgroundColor: GREEN }} />
       </div>
 
-      {/* BENEFITS */}
-      <section style={{ backgroundColor: WHITE }}>
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2
-            className="font-display text-3xl sm:text-4xl text-center"
-            style={{ color: BLUE }}
-          >
-            CHEGOU A SUA CONVOCAÇÃO ⚽
-          </h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                n: "10",
-                title: "TOTALMENTE PERSONALIZADO",
-                desc: "Foto, nome, número e data do casal em cada figurinha.",
-              },
-              {
-                n: "9",
-                title: "QUALIDADE PANINI",
-                desc: "Impressão premium, papel couché e figurinhas com brilho.",
-              },
-              {
-                n: "7",
-                title: "EDIÇÃO LIMITADA",
-                desc: "Apenas 2.026 unidades numeradas para a Copa do Mundo.",
-              },
-            ].map((b) => (
-              <div
-                key={b.title}
-                className="relative rounded-2xl p-8 border-4 shadow-md"
-                style={{ borderColor: BLUE, backgroundColor: YELLOW }}
+      {/* CATALOG */}
+      <section id="catalogo" style={{ backgroundColor: WHITE }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
+          <div className="text-center">
+            <span
+              className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase"
+              style={{ backgroundColor: GREEN, color: YELLOW }}
+            >
+              ⚽ Catálogo Oficial
+            </span>
+            <h2
+              className="font-display text-3xl sm:text-4xl md:text-5xl mt-4"
+              style={{ color: BLUE }}
+            >
+              ESCOLHA SUA <span style={{ color: GREEN }}>JOGADA</span>
+            </h2>
+            <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: BLUE }}>
+              Álbum, figurinhas individuais, pacotes e a rara dourada. Tudo personalizado.
+            </p>
+          </div>
+
+          <div className="mt-10 sm:mt-14 grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCTS.map((p, i) => (
+              <article
+                key={p.id}
+                className="group relative rounded-2xl border-4 shadow-lg overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col"
+                style={{
+                  backgroundColor: WHITE,
+                  borderColor: BLUE,
+                  animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.1}s both`,
+                }}
               >
+                {p.badge && (
+                  <div
+                    className="absolute top-3 right-3 z-10 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider animate-bounce-soft"
+                    style={{ backgroundColor: GREEN, color: YELLOW, border: `2px solid ${BLUE}` }}
+                  >
+                    {p.badge}
+                  </div>
+                )}
                 <div
-                  className="absolute -top-6 -left-4 flex h-14 w-14 items-center justify-center rounded-full font-display text-xl border-4"
+                  className="relative h-48 sm:h-56 flex items-center justify-center overflow-hidden"
                   style={{
-                    backgroundColor: GREEN,
-                    color: YELLOW,
-                    borderColor: BLUE,
+                    background: `repeating-linear-gradient(45deg, ${p.color} 0 14px, ${YELLOW_DEEP} 14px 28px)`,
                   }}
                 >
-                  {b.n}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="max-h-[85%] w-auto drop-shadow-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                    loading="lazy"
+                  />
                 </div>
+                <div className="p-4 sm:p-5 flex flex-col flex-1">
+                  <span
+                    className="text-[10px] font-black tracking-[0.2em] uppercase"
+                    style={{ color: GREEN }}
+                  >
+                    ★ {p.tag}
+                  </span>
+                  <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: BLUE }}>
+                    {p.name}
+                  </h3>
+                  <p className="mt-2 text-sm font-medium flex-1" style={{ color: BLUE }}>
+                    {p.desc}
+                  </p>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    {p.oldPrice && (
+                      <span className="text-xs line-through opacity-60" style={{ color: BLUE }}>
+                        {p.oldPrice}
+                      </span>
+                    )}
+                    <span className="font-display text-2xl" style={{ color: BLUE }}>
+                      {p.price}
+                    </span>
+                  </div>
+                  <div className="text-[11px] mt-0.5 opacity-80" style={{ color: BLUE }}>
+                    {p.installments}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => addToCart(p.id)}
+                    className="mt-4 w-full rounded-full px-5 py-3 font-display text-xs sm:text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.03]"
+                    style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                  >
+                    + Adicionar
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={{ backgroundColor: GREEN }} className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, ${YELLOW} 0 20px, transparent 20px 40px)`,
+          }}
+        />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
+          <h2 className="font-display text-3xl sm:text-4xl text-center" style={{ color: YELLOW }}>
+            COMO FUNCIONA ⚽
+          </h2>
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            {[
+              { n: "1", t: "ESCOLHA", d: "Selecione álbum e figurinhas no catálogo." },
+              { n: "2", t: "ENVIE A FOTO", d: "Após a compra, mande a foto da pessoa." },
+              { n: "3", t: "RECEBA EM CASA", d: "Em 7 dias úteis seu kit chega impresso." },
+            ].map((s, i) => (
+              <div
+                key={s.n}
+                className="rounded-2xl p-6 border-4 text-center"
+                style={{
+                  backgroundColor: YELLOW,
+                  borderColor: BLUE,
+                  animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.15}s both`,
+                }}
+              >
                 <div
-                  className="font-display text-xl mb-2 mt-2"
-                  style={{ color: BLUE }}
+                  className="mx-auto flex h-16 w-16 items-center justify-center rounded-full font-display text-2xl border-4 animate-bounce-soft"
+                  style={{ backgroundColor: BLUE, color: YELLOW, borderColor: GREEN }}
                 >
-                  {b.title}
+                  {s.n}
                 </div>
-                <p className="font-medium" style={{ color: BLUE }}>
-                  {b.desc}
+                <div className="font-display text-xl mt-4" style={{ color: BLUE }}>
+                  {s.t}
+                </div>
+                <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                  {s.d}
                 </p>
               </div>
             ))}
@@ -200,159 +373,40 @@ function Index() {
         </div>
       </section>
 
-      {/* ALBUM PREVIEW */}
-      <section className="px-6 py-20" style={{ backgroundColor: GREEN }}>
-        <div className="mx-auto max-w-6xl">
-          <h2
-            className="font-display text-3xl sm:text-4xl text-center"
-            style={{ color: YELLOW }}
-          >
-            ENTRE EM CAMPO ⚽ VEJA O ÁLBUM
-          </h2>
-          <p
-            className="mt-4 text-center max-w-xl mx-auto font-semibold"
-            style={{ color: WHITE }}
-          >
-            Cole as figurinhas, complete as páginas e levante a taça do amor.
-          </p>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
-            <figure>
-              <img
-                src={albumEmpty}
-                alt="Páginas do álbum em branco"
-                className="w-full rounded-2xl shadow-xl border-8"
-                style={{ borderColor: YELLOW }}
-                loading="lazy"
-              />
-              <figcaption
-                className="mt-3 text-center text-sm uppercase tracking-widest font-bold"
-                style={{ color: YELLOW }}
-              >
-                1º Tempo — espaços para colar
-              </figcaption>
-            </figure>
-            <figure>
-              <img
-                src={albumFilled}
-                alt="Páginas do álbum completas com figurinhas"
-                className="w-full rounded-2xl shadow-xl border-8"
-                style={{ borderColor: YELLOW }}
-                loading="lazy"
-              />
-              <figcaption
-                className="mt-3 text-center text-sm uppercase tracking-widest font-bold"
-                style={{ color: YELLOW }}
-              >
-                2º Tempo — álbum completo
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      {/* WHAT'S INCLUDED */}
-      <section style={{ backgroundColor: YELLOW }}>
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2
-            className="font-display text-3xl sm:text-4xl text-center"
-            style={{ color: BLUE }}
-          >
-            O KIT DO CRAQUE INCLUI
-          </h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-            {[
-              "1 Álbum oficial capa dura Copa 2026",
-              "60 figurinhas personalizadas do casal",
-              "4 figurinhas EXTRA SHINY douradas",
-              "Pôster da seleção do casal",
-              "Embalagem oficial estilo Panini",
-              "Certificado numerado da edição",
-            ].map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-3 rounded-xl p-4 border-4"
-                style={{ backgroundColor: WHITE, borderColor: GREEN }}
-              >
-                <span
-                  className="mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-sm font-black"
-                  style={{ backgroundColor: GREEN, color: YELLOW }}
-                >
-                  ★
-                </span>
-                <span className="font-semibold" style={{ color: BLUE }}>
-                  {item}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* CTA */}
+      {/* FINAL CTA */}
       <section
-        id="comprar"
-        className="px-6 py-24 text-center relative overflow-hidden"
+        className="px-4 sm:px-6 py-16 sm:py-20 text-center relative overflow-hidden"
         style={{ backgroundColor: BLUE }}
       >
         <div
           aria-hidden
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-15"
           style={{
             backgroundImage: `repeating-linear-gradient(45deg, ${YELLOW} 0 20px, transparent 20px 40px)`,
           }}
         />
         <div className="relative mx-auto max-w-2xl">
-          <h2 className="font-display text-4xl sm:text-5xl leading-tight" style={{ color: YELLOW }}>
-            CONVOQUE SEU <span style={{ color: GREEN }}>CASAL DE OURO</span> ⚽
+          <h2 className="font-display text-3xl sm:text-5xl leading-tight" style={{ color: YELLOW }}>
+            ENTRE EM <span style={{ color: GREEN }}>CAMPO</span> ⚽
           </h2>
-          <p className="mt-4 text-lg font-semibold" style={{ color: WHITE }}>
-            Edição limitada a 2.026 unidades. Acabou, acabou.
+          <p className="mt-4 text-base sm:text-lg font-semibold" style={{ color: WHITE }}>
+            Edição limitada. Não fique fora da Copa 2026.
           </p>
-
-          <div
-            className="mt-10 inline-block rounded-3xl p-8 shadow-2xl border-8"
-            style={{ backgroundColor: WHITE, borderColor: YELLOW }}
+          <a
+            href="#catalogo"
+            className="inline-block mt-8 rounded-full px-10 py-4 font-display text-sm sm:text-base tracking-widest uppercase border-4 transition-transform hover:scale-105 animate-wiggle"
+            style={{ backgroundColor: YELLOW, color: BLUE, borderColor: GREEN }}
           >
-            <div
-              className="text-xs tracking-[0.25em] uppercase font-bold"
-              style={{ color: GREEN }}
-            >
-              ★ Memory Album Copa 2026 ★
-            </div>
-            <div className="mt-2 flex items-baseline justify-center gap-2">
-              <span
-                className="text-sm line-through opacity-60"
-                style={{ color: BLUE }}
-              >
-                R$ 297
-              </span>
-              <span className="font-display text-5xl" style={{ color: BLUE }}>
-                R$ 197
-              </span>
-            </div>
-            <div className="text-sm mt-1" style={{ color: BLUE }}>
-              ou 12x de R$ 19,90
-            </div>
-            <button
-              type="button"
-              className="mt-6 w-full rounded-full px-10 py-4 font-display text-base tracking-widest uppercase border-4 transition-transform hover:scale-[1.02]"
-              style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
-            >
-              Comprar agora
-            </button>
-            <div className="mt-3 text-xs" style={{ color: BLUE }}>
-              Compra 100% segura · Envio em 7 dias úteis
-            </div>
-          </div>
+            Ver catálogo
+          </a>
         </div>
       </section>
 
       <footer
-        className="px-6 py-8 text-center text-xs font-semibold"
+        className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold"
         style={{ backgroundColor: GREEN, color: YELLOW }}
       >
-        © 2026 Memory Album Copa · Edição Oficial Casal de Ouro
+        © 2026 Copa Album · Edição Oficial Casal de Ouro
       </footer>
     </main>
   );
