@@ -260,6 +260,73 @@ const PRODUCTS: Product[] = [
       ],
     },
   },
+  {
+    id: "porta-figurinhas-copa",
+    name: "Case Porta Figurinhas Copa 2026 — Maleta + Chaveiro Troféu",
+    tag: "Estojo Organizador · Gurumania",
+    price: 89.9,
+    oldPrice: 139.9,
+    installments: "ou 6x de R$ 14,98 sem juros",
+    desc: "Maleta organizadora oficial estilo Copa 2026 com até 200 figurinhas, travas reforçadas e chaveiro mini troféu de brinde exclusivo.",
+    image: portaFigurinhas1,
+    badge: "Lançamento exclusivo",
+    gallery: [
+      { src: portaFigurinhas1, label: "Apresentação" },
+      { src: portaFigurinhas2, label: "Detalhes da tampa" },
+      { src: portaFigurinhas3, label: "Alta capacidade — 200 figurinhas" },
+      { src: portaFigurinhas4, label: "Fechamento seguro" },
+      { src: portaFigurinhas5, label: "Dimensões compactas" },
+      { src: portaFigurinhas6, label: "Chaveiro mini troféu" },
+      { src: portaFigurinhas7, label: "Proteção total" },
+      { src: portaFigurinhas8, label: "Entre no clima da Copa" },
+    ],
+    details: [
+      "Comporta até 200 figurinhas com divisórias inteligentes (1 e 2)",
+      "Travas verdes reforçadas — proteção contra abertura acidental",
+      "Material durável: ABS branco com estampa FIFA Copa 2026",
+      "Dimensões compactas: 11,5 × 9,5 × 4,5 cm — cabe na mochila ou no bolso",
+      "Brinde exclusivo: chaveiro mini troféu da Copa com argola italiana",
+      "Ideal para colecionadores e perfeito para presentear",
+    ],
+    options: [
+      { name: "Personagem", values: ["Branco", "Jogadores Copa do Mundo"], default: "Branco" },
+      { name: "Nome do desenho", values: ["Porta Figurinhas", "Figurinhas Copa"], default: "Porta Figurinhas" },
+      { name: "Tipo de embalagem", values: ["Maleta", "Envelope"], default: "Maleta" },
+      { name: "Formato de venda", values: ["Unidade", "Kit"], default: "Unidade" },
+      { name: "Unidades por kit", values: ["1", "105"], default: "1" },
+    ],
+    specs: [
+      {
+        group: "Características principais",
+        items: [
+          { label: "Marca", value: "Gurumania" },
+          { label: "Nome do álbum", value: "Copa do Mundo 2026 FIFA" },
+          { label: "Personagem", value: "Branco" },
+          { label: "Nome do desenho", value: "Porta Figurinhas" },
+          { label: "Tipo de embalagem", value: "Maleta" },
+        ],
+      },
+      {
+        group: "Características de venda",
+        items: [
+          { label: "Formato de venda", value: "Unidade" },
+        ],
+      },
+      {
+        group: "Outros",
+        items: [
+          { label: "Time", value: "Brasil" },
+          { label: "Ano do álbum", value: "2026" },
+          { label: "Temática", value: "Futebol Copa do Mundo World Cup 2026" },
+          { label: "Sem figurinhas repetidas", value: "Não" },
+          { label: "É uma figurinha holográfica", value: "Não" },
+          { label: "É uma figurinha especial", value: "Não" },
+          { label: "Idade mínima recomendada", value: "5 anos" },
+          { label: "Idade recomendada", value: "8-13 anos" },
+        ],
+      },
+    ],
+  },
 ];
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -270,6 +337,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "fig-shiny": "figurinhas",
   "figurinha-canva-editavel": "digital",
   "mini-taca-porta-foto": "decoracao",
+  "porta-figurinhas-copa": "decoracao",
   "capinha-neymar": "acessorios",
 };
 
