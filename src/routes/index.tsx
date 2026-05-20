@@ -556,6 +556,7 @@ function Index() {
         return c.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l));
       return [...c, { id, qty: 1 }];
     });
+    setCartOpen(true);
   };
   const removeLine = (id: string) =>
     setCart((c) => c.filter((l) => l.id !== id));
