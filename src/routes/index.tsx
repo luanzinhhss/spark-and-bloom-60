@@ -15,6 +15,7 @@ import figurinhaCanvaTemplate from "@/assets/figurinha-canva-template.png";
 import albumCasalMain from "@/assets/album-casal-main.png";
 import albumCasalInterior from "@/assets/album-casal-interior.png";
 import capinhaNeymar from "@/assets/capinha-neymar.png";
+import capinhaNeymarJ2 from "@/assets/capinha-neymar-j2.png";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
