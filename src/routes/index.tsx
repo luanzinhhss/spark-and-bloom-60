@@ -232,7 +232,7 @@ function Index() {
       document.body.style.overflow = "hidden";
       return () => { document.body.style.overflow = prev; };
     }
-  }, [cartOpen, checkout, confirmBuy]);
+  }, [cartOpen, checkout, confirmBuy, detailsId]);
 
   // Welcome coupon w/ countdown (2-4 day random expiration, persisted)
   const [welcomeOpen, setWelcomeOpen] = useState(false);
