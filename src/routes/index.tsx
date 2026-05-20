@@ -422,9 +422,12 @@ function Index() {
 
   const closeCheckout = () => {
     setCheckout(null);
+    setCheckoutStep("contact");
     setPix({ kind: "idle" });
     setCopied(false);
     setPaid(false);
+    setFormError(null);
+    setCepError(null);
   };
 
   const qrSrc = (img: string) =>
