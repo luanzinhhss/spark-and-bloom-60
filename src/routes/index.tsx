@@ -154,6 +154,8 @@ function Index() {
   const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [detailsImg, setDetailsImg] = useState(0);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
   const [customer, setCustomer] = useState({
