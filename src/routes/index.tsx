@@ -1551,6 +1551,69 @@ function maskCep(v: string) {
   return `${d.slice(0, 5)}-${d.slice(5)}`;
 }
 
+function EmailField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const DOMAINS = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "icloud.com"];
+  const [focused, setFocused] = useState(false);
+  const atIdx = value.indexOf("@");
+  const local = atIdx === -1 ? value : value.slice(0, atIdx);
+  const typedDomain = atIdx === -1 ? "" : value.slice(atIdx + 1).toLowerCase();
+  const suggestions =
+    local.length === 0
+      ? []
+      : atIdx === -1
+        ? DOMAINS.map((d) => `${local}@${d}`)
+        : DOMAINS.filter((d) => d.startsWith(typedDomain) && d !== typedDomain)
+            .map((d) => `${local}@${d}`);
+  const showList = focused && suggestions.length > 0;
+  return (
+    <div className="relative">
+      <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#7a7a85" }}>
+        E-mail
+      </label>
+      <input
+        type="email"
+        autoComplete="email"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 150)}
+        placeholder="voce@gmail.com"
+        className="mt-1 w-full rounded-lg px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+        style={{ backgroundColor: "#08080d", border: "1px solid #1f1f28", color: "#fff" }}
+      />
+      {showList && (
+        <div
+          className="absolute left-0 right-0 mt-1 z-20 rounded-lg overflow-hidden shadow-2xl animate-fade-in"
+          style={{ backgroundColor: "#0f0f17", border: "1px solid #2A2A38" }}
+        >
+          {suggestions.slice(0, 5).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(s);
+                setFocused(false);
+              }}
+              className="w-full text-left px-3 py-2.5 text-sm transition-colors hover:bg-white/5"
+              style={{ color: "#fff" }}
+            >
+              <span style={{ color: "#9CA0AE" }}>{s.split("@")[0]}</span>
+              <span style={{ color: "#F4C430" }}>@{s.split("@")[1]}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FieldInput({
   label,
   value,
