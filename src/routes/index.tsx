@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import stickerCard from "@/assets/sticker-card.png";
+import cardMiguel from "@/assets/card-miguel.png";
+import cardArthur from "@/assets/card-arthur.png";
+import cardHelena from "@/assets/card-helena.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -30,21 +32,21 @@ function Index() {
         DO MUNDO
       </h1>
 
-      <div className="relative my-10 h-[360px] w-[280px] sm:h-[420px] sm:w-[320px]">
+      <div className="relative my-10 h-[360px] w-[260px] sm:h-[420px] sm:w-[300px]">
         <img
-          src={stickerCard}
+          src={cardHelena}
           alt=""
           aria-hidden
-          className="absolute left-12 top-4 h-full w-full object-contain rotate-6 opacity-90"
+          className="absolute -left-16 top-4 h-full w-full object-contain -rotate-6 drop-shadow-xl"
         />
         <img
-          src={stickerCard}
+          src={cardArthur}
           alt=""
           aria-hidden
-          className="absolute -left-12 top-4 h-full w-full object-contain -rotate-6 opacity-90"
+          className="absolute left-16 top-4 h-full w-full object-contain rotate-6 drop-shadow-xl"
         />
         <img
-          src={stickerCard}
+          src={cardMiguel}
           alt="Figurinha personalizada Copa do Mundo"
           className="relative h-full w-full object-contain drop-shadow-2xl"
         />
