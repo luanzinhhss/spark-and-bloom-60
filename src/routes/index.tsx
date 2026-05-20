@@ -8,6 +8,10 @@ import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
 import pack10Figurinhas from "@/assets/pack-10-figurinhas.jpg";
 import miniTacaPortaFoto from "@/assets/mini-taca-porta-foto.jpg";
+import figurinhaCanvaMain from "@/assets/figurinha-canva-main.png";
+import figurinhaCanvaFolha from "@/assets/figurinha-canva-folha.png";
+import figurinhaCanvaCards from "@/assets/figurinha-canva-cards.png";
+import figurinhaCanvaTemplate from "@/assets/figurinha-canva-template.png";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -143,6 +147,31 @@ const PRODUCTS: Product[] = [
       "Funciona como porta-foto, acompanha 1 MiniPic no tamanho ideal",
       "Foto totalmente personalizável — escolha a sua na hora do pedido",
       "MiniPics e tamanhos adicionais podem ser pedidos separadamente",
+    ],
+  },
+  {
+    id: "figurinha-canva-editavel",
+    name: "Figurinha Copa 2026 Editável no Canva",
+    tag: "Digital · Canva",
+    price: 19.9,
+    oldPrice: 39.9,
+    installments: "Entrega digital imediata após o pagamento",
+    desc: "Crie sua figurinha da Seleção Brasileira no Canva: troque a foto, edite os dados e exporte pronto para imprimir.",
+    image: figurinhaCanvaMain,
+    badge: "Faça você mesmo",
+    gallery: [
+      { src: figurinhaCanvaMain, label: "Apresentação" },
+      { src: figurinhaCanvaTemplate, label: "Modelo no Canva" },
+      { src: figurinhaCanvaFolha, label: "Folha pronta para impressão" },
+      { src: figurinhaCanvaCards, label: "Variações de seleções" },
+    ],
+    details: [
+      "Arquivo editável da figurinha da Seleção Brasileira",
+      "Acesso direto ao modelo no Canva (sem precisar instalar nada)",
+      "Estrutura pronta no tamanho ideal de figurinha",
+      "Tutorial passo a passo para edição",
+      "Indicação de ferramenta gratuita para remoção de fundo",
+      "Você mesmo personaliza foto e dados — pronto em minutos",
     ],
   },
 ];
