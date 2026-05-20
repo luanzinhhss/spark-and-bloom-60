@@ -781,11 +781,12 @@ function Index() {
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => addToCart(p.id)}
-                      className="rounded-full px-3 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5"
+                      onClick={() => { setDetailsId(p.id); setDetailsImg(0); }}
+                      className="rounded-full px-3 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center justify-center gap-1.5"
                       style={{ color: WHITE, border: `1px solid ${LINE}` }}
                     >
-                      Carrinho
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      Detalhes
                     </button>
                     <button
                       type="button"
