@@ -317,6 +317,7 @@ function Index() {
         if (r.status === "paid" || r.status === "approved" || r.status === "completed") {
           setPaid(true);
           setCart([]);
+          setCoupon(null);
         }
       } catch {
         // ignore
