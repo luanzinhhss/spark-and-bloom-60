@@ -393,37 +393,39 @@ function Index() {
                 <div
                   className="relative h-48 sm:h-56 flex items-center justify-center overflow-hidden"
                   style={{
-                    background: `repeating-linear-gradient(45deg, ${GREEN} 0 14px, ${YELLOW} 14px 28px)`,
+                    backgroundImage: `linear-gradient(135deg, ${DARK}cc, ${DARK2}aa), url(${fifaBackdrop})`,
+                    backgroundSize: "cover, cover",
+                    backgroundPosition: "center, center",
                   }}
                 >
                   <img
                     src={p.image}
                     alt={p.name}
-                    className="max-h-[85%] w-auto drop-shadow-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                    className="max-h-[85%] w-auto drop-shadow-[0_10px_30px_rgba(255,230,0,0.35)] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
                     loading="lazy"
                   />
                 </div>
-                <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  <span className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
+                <div className="p-4 sm:p-5 flex flex-col flex-1" style={{ backgroundColor: DARK2 }}>
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: GREEN }}>
                     ★ {p.tag}
                   </span>
-                  <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: BLUE }}>
+                  <h3 className="font-display text-lg sm:text-xl mt-1 leading-tight" style={{ color: WHITE }}>
                     {p.name}
                   </h3>
-                  <p className="mt-2 text-sm font-medium flex-1" style={{ color: BLUE }}>
+                  <p className="mt-2 text-sm font-medium flex-1" style={{ color: "#b8bcc8" }}>
                     {p.desc}
                   </p>
                   <div className="mt-3 flex items-baseline gap-2">
                     {p.oldPrice && (
-                      <span className="text-xs line-through opacity-60" style={{ color: BLUE }}>
+                      <span className="text-xs line-through opacity-60" style={{ color: "#b8bcc8" }}>
                         {fmt(p.oldPrice)}
                       </span>
                     )}
-                    <span className="font-display text-2xl" style={{ color: BLUE }}>
+                    <span className="font-display text-2xl" style={{ color: YELLOW }}>
                       {fmt(p.price)}
                     </span>
                   </div>
-                  <div className="text-[11px] mt-0.5 opacity-80" style={{ color: BLUE }}>
+                  <div className="text-[11px] mt-0.5 opacity-80" style={{ color: "#b8bcc8" }}>
                     {p.installments}
                   </div>
 
@@ -433,9 +435,9 @@ function Index() {
                       onClick={() => addToCart(p.id)}
                       className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
-                        backgroundColor: WHITE,
-                        color: BLUE,
-                        border: `3px solid ${BLUE}`,
+                        backgroundColor: "transparent",
+                        color: YELLOW,
+                        border: `3px solid ${YELLOW}`,
                       }}
                     >
                       + Carrinho
@@ -446,8 +448,8 @@ function Index() {
                       className="rounded-full px-3 py-2.5 font-display text-[11px] sm:text-xs tracking-widest uppercase transition-transform active:scale-95 hover:scale-[1.03]"
                       style={{
                         backgroundColor: GREEN,
-                        color: YELLOW,
-                        border: `3px solid ${BLUE}`,
+                        color: DARK,
+                        border: `3px solid ${YELLOW}`,
                         boxShadow: `0 3px 0 ${GREEN_DEEP}`,
                       }}
                     >
