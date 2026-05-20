@@ -1319,6 +1319,74 @@ function Index() {
                     ))}
                   </ul>
 
+                  {p.variants && (
+                    <div className="mt-6 space-y-4">
+                      {p.variants.colors && (
+                        <div>
+                          <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: MUTED }}>
+                            Cor
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {p.variants.colors.map((c) => {
+                              const active = variantColor === c;
+                              return (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => setVariantColor(c)}
+                                  className="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : "transparent",
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {c}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {p.variants.models && (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                              Modelo
+                            </div>
+                            {variantModel && (
+                              <div className="text-[11px]" style={{ color: GREEN }}>{variantModel}</div>
+                            )}
+                          </div>
+                          <div
+                            className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto pr-2 rounded-lg p-2"
+                            style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
+                          >
+                            {p.variants.models.map((m) => {
+                              const active = variantModel === m;
+                              return (
+                                <button
+                                  key={m}
+                                  type="button"
+                                  onClick={() => setVariantModel(m)}
+                                  className="px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : SURFACE_2,
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {m}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+
                   <div className="mt-6 pt-5 flex items-baseline gap-3" style={{ borderTop: `1px solid ${LINE}` }}>
                     {p.oldPrice && (
                       <span className="text-sm line-through" style={{ color: MUTED }}>
