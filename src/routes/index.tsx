@@ -16,6 +16,14 @@ import albumCasalMain from "@/assets/album-casal-main.png";
 import albumCasalInterior from "@/assets/album-casal-interior.png";
 import capinhaNeymar from "@/assets/capinha-neymar.png";
 import capinhaNeymarJ2 from "@/assets/capinha-neymar-j2.png";
+import portaFigurinhas1 from "@/assets/porta-figurinhas-1.jpg";
+import portaFigurinhas2 from "@/assets/porta-figurinhas-2.jpg";
+import portaFigurinhas3 from "@/assets/porta-figurinhas-3.jpg";
+import portaFigurinhas4 from "@/assets/porta-figurinhas-4.jpg";
+import portaFigurinhas5 from "@/assets/porta-figurinhas-5.jpg";
+import portaFigurinhas6 from "@/assets/porta-figurinhas-6.jpg";
+import portaFigurinhas7 from "@/assets/porta-figurinhas-7.jpg";
+import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -59,6 +67,8 @@ type Product = {
     colors?: string[];
     models?: string[];
   };
+  options?: { name: string; values: string[]; default?: string }[];
+  specs?: { group: string; items: { label: string; value: string }[] }[];
 };
 
 const PRODUCTS: Product[] = [
