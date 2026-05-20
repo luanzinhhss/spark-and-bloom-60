@@ -156,9 +156,7 @@
   0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
   50% { transform: translateY(-14px) rotate(var(--r, 0deg)); }
 }
-@keyframes spin-slow {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin-slow { to { transform: rotate(360deg); } }
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -177,8 +175,36 @@
   50% { transform: translateY(-6px); }
 }
 @keyframes wiggle {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 230, 0, 0.7), 0 0 20px rgba(255, 206, 0, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(255, 230, 0, 0), 0 0 40px rgba(255, 206, 0, 0.9);
+    transform: scale(1.02);
+  }
+}
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes ball-kick {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(8px) rotate(90deg); }
+  50% { transform: translateX(0) rotate(180deg); }
+  75% { transform: translateX(-8px) rotate(270deg); }
+}
+@keyframes gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .animate-floaty { animation: floaty 4s ease-in-out infinite; }
@@ -186,12 +212,29 @@
 .animate-marquee { animation: marquee 22s linear infinite; }
 .animate-pop-in { animation: pop-in 0.7s cubic-bezier(.5,1.7,.5,1) both; }
 .animate-bounce-soft { animation: bounce-soft 2.2s ease-in-out infinite; }
-.animate-wiggle { animation: wiggle 1.6s ease-in-out infinite; }
+.animate-wiggle { animation: wiggle 1.2s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 1.8s ease-in-out infinite; }
+.animate-slide-up { animation: slide-up 0.35s cubic-bezier(.2,.9,.3,1.2) both; }
+.animate-slide-in-right { animation: slide-in-right 0.3s cubic-bezier(.2,.9,.3,1.2) both; }
+.animate-ball-kick { animation: ball-kick 1.6s ease-in-out infinite; }
+
 .shimmer-text {
-  background: linear-gradient(90deg, #FFCE00 0%, #FFF6B0 25%, #FFCE00 50%, #FFF6B0 75%, #FFCE00 100%);
+  background: linear-gradient(90deg, #FFE600 0%, #FFFAA0 25%, #FFE600 50%, #FFFAA0 75%, #FFE600 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer 3s linear infinite;
+  animation: shimmer 2.5s linear infinite;
+}
+.bg-copa-flow {
+  background: linear-gradient(120deg, #00E558, #FFE600, #00E558, #003BB5, #FFE600);
+  background-size: 300% 300%;
+  animation: gradient-flow 8s ease infinite;
+}
+.field-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #00C24A 0 40px,
+    #00A53E 40px 80px
+  );
 }
