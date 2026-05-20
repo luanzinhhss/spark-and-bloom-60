@@ -1404,37 +1404,69 @@ function Index() {
                       )}
                       {p.variants.models && (
                         <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
-                              Modelo
-                            </div>
-                            {variantModel && (
-                              <div className="text-[11px]" style={{ color: GREEN }}>{variantModel}</div>
-                            )}
+                          <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: MUTED }}>
+                            Sistema
                           </div>
-                          <div
-                            className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto pr-2 rounded-lg p-2"
-                            style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
-                          >
-                            {p.variants.models.map((m) => {
-                              const active = variantModel === m;
+                          <div className="flex gap-2 mb-4">
+                            {([
+                              { id: "android", label: "Android" },
+                              { id: "ios", label: "iOS" },
+                            ] as const).map((s) => {
+                              const active = variantSystem === s.id;
                               return (
                                 <button
-                                  key={m}
+                                  key={s.id}
                                   type="button"
-                                  onClick={() => setVariantModel(m)}
-                                  className="px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all"
+                                  onClick={() => { setVariantSystem(s.id); setVariantModel(null); }}
+                                  className="flex-1 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all"
                                   style={{
                                     color: active ? INK : WHITE,
-                                    backgroundColor: active ? YELLOW : SURFACE_2,
+                                    backgroundColor: active ? YELLOW : "transparent",
                                     border: `1px solid ${active ? YELLOW : LINE}`,
                                   }}
                                 >
-                                  {m}
+                                  {s.label}
                                 </button>
                               );
                             })}
                           </div>
+                          {variantSystem && (
+                            <>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                                  Modelo
+                                </div>
+                                {variantModel && (
+                                  <div className="text-[11px]" style={{ color: GREEN }}>{variantModel}</div>
+                                )}
+                              </div>
+                              <div
+                                className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto pr-2 rounded-lg p-2"
+                                style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
+                              >
+                                {p.variants.models
+                                  .filter((m) => variantSystem === "ios" ? m.toLowerCase().includes("iphone") : !m.toLowerCase().includes("iphone"))
+                                  .map((m) => {
+                                    const active = variantModel === m;
+                                    return (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => setVariantModel(m)}
+                                        className="px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all"
+                                        style={{
+                                          color: active ? INK : WHITE,
+                                          backgroundColor: active ? YELLOW : SURFACE_2,
+                                          border: `1px solid ${active ? YELLOW : LINE}`,
+                                        }}
+                                      >
+                                        {m}
+                                      </button>
+                                    );
+                                  })}
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
