@@ -649,18 +649,18 @@ function Index() {
           <div
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-md rounded-3xl border-8 shadow-2xl overflow-hidden animate-slide-up"
-            style={{ backgroundColor: WHITE, borderColor: YELLOW }}
+            style={{ backgroundColor: DARK, borderColor: YELLOW }}
           >
             <div
               className="px-5 py-4 flex items-center justify-between border-b-4"
-              style={{ backgroundColor: BLUE, borderColor: YELLOW, color: YELLOW }}
+              style={{ backgroundColor: DARK2, borderColor: YELLOW, color: YELLOW }}
             >
               <div className="font-display text-lg tracking-widest">PAGAR COM PIX ⚡</div>
               <button
                 type="button"
                 onClick={closeCheckout}
                 className="rounded-full h-9 w-9 flex items-center justify-center text-lg font-black"
-                style={{ backgroundColor: YELLOW, color: BLUE }}
+                style={{ backgroundColor: YELLOW, color: DARK }}
               >
                 ×
               </button>
@@ -670,7 +670,7 @@ function Index() {
               {pix.kind === "loading" && (
                 <div className="text-center py-10">
                   <div className="text-5xl animate-ball-kick inline-block">⚽</div>
-                  <p className="mt-4 font-display text-lg" style={{ color: BLUE }}>
+                  <p className="mt-4 font-display text-lg" style={{ color: YELLOW }}>
                     Gerando seu PIX...
                   </p>
                 </div>
@@ -678,10 +678,10 @@ function Index() {
               {pix.kind === "error" && (
                 <div className="text-center py-8">
                   <div className="text-5xl">😞</div>
-                  <p className="mt-3 font-display text-lg" style={{ color: BLUE }}>
+                  <p className="mt-3 font-display text-lg" style={{ color: WHITE }}>
                     Não rolou
                   </p>
-                  <p className="mt-1 text-sm font-semibold" style={{ color: BLUE }}>
+                  <p className="mt-1 text-sm font-semibold" style={{ color: "#b8bcc8" }}>
                     {pix.message}
                   </p>
                   <button
@@ -692,7 +692,7 @@ function Index() {
                       setTimeout(() => setCheckout(c), 50);
                     }}
                     className="mt-5 rounded-full px-6 py-2 font-display text-xs tracking-widest uppercase border-4"
-                    style={{ backgroundColor: GREEN, color: YELLOW, borderColor: BLUE }}
+                    style={{ backgroundColor: GREEN, color: DARK, borderColor: YELLOW }}
                   >
                     Tentar de novo
                   </button>
@@ -701,10 +701,10 @@ function Index() {
               {pix.kind === "ok" && (
                 <div>
                   <div className="text-center">
-                    <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN_DEEP }}>
+                    <div className="text-xs font-black tracking-[0.2em] uppercase" style={{ color: GREEN }}>
                       ★ Total
                     </div>
-                    <div className="font-display text-4xl mt-1" style={{ color: BLUE }}>
+                    <div className="font-display text-4xl mt-1" style={{ color: YELLOW }}>
                       {fmt(pix.total)}
                     </div>
                   </div>
@@ -713,7 +713,7 @@ function Index() {
                     <div className="mt-5 flex justify-center">
                       <div
                         className="p-3 rounded-2xl border-4"
-                        style={{ borderColor: BLUE, backgroundColor: WHITE }}
+                        style={{ borderColor: YELLOW, backgroundColor: WHITE }}
                       >
                         <img
                           src={
@@ -729,12 +729,12 @@ function Index() {
                   )}
 
                   <div className="mt-5">
-                    <label className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: BLUE }}>
+                    <label className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: YELLOW }}>
                       PIX Copia e Cola
                     </label>
                     <div
                       className="mt-1 rounded-lg p-3 text-xs break-all font-mono border-2 max-h-24 overflow-y-auto"
-                      style={{ backgroundColor: "#F5F5F5", borderColor: BLUE, color: BLUE }}
+                      style={{ backgroundColor: DARK2, borderColor: YELLOW, color: "#b8bcc8" }}
                     >
                       {pix.copy_paste}
                     </div>
@@ -747,16 +747,16 @@ function Index() {
                       }}
                       className="mt-3 w-full rounded-full px-5 py-3 font-display text-sm tracking-widest uppercase border-4 transition-transform active:scale-95 hover:scale-[1.02]"
                       style={{
-                        backgroundColor: copied ? BLUE : GREEN,
-                        color: YELLOW,
-                        borderColor: BLUE,
+                        backgroundColor: copied ? YELLOW : GREEN,
+                        color: DARK,
+                        borderColor: YELLOW,
                       }}
                     >
                       {copied ? "✓ Copiado!" : "Copiar código PIX"}
                     </button>
                   </div>
 
-                  <p className="mt-4 text-center text-[11px] font-semibold opacity-80" style={{ color: BLUE }}>
+                  <p className="mt-4 text-center text-[11px] font-semibold opacity-80" style={{ color: "#b8bcc8" }}>
                     Abra seu app do banco e pague com PIX. A confirmação é automática.
                   </p>
                 </div>
