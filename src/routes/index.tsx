@@ -231,9 +231,16 @@ function Index() {
   // Buy-now flow: open confirmation modal first
   const handleBuyClick = (id: string) => setConfirmBuy(id);
 
+  const openCheckout = (items: CartLine[]) => {
+    setCheckoutStep("contact");
+    setFormError(null);
+    setCepError(null);
+    setCheckout({ items });
+  };
+
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
-    setCheckout({ items: [{ id, qty: 1 }] });
+    openCheckout([{ id, qty: 1 }]);
   };
   const addAndKeepShopping = (id: string) => {
     addToCart(id);
@@ -247,19 +254,74 @@ function Index() {
       map.set(id, (map.get(id) ?? 0) + 1);
       return Array.from(map, ([id, qty]) => ({ id, qty }));
     })();
-    setCheckout({ items });
+    openCheckout(items);
   };
 
   const checkoutCart = () => {
     if (cart.length === 0) return;
     setCartOpen(false);
-    setCheckout({ items: cart });
+    openCheckout(cart);
   };
 
   const regeneratePix = () => {
     if (!checkout) return;
     setCheckout({ items: checkout.items, nonce: Date.now() });
   };
+
+  // CEP lookup via ViaCEP
+  const lookupCep = async (rawCep: string) => {
+    const cep = rawCep.replace(/\D/g, "");
+    if (cep.length !== 8) return;
+    setCepLoading(true);
+    setCepError(null);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = (await res.json()) as {
+        erro?: boolean;
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+      };
+      if (data.erro) {
+        setCepError("CEP não encontrado");
+        return;
+      }
+      setCustomer((c) => ({
+        ...c,
+        street: data.logradouro ?? c.street,
+        neighborhood: data.bairro ?? c.neighborhood,
+        city: data.localidade ?? c.city,
+        state: data.uf ?? c.state,
+      }));
+    } catch {
+      setCepError("Erro ao buscar CEP");
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
+  const submitContact = () => {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim());
+    const phoneDigits = customer.phone.replace(/\D/g, "");
+    if (!customer.name.trim()) return setFormError("Informe seu nome");
+    if (!emailOk) return setFormError("Informe um e-mail válido");
+    if (phoneDigits.length < 10) return setFormError("Informe um telefone válido");
+    setFormError(null);
+    setCheckoutStep("address");
+  };
+
+  const submitAddress = () => {
+    const cepOk = customer.cep.replace(/\D/g, "").length === 8;
+    if (!cepOk) return setFormError("Informe um CEP válido");
+    if (!customer.street.trim()) return setFormError("Informe a rua");
+    if (!customer.number.trim()) return setFormError("Informe o número");
+    if (!customer.city.trim() || !customer.state.trim())
+      return setFormError("Endereço incompleto");
+    setFormError(null);
+    setCheckoutStep("pix");
+  };
+
 
 
   // Generate PIX when checkout reaches pix step
