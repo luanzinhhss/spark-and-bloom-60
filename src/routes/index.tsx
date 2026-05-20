@@ -1412,7 +1412,7 @@ function Index() {
 
             {cart.length > 0 && (
               <div
-                className="p-5 space-y-4 sticky bottom-0"
+                className="p-5 space-y-4"
                 style={{ borderTop: `1px solid ${LINE}`, backgroundColor: INK }}
               >
                 {/* COUPON */}
