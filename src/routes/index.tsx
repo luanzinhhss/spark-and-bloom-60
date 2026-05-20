@@ -472,7 +472,16 @@ function Index() {
     );
 
   // Buy-now flow: open confirmation modal first
-  const handleBuyClick = (id: string) => setConfirmBuy(id);
+  const handleBuyClick = (id: string) => {
+    const prod = PRODUCTS.find((x) => x.id === id);
+    // If product requires variant selection (colors/models), open details modal
+    if (prod?.variants && (prod.variants.models || prod.variants.colors)) {
+      setDetailsId(id);
+      setDetailsImg(0);
+      return;
+    }
+    setConfirmBuy(id);
+  };
 
   const openCheckout = (items: CartLine[]) => {
     setCheckoutStep("contact");
