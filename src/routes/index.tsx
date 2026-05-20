@@ -252,6 +252,26 @@ const PRODUCTS: Product[] = [
   },
 ];
 
+const CATEGORY_MAP: Record<string, string> = {
+  album: "albuns",
+  "album-casal-50": "albuns",
+  "fig-individual": "figurinhas",
+  "fig-pack-10": "figurinhas",
+  "fig-shiny": "figurinhas",
+  "figurinha-canva-editavel": "digital",
+  "mini-taca-porta-foto": "decoracao",
+  "capinha-neymar": "acessorios",
+};
+
+const CATEGORIES: { id: string; label: string }[] = [
+  { id: "all", label: "Todos" },
+  { id: "albuns", label: "Álbuns" },
+  { id: "figurinhas", label: "Figurinhas" },
+  { id: "acessorios", label: "Acessórios" },
+  { id: "decoracao", label: "Decoração" },
+  { id: "digital", label: "Digital" },
+];
+
 const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 const fmt = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -272,6 +292,7 @@ type PixState =
 
 function Index() {
   const [intro, setIntro] = useState(true);
+  const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -1053,8 +1074,40 @@ function Index() {
             </p>
           </div>
 
+          <div className="-mx-4 sm:mx-0 mb-8 sm:mb-10 overflow-x-auto">
+            <div className="flex gap-2 px-4 sm:px-0 sm:flex-wrap min-w-max sm:min-w-0">
+              {CATEGORIES.map((c) => {
+                const active = category === c.id;
+                const count = c.id === "all"
+                  ? PRODUCTS.length
+                  : PRODUCTS.filter((p) => CATEGORY_MAP[p.id] === c.id).length;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategory(c.id)}
+                    className="px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all whitespace-nowrap"
+                    style={{
+                      color: active ? INK : WHITE,
+                      backgroundColor: active ? YELLOW : "transparent",
+                      border: `1px solid ${active ? YELLOW : LINE}`,
+                    }}
+                  >
+                    {c.label}
+                    <span
+                      className="ml-2 text-[10px] opacity-70"
+                      style={{ color: active ? INK : MUTED }}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.map((p) => (
+            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category).map((p) => (
               <article
                 key={p.id}
                 className="group relative rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1"
