@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import albumCover from "@/assets/album-cover.png";
+import albumFront from "@/assets/album-front.png";
+import albumInterior from "@/assets/album-interior.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
