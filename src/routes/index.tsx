@@ -1333,7 +1333,7 @@ function Index() {
               </button>
             </div>
 
-            <div className="flex-1 p-5 space-y-3">
+            <div className="p-5 space-y-3">
               {cart.length === 0 && (
                 <div className="text-center py-20">
                   <div className="mx-auto h-14 w-14 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}>
