@@ -216,7 +216,8 @@ const PRODUCTS: Product[] = [
     image: capinhaNeymar,
     badge: "Lançamento",
     gallery: [
-      { src: capinhaNeymar, label: "Estampa Neymar Jr" },
+      { src: capinhaNeymar, label: "Estampa J1 — Neymar Jr" },
+      { src: capinhaNeymarJ2, label: "Estampa J2 — Neymar Jr Amarelo" },
     ],
     details: [
       "Material: silicone fosco premium com tecnologia anti-impacto",
