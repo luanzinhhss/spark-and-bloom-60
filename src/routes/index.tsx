@@ -6,6 +6,7 @@ import albumInterior from "@/assets/album-interior.png";
 import cardMiguel from "@/assets/card-miguel.png";
 import cardArthur from "@/assets/card-arthur.png";
 import cardHelena from "@/assets/card-helena.png";
+import pack10Figurinhas from "@/assets/pack-10-figurinhas.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -61,7 +62,6 @@ const PRODUCTS: Product[] = [
     gallery: [
       { src: albumFront, label: "Capa" },
       { src: albumInterior, label: "Interior" },
-      { src: albumCover, label: "Detalhe" },
     ],
     details: [
       "Formato A4 — 60 espaços numerados",
@@ -80,10 +80,9 @@ const PRODUCTS: Product[] = [
     image: cardMiguel,
     gallery: [
       { src: cardMiguel, label: "Frente" },
-      { src: albumInterior, label: "No álbum" },
     ],
     details: [
-      "Impressão em alta resolução, papel cartonado",
+      "Impressão em alta resolução, papel adesivo já cortado",
       "Nome, posição e número personalizados",
       "Verso com escudo e número de coleção",
     ],
@@ -96,12 +95,11 @@ const PRODUCTS: Product[] = [
     oldPrice: 99,
     installments: "R$ 7,90 cada — economize 20%",
     desc: "Monte sua seleção do casal, da família ou do time.",
-    image: cardArthur,
+    image: pack10Figurinhas,
     badge: "Economia",
     gallery: [
-      { src: cardArthur, label: "Frente" },
+      { src: pack10Figurinhas, label: "Pack completo" },
       { src: cardMiguel, label: "Variações" },
-      { src: albumInterior, label: "Coleção" },
     ],
     details: [
       "10 figurinhas personalizadas no mesmo pedido",
@@ -120,7 +118,6 @@ const PRODUCTS: Product[] = [
     badge: "Limitada",
     gallery: [
       { src: cardHelena, label: "Frente Shiny" },
-      { src: albumInterior, label: "No álbum" },
     ],
     details: [
       "Acabamento holográfico foil dourado",
