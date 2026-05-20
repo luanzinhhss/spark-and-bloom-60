@@ -61,6 +61,7 @@ type Product = {
   desc: string;
   image: string;
   badge?: string;
+  pinned?: boolean;
   gallery: { src: string; label: string }[];
   details: string[];
   variants?: {
