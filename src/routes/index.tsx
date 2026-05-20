@@ -358,10 +358,20 @@ function Index() {
             >
               ⚽ Catálogo Oficial
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4" style={{ color: BLUE }}>
-              ESCOLHA SUA <span style={{ color: GREEN }}>JOGADA</span>
+      {/* CATALOG */}
+      <section id="catalogo" style={{ backgroundColor: DARK }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
+          <div className="text-center">
+            <span
+              className="inline-block rounded-full px-4 py-1 text-[10px] sm:text-xs font-extrabold tracking-[0.2em] uppercase"
+              style={{ backgroundColor: GREEN, color: DARK }}
+            >
+              ⚽ Catálogo Oficial
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4" style={{ color: WHITE }}>
+              ESCOLHA SUA <span style={{ color: YELLOW }}>JOGADA</span>
             </h2>
-            <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: BLUE }}>
+            <p className="mt-3 font-semibold max-w-xl mx-auto" style={{ color: "#cfd2dc" }}>
               Álbum, figurinhas individuais, pacotes e a rara dourada. Tudo personalizado.
             </p>
           </div>
@@ -370,9 +380,10 @@ function Index() {
             {PRODUCTS.map((p, i) => (
               <article
                 key={p.id}
-                className="group relative rounded-2xl border-4 shadow-xl overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col bg-white"
+                className="group relative rounded-2xl border-4 shadow-xl overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl flex flex-col"
                 style={{
-                  borderColor: BLUE,
+                  backgroundColor: DARK2,
+                  borderColor: YELLOW,
                   animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.1}s both`,
                 }}
               >
