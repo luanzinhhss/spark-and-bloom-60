@@ -224,6 +224,47 @@ function Index() {
     return () => clearTimeout(t);
   }, []);
 
+  // Welcome coupon w/ countdown (2-4 day random expiration, persisted)
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [welcomeExpiry, setWelcomeExpiry] = useState<number | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("copa_welcome_v1");
+      if (raw) {
+        const exp = Number(raw);
+        if (Number.isFinite(exp) && exp > Date.now()) {
+          setWelcomeExpiry(exp);
+          return;
+        }
+      }
+      // First visit: pick random 2-4 day window
+      const days = 2 + Math.floor(Math.random() * 3); // 2, 3 or 4
+      const exp = Date.now() + days * 24 * 60 * 60 * 1000;
+      localStorage.setItem("copa_welcome_v1", String(exp));
+      setWelcomeExpiry(exp);
+      // Open welcome modal after intro
+      const t = setTimeout(() => setWelcomeOpen(true), 2000);
+      return () => clearTimeout(t);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  useEffect(() => {
+    const i = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, []);
+  const countdown = useMemo(() => {
+    if (!welcomeExpiry) return null;
+    const diff = Math.max(0, welcomeExpiry - now);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s, expired: diff === 0 };
+  }, [welcomeExpiry, now]);
+
+
   const cartCount = cart.reduce((a, l) => a + l.qty, 0);
   const cartSubtotal = useMemo(
     () => cart.reduce((a, l) => a + PRODUCT_MAP[l.id].price * l.qty, 0),
@@ -519,6 +560,85 @@ function Index() {
         </div>
       </div>
 
+      {/* WELCOME COUPON MODAL with countdown */}
+      {welcomeOpen && countdown && !countdown.expired && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setWelcomeOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-2xl overflow-hidden animate-slide-up"
+            style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}
+          >
+            <div
+              className="h-2"
+              style={{
+                background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE})`,
+                backgroundSize: "200% 100%",
+                animation: "gradient-flow 6s ease infinite",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setWelcomeOpen(false)}
+              className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+              style={{ color: MUTED }}
+              aria-label="Fechar"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+            <div className="p-7 text-center">
+              <div className="text-[10px] font-semibold tracking-[0.35em] uppercase" style={{ color: YELLOW }}>
+                Presente de boas-vindas
+              </div>
+              <h3 className="font-display text-3xl sm:text-4xl mt-3 leading-[1.05]" style={{ color: WHITE }}>
+                25% OFF na sua<br />primeira compra
+              </h3>
+              <p className="mt-3 text-sm" style={{ color: MUTED }}>
+                Use o cupom abaixo no carrinho. Oferta por tempo limitado.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => { applyCoupon("NEYVOLTOU26K"); setWelcomeOpen(false); setCartOpen(true); }}
+                className="mt-5 w-full rounded-xl px-4 py-4 font-mono font-bold text-lg tracking-wider transition-transform hover:scale-[1.02]"
+                style={{ backgroundColor: YELLOW, color: INK }}
+              >
+                NEYVOLTOU26K
+              </button>
+              <div className="mt-2 text-[10px] tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                Toque para aplicar
+              </div>
+
+              <div className="mt-6">
+                <div className="text-[10px] tracking-[0.3em] uppercase mb-2" style={{ color: MUTED }}>
+                  Expira em
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { v: countdown.d, l: "Dias" },
+                    { v: countdown.h, l: "Horas" },
+                    { v: countdown.m, l: "Min" },
+                    { v: countdown.s, l: "Seg" },
+                  ].map((t) => (
+                    <div key={t.l} className="rounded-lg py-2.5" style={{ backgroundColor: INK, border: `1px solid ${LINE}` }}>
+                      <div className="font-display text-2xl tabular-nums" style={{ color: WHITE }}>
+                        {String(t.v).padStart(2, "0")}
+                      </div>
+                      <div className="text-[9px] tracking-[0.2em] uppercase mt-0.5" style={{ color: MUTED }}>{t.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
       {/* PAGE CONTENT WRAPPER — fade-blur in on mount */}
       <div
         className="transition-all duration-[1100ms] ease-out"
@@ -530,28 +650,44 @@ function Index() {
       >
 
 
-      {/* DISCOUNT BANNER */}
+      {/* DISCOUNT BANNER — marquee with both coupons */}
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden border-b"
         style={{
           background: `linear-gradient(90deg, ${YELLOW}, ${GREEN}, ${BLUE}, ${YELLOW})`,
           backgroundSize: "300% 100%",
-          animation: "gradient-flow 8s ease infinite",
+          animation: "gradient-flow 10s ease infinite",
+          borderColor: `${INK}`,
         }}
       >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 flex items-center justify-center gap-2 sm:gap-3 text-center">
-          <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
-          <span className="text-[11px] sm:text-xs font-semibold tracking-wide" style={{ color: INK }}>
-            <span className="font-bold">Até 30% OFF</span> na primeira compra · use o cupom{" "}
-            <button
-              type="button"
-              onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
-              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
-              style={{ backgroundColor: INK, color: YELLOW }}
-            >
-              NEYVOLTOU26K
-            </button>
-          </span>
+        <div className="relative py-2">
+          <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 text-[12px] sm:text-[13px] font-semibold" style={{ color: INK }}>
+                <span className="inline-flex h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: INK }} />
+                <span>Até <span className="font-extrabold">30% OFF</span> na primeira compra</span>
+                <button
+                  type="button"
+                  onClick={() => { applyCoupon("NEYVOLTOU26K"); setCartOpen(true); }}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+                  style={{ backgroundColor: INK, color: YELLOW }}
+                >
+                  NEYVOLTOU26K · −25%
+                </button>
+                <span className="opacity-60">•</span>
+                <span>Cupom de boas-vindas</span>
+                <button
+                  type="button"
+                  onClick={() => { applyCoupon("COPA10"); setCartOpen(true); }}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono font-bold transition-transform hover:scale-105"
+                  style={{ backgroundColor: INK, color: GREEN }}
+                >
+                  COPA10 · −15%
+                </button>
+                <span className="opacity-60 mr-2">•</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -643,21 +779,23 @@ function Index() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a
-                href="#catalogo"
+              <button
+                type="button"
+                onClick={() => document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.02]"
                 style={{ backgroundColor: YELLOW, color: INK }}
               >
-                Ver catálogo
+                Comprar agora
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </a>
-              <a
-                href="#como-funciona"
+              </button>
+              <button
+                type="button"
+                onClick={() => document.getElementById("como-funciona")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:bg-white/5"
                 style={{ color: WHITE, border: `1px solid ${LINE}` }}
               >
                 Como funciona
-              </a>
+              </button>
             </div>
 
             <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
@@ -698,7 +836,61 @@ function Index() {
         </div>
       </section>
 
-      {/* CATALOG */}
+      {/* COUPONS SECTION */}
+      <section id="cupons" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <div className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-3" style={{ color: YELLOW }}>
+              Cupons ativos
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
+              Aplique e economize
+            </h2>
+            <p className="mt-3 text-sm" style={{ color: MUTED }}>
+              Clique no cupom para aplicar automaticamente ao seu carrinho.
+            </p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 max-w-3xl mx-auto">
+            {[
+              { code: "COPA10", pct: 15, color: GREEN, desc: "Cupom geral · use em qualquer pedido" },
+              { code: "NEYVOLTOU26K", pct: 25, color: YELLOW, desc: "Boas-vindas · primeira compra" },
+            ].map((c) => (
+              <div
+                key={c.code}
+                className="relative rounded-2xl overflow-hidden p-6 flex items-center gap-5 transition-transform hover:-translate-y-1"
+                style={{
+                  backgroundColor: INK,
+                  border: `1px solid ${LINE}`,
+                  boxShadow: `0 0 0 1px ${c.color}22 inset, 0 10px 30px ${c.color}14`,
+                }}
+              >
+                {/* perforation */}
+                <div className="absolute top-0 bottom-0 left-[110px] w-px" style={{ background: `repeating-linear-gradient(to bottom, ${LINE} 0 6px, transparent 6px 12px)` }} />
+                <div className="flex flex-col items-center justify-center w-[90px] shrink-0">
+                  <div className="font-display text-4xl leading-none" style={{ color: c.color }}>{c.pct}%</div>
+                  <div className="text-[10px] mt-1 tracking-[0.25em] uppercase" style={{ color: MUTED }}>OFF</div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-base font-bold truncate" style={{ color: WHITE }}>{c.code}</div>
+                  <p className="text-xs mt-1" style={{ color: MUTED }}>{c.desc}</p>
+                  <button
+                    type="button"
+                    onClick={() => { applyCoupon(c.code); setCartOpen(true); }}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide transition-transform hover:scale-[1.03]"
+                    style={{ backgroundColor: c.color, color: INK }}
+                  >
+                    Aplicar cupom
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
       <section id="catalogo" style={{ backgroundColor: INK }}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-28">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-12">

@@ -161,6 +161,13 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee-reverse { animation: marquee-reverse 28s linear infinite; }
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 80px; }
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
