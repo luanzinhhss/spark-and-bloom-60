@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
 import albumCover from "@/assets/album-cover.png";
 import albumFront from "@/assets/album-front.png";
 import albumInterior from "@/assets/album-interior.png";
