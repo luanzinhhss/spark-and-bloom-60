@@ -250,10 +250,11 @@ function Index() {
   // Generate PIX when checkout opens
   useEffect(() => {
     if (!checkout) return;
-    const total = checkout.items.reduce(
+    const subtotal = checkout.items.reduce(
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
     );
+    const total = coupon ? subtotal * (1 - coupon.pct) : subtotal;
     const desc = checkout.items
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
       .join(", ")
