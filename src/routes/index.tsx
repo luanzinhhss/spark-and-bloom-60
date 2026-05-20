@@ -270,6 +270,7 @@ const PRODUCTS: Product[] = [
     desc: "Maleta organizadora oficial estilo Copa 2026 com até 200 figurinhas, travas reforçadas e chaveiro mini troféu de brinde exclusivo.",
     image: portaFigurinhas1,
     badge: "Lançamento exclusivo",
+    pinned: true,
     gallery: [
       { src: portaFigurinhas1, label: "Apresentação" },
       { src: portaFigurinhas2, label: "Detalhes da tampa" },
