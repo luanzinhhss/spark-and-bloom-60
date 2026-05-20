@@ -1074,8 +1074,40 @@ function Index() {
             </p>
           </div>
 
+          <div className="-mx-4 sm:mx-0 mb-8 sm:mb-10 overflow-x-auto">
+            <div className="flex gap-2 px-4 sm:px-0 sm:flex-wrap min-w-max sm:min-w-0">
+              {CATEGORIES.map((c) => {
+                const active = category === c.id;
+                const count = c.id === "all"
+                  ? PRODUCTS.length
+                  : PRODUCTS.filter((p) => CATEGORY_MAP[p.id] === c.id).length;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategory(c.id)}
+                    className="px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all whitespace-nowrap"
+                    style={{
+                      color: active ? INK : WHITE,
+                      backgroundColor: active ? YELLOW : "transparent",
+                      border: `1px solid ${active ? YELLOW : LINE}`,
+                    }}
+                  >
+                    {c.label}
+                    <span
+                      className="ml-2 text-[10px] opacity-70"
+                      style={{ color: active ? INK : MUTED }}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.map((p) => (
+            {PRODUCTS.filter((p) => category === "all" || CATEGORY_MAP[p.id] === category).map((p) => (
               <article
                 key={p.id}
                 className="group relative rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1"
