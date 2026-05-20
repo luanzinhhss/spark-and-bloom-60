@@ -16,6 +16,14 @@ import albumCasalMain from "@/assets/album-casal-main.png";
 import albumCasalInterior from "@/assets/album-casal-interior.png";
 import capinhaNeymar from "@/assets/capinha-neymar.png";
 import capinhaNeymarJ2 from "@/assets/capinha-neymar-j2.png";
+import portaFigurinhas1 from "@/assets/porta-figurinhas-1.jpg";
+import portaFigurinhas2 from "@/assets/porta-figurinhas-2.jpg";
+import portaFigurinhas3 from "@/assets/porta-figurinhas-3.jpg";
+import portaFigurinhas4 from "@/assets/porta-figurinhas-4.jpg";
+import portaFigurinhas5 from "@/assets/porta-figurinhas-5.jpg";
+import portaFigurinhas6 from "@/assets/porta-figurinhas-6.jpg";
+import portaFigurinhas7 from "@/assets/porta-figurinhas-7.jpg";
+import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 
 export const Route = createFileRoute("/")({
@@ -59,6 +67,8 @@ type Product = {
     colors?: string[];
     models?: string[];
   };
+  options?: { name: string; values: string[]; default?: string }[];
+  specs?: { group: string; items: { label: string; value: string }[] }[];
 };
 
 const PRODUCTS: Product[] = [
@@ -250,6 +260,73 @@ const PRODUCTS: Product[] = [
       ],
     },
   },
+  {
+    id: "porta-figurinhas-copa",
+    name: "Case Porta Figurinhas Copa 2026 — Maleta + Chaveiro Troféu",
+    tag: "Estojo Organizador · Gurumania",
+    price: 89.9,
+    oldPrice: 139.9,
+    installments: "ou 6x de R$ 14,98 sem juros",
+    desc: "Maleta organizadora oficial estilo Copa 2026 com até 200 figurinhas, travas reforçadas e chaveiro mini troféu de brinde exclusivo.",
+    image: portaFigurinhas1,
+    badge: "Lançamento exclusivo",
+    gallery: [
+      { src: portaFigurinhas1, label: "Apresentação" },
+      { src: portaFigurinhas2, label: "Detalhes da tampa" },
+      { src: portaFigurinhas3, label: "Alta capacidade — 200 figurinhas" },
+      { src: portaFigurinhas4, label: "Fechamento seguro" },
+      { src: portaFigurinhas5, label: "Dimensões compactas" },
+      { src: portaFigurinhas6, label: "Chaveiro mini troféu" },
+      { src: portaFigurinhas7, label: "Proteção total" },
+      { src: portaFigurinhas8, label: "Entre no clima da Copa" },
+    ],
+    details: [
+      "Comporta até 200 figurinhas com divisórias inteligentes (1 e 2)",
+      "Travas verdes reforçadas — proteção contra abertura acidental",
+      "Material durável: ABS branco com estampa FIFA Copa 2026",
+      "Dimensões compactas: 11,5 × 9,5 × 4,5 cm — cabe na mochila ou no bolso",
+      "Brinde exclusivo: chaveiro mini troféu da Copa com argola italiana",
+      "Ideal para colecionadores e perfeito para presentear",
+    ],
+    options: [
+      { name: "Personagem", values: ["Branco", "Jogadores Copa do Mundo"], default: "Branco" },
+      { name: "Nome do desenho", values: ["Porta Figurinhas", "Figurinhas Copa"], default: "Porta Figurinhas" },
+      { name: "Tipo de embalagem", values: ["Maleta", "Envelope"], default: "Maleta" },
+      { name: "Formato de venda", values: ["Unidade", "Kit"], default: "Unidade" },
+      { name: "Unidades por kit", values: ["1", "105"], default: "1" },
+    ],
+    specs: [
+      {
+        group: "Características principais",
+        items: [
+          { label: "Marca", value: "Gurumania" },
+          { label: "Nome do álbum", value: "Copa do Mundo 2026 FIFA" },
+          { label: "Personagem", value: "Branco" },
+          { label: "Nome do desenho", value: "Porta Figurinhas" },
+          { label: "Tipo de embalagem", value: "Maleta" },
+        ],
+      },
+      {
+        group: "Características de venda",
+        items: [
+          { label: "Formato de venda", value: "Unidade" },
+        ],
+      },
+      {
+        group: "Outros",
+        items: [
+          { label: "Time", value: "Brasil" },
+          { label: "Ano do álbum", value: "2026" },
+          { label: "Temática", value: "Futebol Copa do Mundo World Cup 2026" },
+          { label: "Sem figurinhas repetidas", value: "Não" },
+          { label: "É uma figurinha holográfica", value: "Não" },
+          { label: "É uma figurinha especial", value: "Não" },
+          { label: "Idade mínima recomendada", value: "5 anos" },
+          { label: "Idade recomendada", value: "8-13 anos" },
+        ],
+      },
+    ],
+  },
 ];
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -260,6 +337,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "fig-shiny": "figurinhas",
   "figurinha-canva-editavel": "digital",
   "mini-taca-porta-foto": "decoracao",
+  "porta-figurinhas-copa": "decoracao",
   "capinha-neymar": "acessorios",
 };
 
@@ -302,7 +380,20 @@ function Index() {
   const [variantColor, setVariantColor] = useState<string | null>(null);
   const [variantSystem, setVariantSystem] = useState<"android" | "ios" | null>(null);
   const [variantModel, setVariantModel] = useState<string | null>(null);
-  useEffect(() => { setVariantColor(null); setVariantSystem(null); setVariantModel(null); }, [detailsId]);
+  const [variantOptions, setVariantOptions] = useState<Record<string, string>>({});
+  useEffect(() => {
+    setVariantColor(null);
+    setVariantSystem(null);
+    setVariantModel(null);
+    const prod = detailsId ? PRODUCTS.find((x) => x.id === detailsId) : null;
+    if (prod?.options) {
+      const init: Record<string, string> = {};
+      prod.options.forEach((o) => { init[o.name] = o.default ?? o.values[0]; });
+      setVariantOptions(init);
+    } else {
+      setVariantOptions({});
+    }
+  }, [detailsId]);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
   const [customer, setCustomer] = useState({
@@ -474,8 +565,13 @@ function Index() {
   // Buy-now flow: open confirmation modal first
   const handleBuyClick = (id: string) => {
     const prod = PRODUCTS.find((x) => x.id === id);
-    // If product requires variant selection (colors/models), open details modal
+    // If product requires variant/option selection, open details modal
     if (prod?.variants && (prod.variants.models || prod.variants.colors)) {
+      setDetailsId(id);
+      setDetailsImg(0);
+      return;
+    }
+    if (prod?.options && prod.options.length > 0) {
       setDetailsId(id);
       setDetailsImg(0);
       return;
@@ -1539,6 +1635,73 @@ function Index() {
                           )}
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {p.options && p.options.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      {p.options.map((opt) => (
+                        <div key={opt.name}>
+                          <div className="text-[11px] mb-2" style={{ color: MUTED }}>
+                            <span className="font-semibold tracking-[0.2em] uppercase" style={{ color: MUTED }}>{opt.name}:</span>{" "}
+                            <span style={{ color: WHITE }}>{variantOptions[opt.name] ?? opt.values[0]}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {opt.values.map((v) => {
+                              const active = (variantOptions[opt.name] ?? opt.default ?? opt.values[0]) === v;
+                              return (
+                                <button
+                                  key={v}
+                                  type="button"
+                                  onClick={() => setVariantOptions((prev) => ({ ...prev, [opt.name]: v }))}
+                                  className="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all leading-tight max-w-[140px]"
+                                  style={{
+                                    color: active ? INK : WHITE,
+                                    backgroundColor: active ? YELLOW : "transparent",
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                  }}
+                                >
+                                  {v}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {p.specs && p.specs.length > 0 && (
+                    <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${LINE}` }}>
+                      <div className="font-display text-lg mb-4" style={{ color: WHITE }}>
+                        Características do produto
+                      </div>
+                      <div className="space-y-5">
+                        {p.specs.map((g) => (
+                          <div key={g.group}>
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: GREEN }}>
+                              {g.group}
+                            </div>
+                            <div
+                              className="rounded-lg overflow-hidden"
+                              style={{ border: `1px solid ${LINE}`, backgroundColor: `${INK}80` }}
+                            >
+                              {g.items.map((it, i) => (
+                                <div
+                                  key={it.label}
+                                  className="flex items-start justify-between gap-4 px-3.5 py-2.5 text-xs"
+                                  style={{
+                                    borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
+                                  }}
+                                >
+                                  <span style={{ color: MUTED }}>{it.label}</span>
+                                  <span className="text-right font-medium" style={{ color: WHITE }}>{it.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 
