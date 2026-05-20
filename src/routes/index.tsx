@@ -252,6 +252,26 @@ const PRODUCTS: Product[] = [
   },
 ];
 
+const CATEGORY_MAP: Record<string, string> = {
+  album: "albuns",
+  "album-casal-50": "albuns",
+  "fig-individual": "figurinhas",
+  "fig-pack-10": "figurinhas",
+  "fig-shiny": "figurinhas",
+  "figurinha-canva-editavel": "digital",
+  "mini-taca-porta-foto": "decoracao",
+  "capinha-neymar": "acessorios",
+};
+
+const CATEGORIES: { id: string; label: string }[] = [
+  { id: "all", label: "Todos" },
+  { id: "albuns", label: "Álbuns" },
+  { id: "figurinhas", label: "Figurinhas" },
+  { id: "acessorios", label: "Acessórios" },
+  { id: "decoracao", label: "Decoração" },
+  { id: "digital", label: "Digital" },
+];
+
 const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 const fmt = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
