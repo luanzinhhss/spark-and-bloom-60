@@ -1053,7 +1053,7 @@ function Index() {
             </p>
           </div>
 
-          <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
             {PRODUCTS.map((p) => (
               <article
                 key={p.id}
