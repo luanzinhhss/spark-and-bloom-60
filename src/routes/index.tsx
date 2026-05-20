@@ -113,7 +113,7 @@ function Index() {
   const [checkout, setCheckout] = useState<{ items: CartLine[] } | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
-  const genPix = useServerFn(generatePix);
+  const [paid, setPaid] = useState(false);
 
   const cartCount = cart.reduce((a, l) => a + l.qty, 0);
   const cartTotal = useMemo(
@@ -159,36 +159,82 @@ function Index() {
       .join(", ")
       .slice(0, 200);
     setPix({ kind: "loading" });
-    genPix({
-      data: {
-        amount: Number(total.toFixed(2)),
-        description: desc || "Copa Album 2026",
-        external_id: `order_${Date.now()}`,
-      },
-    })
-      .then((r) => {
-        if (r.success) {
+    setPaid(false);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/pix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: Number(total.toFixed(2)),
+            description: desc || "Copa Album 2026",
+            external_id: `order_${Date.now()}`,
+          }),
+        });
+        const r = (await res.json()) as {
+          success: boolean;
+          error?: string;
+          copy_paste?: string;
+          qr_code_image?: string;
+          total?: number;
+          transaction_id?: string;
+        };
+        if (cancelled) return;
+        if (r.success && r.copy_paste && r.qr_code_image && r.transaction_id) {
           setPix({
             kind: "ok",
             copy_paste: r.copy_paste,
             qr_code_image: r.qr_code_image,
-            total: r.total,
+            total: r.total ?? total,
             transaction_id: r.transaction_id,
           });
         } else {
           setPix({ kind: "error", message: r.error ?? "Erro desconhecido" });
         }
-      })
-      .catch(() =>
-        setPix({ kind: "error", message: "Falha ao gerar PIX" }),
-      );
-  }, [checkout, genPix]);
+      } catch {
+        if (!cancelled) setPix({ kind: "error", message: "Falha ao gerar PIX" });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [checkout]);
+
+  // Poll for payment confirmation
+  useEffect(() => {
+    if (pix.kind !== "ok" || paid) return;
+    const txId = pix.transaction_id;
+    let stopped = false;
+    const tick = async () => {
+      try {
+        const res = await fetch(
+          `/api/pix?transaction_id=${encodeURIComponent(txId)}`,
+        );
+        const r = (await res.json()) as { status?: string };
+        if (stopped) return;
+        if (r.status === "paid" || r.status === "approved" || r.status === "completed") {
+          setPaid(true);
+          setCart([]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    const interval = setInterval(tick, 4000);
+    return () => {
+      stopped = true;
+      clearInterval(interval);
+    };
+  }, [pix, paid]);
 
   const closeCheckout = () => {
     setCheckout(null);
     setPix({ kind: "idle" });
     setCopied(false);
+    setPaid(false);
   };
+
 
   return (
     <main
