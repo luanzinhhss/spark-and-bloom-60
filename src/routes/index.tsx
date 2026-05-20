@@ -51,7 +51,7 @@ type Product = {
 const PRODUCTS: Product[] = [
   {
     id: "album",
-    name: "Álbum Oficial Copa 2026",
+    name: "Álbum Oficial Copa Namorados 2026",
     tag: "Álbum",
     price: 197,
     oldPrice: 297,
