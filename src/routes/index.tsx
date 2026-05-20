@@ -1070,6 +1070,7 @@ function Index() {
           </div>
         </div>
       )}
+      </div>
     </main>
   );
 }
