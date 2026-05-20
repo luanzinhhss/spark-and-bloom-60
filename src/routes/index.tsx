@@ -464,12 +464,19 @@ function Index() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section style={{ backgroundColor: GREEN }} className="relative overflow-hidden">
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(180deg, ${DARK2}, ${DARK})`,
+        }}
+      >
         <div
           aria-hidden
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
-            backgroundImage: `repeating-linear-gradient(45deg, ${YELLOW} 0 20px, transparent 20px 40px)`,
+            backgroundImage: `url(${fifaBackdrop})`,
+            backgroundSize: "500px auto",
+            backgroundRepeat: "repeat",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
@@ -484,23 +491,23 @@ function Index() {
             ].map((s, i) => (
               <div
                 key={s.n}
-                className="rounded-2xl p-6 border-4 text-center"
+                className="rounded-2xl p-6 border-4 text-center backdrop-blur-sm"
                 style={{
-                  backgroundColor: YELLOW,
-                  borderColor: BLUE,
+                  backgroundColor: `${DARK3}cc`,
+                  borderColor: YELLOW,
                   animation: `pop-in 0.6s cubic-bezier(.5,1.7,.5,1) ${i * 0.15}s both`,
                 }}
               >
                 <div
                   className="mx-auto flex h-16 w-16 items-center justify-center rounded-full font-display text-2xl border-4 animate-bounce-soft"
-                  style={{ backgroundColor: BLUE, color: YELLOW, borderColor: GREEN }}
+                  style={{ backgroundColor: YELLOW, color: DARK, borderColor: GREEN }}
                 >
                   {s.n}
                 </div>
-                <div className="font-display text-xl mt-4" style={{ color: BLUE }}>
+                <div className="font-display text-xl mt-4" style={{ color: WHITE }}>
                   {s.t}
                 </div>
-                <p className="mt-2 font-semibold text-sm" style={{ color: BLUE }}>
+                <p className="mt-2 font-semibold text-sm" style={{ color: "#b8bcc8" }}>
                   {s.d}
                 </p>
               </div>
@@ -510,8 +517,8 @@ function Index() {
       </section>
 
       <footer
-        className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold"
-        style={{ backgroundColor: GREEN, color: YELLOW }}
+        className="px-4 sm:px-6 py-6 sm:py-8 text-center text-xs font-semibold border-t-4"
+        style={{ backgroundColor: DARK, color: YELLOW, borderColor: YELLOW }}
       >
         © 2026 Copa Album · Edição Oficial · Pagamento via PIX
       </footer>
