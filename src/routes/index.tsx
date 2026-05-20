@@ -224,6 +224,47 @@ function Index() {
     return () => clearTimeout(t);
   }, []);
 
+  // Welcome coupon w/ countdown (2-4 day random expiration, persisted)
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [welcomeExpiry, setWelcomeExpiry] = useState<number | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("copa_welcome_v1");
+      if (raw) {
+        const exp = Number(raw);
+        if (Number.isFinite(exp) && exp > Date.now()) {
+          setWelcomeExpiry(exp);
+          return;
+        }
+      }
+      // First visit: pick random 2-4 day window
+      const days = 2 + Math.floor(Math.random() * 3); // 2, 3 or 4
+      const exp = Date.now() + days * 24 * 60 * 60 * 1000;
+      localStorage.setItem("copa_welcome_v1", String(exp));
+      setWelcomeExpiry(exp);
+      // Open welcome modal after intro
+      const t = setTimeout(() => setWelcomeOpen(true), 2000);
+      return () => clearTimeout(t);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  useEffect(() => {
+    const i = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, []);
+  const countdown = useMemo(() => {
+    if (!welcomeExpiry) return null;
+    const diff = Math.max(0, welcomeExpiry - now);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s, expired: diff === 0 };
+  }, [welcomeExpiry, now]);
+
+
   const cartCount = cart.reduce((a, l) => a + l.qty, 0);
   const cartSubtotal = useMemo(
     () => cart.reduce((a, l) => a + PRODUCT_MAP[l.id].price * l.qty, 0),
