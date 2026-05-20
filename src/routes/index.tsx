@@ -1136,7 +1136,58 @@ function Index() {
         </div>
       </section>
 
+      {/* TRUST / BENEFITS */}
+      <section style={{ backgroundColor: INK, borderTop: `1px solid ${LINE}` }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden" style={{ backgroundColor: LINE }}>
+            {[
+              {
+                title: "Frete Grátis",
+                sub: "Compras acima de R$ 199",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7h11v9H3z" /><path d="M14 10h4l3 3v3h-7" />
+                    <circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" />
+                  </svg>
+                ),
+              },
+              {
+                title: "Parcelamento 6x",
+                sub: "Sem juros no cartão",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2.5" y="6" width="19" height="13" rx="2" />
+                    <path d="M2.5 10h19" /><path d="M6 15.5h4" />
+                  </svg>
+                ),
+              },
+              {
+                title: "4.9 de 5 estrelas",
+                sub: "avaliações reais",
+                icon: (
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                ),
+              },
+            ].map((b) => (
+              <div
+                key={b.title}
+                className="flex flex-col items-center text-center py-10 px-6"
+                style={{ backgroundColor: INK }}
+              >
+                <div style={{ color: YELLOW }}>{b.icon}</div>
+                <div className="font-display text-lg mt-4" style={{ color: WHITE }}>{b.title}</div>
+                <div className="text-xs mt-1" style={{ color: MUTED }}>{b.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
+
       <section id="como-funciona" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-24">
           <div className="text-center max-w-xl mx-auto mb-14">
