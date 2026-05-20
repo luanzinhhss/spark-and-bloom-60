@@ -1105,317 +1105,430 @@ function Index() {
         </div>
       )}
 
-      {/* CHECKOUT / PIX MODAL */}
+      {/* FULL-SCREEN CHECKOUT */}
       {checkout && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={closeCheckout}
+          className="fixed inset-0 z-50 overflow-y-auto animate-fade-in"
+          style={{ backgroundColor: INK }}
         >
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm animate-fade-in" />
+          {/* Top bar */}
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md rounded-2xl overflow-hidden animate-slide-up"
-            style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}
+            className="sticky top-0 z-10 backdrop-blur-md"
+            style={{
+              backgroundColor: `${INK}E6`,
+              borderBottom: `1px solid ${LINE}`,
+            }}
           >
-            <div
-              className="px-5 py-4 flex items-center justify-between"
-              style={{ borderBottom: `1px solid ${LINE}` }}
-            >
+            <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
-                  {(["contact", "address", "pix"] as const).map((s, i) => {
-                    const active = checkoutStep === s;
-                    const done =
-                      (checkoutStep === "address" && i === 0) ||
-                      (checkoutStep === "pix" && i < 2);
-                    return (
-                      <span
-                        key={s}
-                        className="h-1.5 rounded-full transition-all"
-                        style={{
-                          width: active ? 22 : 10,
-                          backgroundColor: active ? YELLOW : done ? GREEN : LINE,
-                        }}
-                      />
-                    );
-                  })}
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: YELLOW }} />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: BLUE }} />
                 </div>
-                <span className="font-display text-base" style={{ color: WHITE }}>
-                  {checkoutStep === "contact"
-                    ? "Seus dados"
-                    : checkoutStep === "address"
-                      ? "Endereço de entrega"
-                      : "Pagamento via PIX"}
+                <span className="font-display text-sm sm:text-base tracking-wide" style={{ color: WHITE }}>
+                  Finalizar pedido
                 </span>
+              </div>
+              {/* Step indicator */}
+              <div className="hidden sm:flex items-center gap-2">
+                {(["contact", "address", "pix"] as const).map((s, i) => {
+                  const labels = ["Contato", "Endereço", "Pagamento"];
+                  const active = checkoutStep === s;
+                  const done =
+                    (checkoutStep === "address" && i === 0) ||
+                    (checkoutStep === "pix" && i < 2);
+                  return (
+                    <div key={s} className="flex items-center gap-2">
+                      <span
+                        className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
+                        style={{
+                          backgroundColor: active ? YELLOW : done ? GREEN : "transparent",
+                          color: active ? INK : done ? WHITE : MUTED,
+                          border: active || done ? "none" : `1px solid ${LINE}`,
+                        }}
+                      >
+                        {done ? "✓" : i + 1}
+                      </span>
+                      <span
+                        className="text-xs font-semibold tracking-wide"
+                        style={{ color: active ? WHITE : MUTED }}
+                      >
+                        {labels[i]}
+                      </span>
+                      {i < 2 && (
+                        <span className="h-px w-6" style={{ backgroundColor: LINE }} />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <button
                 type="button"
                 onClick={closeCheckout}
-                className="h-8 w-8 rounded-full flex items-center justify-center text-base transition-colors hover:bg-white/5"
+                className="h-9 px-4 rounded-full text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center gap-1.5"
                 style={{ color: WHITE, border: `1px solid ${LINE}` }}
               >
-                ×
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                Voltar à loja
               </button>
             </div>
+          </div>
 
-            <div className="p-6">
-              {checkoutStep === "contact" && (
-                <div className="space-y-3 animate-fade-in">
-                  <p className="text-xs" style={{ color: MUTED }}>
-                    Usamos para enviar o comprovante e instruções da figurinha.
-                  </p>
-                  <FieldInput
-                    label="Nome completo"
-                    value={customer.name}
-                    onChange={(v) => setCustomer((c) => ({ ...c, name: v }))}
-                    placeholder="Maria Silva"
+          {/* Mobile step indicator */}
+          <div className="sm:hidden px-5 pt-5 max-w-6xl mx-auto">
+            <div className="flex items-center gap-1.5">
+              {(["contact", "address", "pix"] as const).map((s, i) => {
+                const active = checkoutStep === s;
+                const done =
+                  (checkoutStep === "address" && i === 0) ||
+                  (checkoutStep === "pix" && i < 2);
+                return (
+                  <span
+                    key={s}
+                    className="h-1 flex-1 rounded-full transition-all"
+                    style={{ backgroundColor: active ? YELLOW : done ? GREEN : LINE }}
                   />
-                  <FieldInput
-                    label="E-mail (Gmail)"
-                    type="email"
-                    value={customer.email}
-                    onChange={(v) => setCustomer((c) => ({ ...c, email: v }))}
-                    placeholder="seuemail@gmail.com"
-                  />
-                  <FieldInput
-                    label="Telefone (WhatsApp)"
-                    value={customer.phone}
-                    onChange={(v) =>
-                      setCustomer((c) => ({ ...c, phone: maskPhone(v) }))
-                    }
-                    placeholder="(11) 99999-9999"
-                    inputMode="tel"
-                  />
-                  {formError && (
-                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
-                  )}
-                  <button
-                    type="button"
-                    onClick={submitContact}
-                    className="mt-2 w-full rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
-                    style={{ backgroundColor: YELLOW, color: INK }}
-                  >
-                    Dados finalizados
-                  </button>
-                </div>
-              )}
+                );
+              })}
+            </div>
+          </div>
 
-              {checkoutStep === "address" && (
-                <div className="space-y-3 animate-fade-in">
-                  <div>
-                    <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
-                      CEP
-                    </label>
-                    <div className="mt-1 flex gap-2">
-                      <input
-                        value={customer.cep}
-                        onChange={(e) => {
-                          const v = maskCep(e.target.value);
-                          setCustomer((c) => ({ ...c, cep: v }));
-                          if (v.replace(/\D/g, "").length === 8) lookupCep(v);
-                        }}
-                        placeholder="00000-000"
-                        inputMode="numeric"
-                        className="flex-1 rounded-lg px-3 py-2.5 text-sm outline-none"
-                        style={{ backgroundColor: INK, border: `1px solid ${LINE}`, color: WHITE }}
+          {/* Body */}
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-12">
+            {/* Left: form */}
+            <div>
+              <div className="max-w-xl">
+                <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: YELLOW }}>
+                  Etapa {checkoutStep === "contact" ? "1" : checkoutStep === "address" ? "2" : "3"} de 3
+                </p>
+                <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
+                  {checkoutStep === "contact"
+                    ? "Seus dados de contato"
+                    : checkoutStep === "address"
+                      ? "Endereço de entrega"
+                      : "Pague com PIX"}
+                </h2>
+                <p className="mt-2 text-sm" style={{ color: MUTED }}>
+                  {checkoutStep === "contact"
+                    ? "Para enviar o comprovante e as instruções da sua figurinha."
+                    : checkoutStep === "address"
+                      ? "Digite seu CEP e completamos o resto pra você."
+                      : "Escaneie o QR Code abaixo. A confirmação é automática."}
+                </p>
+
+                <div className="mt-7">
+                  {checkoutStep === "contact" && (
+                    <div className="space-y-4 animate-fade-in">
+                      <FieldInput
+                        label="Nome completo"
+                        value={customer.name}
+                        onChange={(v) => setCustomer((c) => ({ ...c, name: v }))}
+                        placeholder="Maria Silva"
                       />
-                      {cepLoading && (
-                        <div className="h-9 w-9 rounded-full border-2 animate-spin self-center"
-                          style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
+                      <EmailField
+                        value={customer.email}
+                        onChange={(v) => setCustomer((c) => ({ ...c, email: v }))}
+                      />
+                      <FieldInput
+                        label="Telefone (WhatsApp)"
+                        value={customer.phone}
+                        onChange={(v) =>
+                          setCustomer((c) => ({ ...c, phone: maskPhone(v) }))
+                        }
+                        placeholder="(11) 99999-9999"
+                        inputMode="tel"
+                      />
+                      {formError && (
+                        <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
                       )}
-                    </div>
-                    {cepError && (
-                      <p className="mt-1 text-xs" style={{ color: "#ff6b6b" }}>{cepError}</p>
-                    )}
-                  </div>
-                  <FieldInput
-                    label="Rua"
-                    value={customer.street}
-                    onChange={(v) => setCustomer((c) => ({ ...c, street: v }))}
-                    placeholder="preenchido pelo CEP"
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <FieldInput
-                      label="Número"
-                      value={customer.number}
-                      onChange={(v) => setCustomer((c) => ({ ...c, number: v }))}
-                      placeholder="123"
-                      inputMode="numeric"
-                    />
-                    <FieldInput
-                      label="Bairro"
-                      value={customer.neighborhood}
-                      onChange={(v) => setCustomer((c) => ({ ...c, neighborhood: v }))}
-                      placeholder=""
-                    />
-                  </div>
-                  <div className="grid grid-cols-[1fr_80px] gap-3">
-                    <FieldInput
-                      label="Cidade"
-                      value={customer.city}
-                      onChange={(v) => setCustomer((c) => ({ ...c, city: v }))}
-                      placeholder=""
-                    />
-                    <FieldInput
-                      label="UF"
-                      value={customer.state}
-                      onChange={(v) =>
-                        setCustomer((c) => ({ ...c, state: v.toUpperCase().slice(0, 2) }))
-                      }
-                      placeholder=""
-                    />
-                  </div>
-                  {formError && (
-                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
-                  )}
-                  <div className="flex gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setCheckoutStep("contact")}
-                      className="rounded-full px-5 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
-                      style={{ color: WHITE, border: `1px solid ${LINE}` }}
-                    >
-                      Voltar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={submitAddress}
-                      className="flex-1 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
-                      style={{ backgroundColor: YELLOW, color: INK }}
-                    >
-                      Confirmar e gerar PIX
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {checkoutStep === "pix" && (
-                <>
-              {pix.kind === "loading" && (
-                <div className="text-center py-14">
-                  <div className="mx-auto h-10 w-10 rounded-full border-2 animate-spin" style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
-                  <p className="mt-5 text-sm" style={{ color: MUTED }}>
-                    Gerando QR Code...
-                  </p>
-                </div>
-              )}
-              {pix.kind === "error" && (
-                <div className="text-center py-8">
-                  <p className="font-display text-lg" style={{ color: WHITE }}>
-                    Não foi possível gerar o PIX
-                  </p>
-                  <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                    {pix.message}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const c = checkout;
-                      setCheckout(null);
-                      setTimeout(() => setCheckout(c), 50);
-                    }}
-                    className="mt-6 rounded-full px-6 py-2.5 text-xs font-semibold"
-                    style={{ backgroundColor: YELLOW, color: INK }}
-                  >
-                    Tentar novamente
-                  </button>
-                </div>
-              )}
-              {pix.kind === "ok" && (
-                <div>
-                  {paid ? (
-                    <div className="text-center py-6 animate-pop-in">
-                      <div
-                        className="mx-auto h-14 w-14 rounded-full flex items-center justify-center mb-4"
-                        style={{ backgroundColor: GREEN }}
-                      >
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                      </div>
-                      <div className="font-display text-2xl" style={{ color: WHITE }}>
-                        Pagamento confirmado
-                      </div>
-                      <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                        Em instantes você receberá um e-mail com as instruções para enviar a foto.
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-baseline justify-between mb-5">
-                        <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: MUTED }}>
-                          Total a pagar
-                        </span>
-                        <span className="font-display text-3xl" style={{ color: WHITE }}>
-                          {fmt(pix.total)}
-                        </span>
-                      </div>
-
-                      {pix.qr_code_image && (
-                        <div className="flex justify-center">
-                          <div
-                            className="p-4 rounded-xl"
-                            style={{ backgroundColor: WHITE }}
-                          >
-                            <img
-                              src={qrSrc(pix.qr_code_image)}
-                              alt="QR Code PIX"
-                              className="w-56 h-56 object-contain"
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <p className="mt-5 text-center text-xs" style={{ color: MUTED }}>
-                        Aponte a câmera do seu app do banco para o QR Code
-                      </p>
-
-                      <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${LINE}` }}>
-                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
-                          Ou copie o código PIX
-                        </label>
-                        <div
-                          className="mt-2 rounded-lg p-3 text-xs break-all font-mono max-h-20 overflow-y-auto"
-                          style={{ backgroundColor: INK, border: `1px solid ${LINE}`, color: MUTED }}
-                        >
-                          {pix.copy_paste}
-                        </div>
+                      <div className="pt-2">
                         <button
                           type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(pix.copy_paste);
-                            setCopied(true);
-                            setTimeout(() => setCopied(false), 2000);
-                          }}
-                          className="mt-3 w-full rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
-                          style={{
-                            backgroundColor: copied ? GREEN : YELLOW,
-                            color: copied ? WHITE : INK,
-                          }}
+                          onClick={submitContact}
+                          className="w-full sm:w-auto rounded-full px-8 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01]"
+                          style={{ backgroundColor: YELLOW, color: INK }}
                         >
-                          {copied ? "Código copiado" : "Copiar código PIX"}
+                          Continuar para endereço →
                         </button>
+                      </div>
+                    </div>
+                  )}
 
+                  {checkoutStep === "address" && (
+                    <div className="space-y-4 animate-fade-in">
+                      <div>
+                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                          CEP
+                        </label>
+                        <div className="mt-1 flex gap-2">
+                          <input
+                            value={customer.cep}
+                            onChange={(e) => {
+                              const v = maskCep(e.target.value);
+                              setCustomer((c) => ({ ...c, cep: v }));
+                              if (v.replace(/\D/g, "").length === 8) lookupCep(v);
+                            }}
+                            placeholder="00000-000"
+                            inputMode="numeric"
+                            className="flex-1 rounded-lg px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+                            style={{ backgroundColor: "#08080d", border: `1px solid ${LINE}`, color: WHITE }}
+                          />
+                          {cepLoading && (
+                            <div className="h-10 w-10 rounded-full border-2 animate-spin self-center"
+                              style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
+                          )}
+                        </div>
+                        {cepError && (
+                          <p className="mt-1 text-xs" style={{ color: "#ff6b6b" }}>{cepError}</p>
+                        )}
+                      </div>
+                      <FieldInput
+                        label="Rua"
+                        value={customer.street}
+                        onChange={(v) => setCustomer((c) => ({ ...c, street: v }))}
+                        placeholder="preenchido pelo CEP"
+                      />
+                      <div className="grid grid-cols-2 gap-3">
+                        <FieldInput
+                          label="Número"
+                          value={customer.number}
+                          onChange={(v) => setCustomer((c) => ({ ...c, number: v }))}
+                          placeholder="123"
+                          inputMode="numeric"
+                        />
+                        <FieldInput
+                          label="Bairro"
+                          value={customer.neighborhood}
+                          onChange={(v) => setCustomer((c) => ({ ...c, neighborhood: v }))}
+                          placeholder=""
+                        />
+                      </div>
+                      <div className="grid grid-cols-[1fr_80px] gap-3">
+                        <FieldInput
+                          label="Cidade"
+                          value={customer.city}
+                          onChange={(v) => setCustomer((c) => ({ ...c, city: v }))}
+                          placeholder=""
+                        />
+                        <FieldInput
+                          label="UF"
+                          value={customer.state}
+                          onChange={(v) =>
+                            setCustomer((c) => ({ ...c, state: v.toUpperCase().slice(0, 2) }))
+                          }
+                          placeholder=""
+                        />
+                      </div>
+                      {formError && (
+                        <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                      )}
+                      <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
                         <button
                           type="button"
-                          onClick={regeneratePix}
-                          className="mt-3 w-full rounded-full px-5 py-2.5 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center justify-center gap-2"
+                          onClick={() => setCheckoutStep("contact")}
+                          className="rounded-full px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-white/5"
                           style={{ color: WHITE, border: `1px solid ${LINE}` }}
                         >
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-                          Gerar novo QR Code
+                          ← Voltar
                         </button>
-
-                        <div className="mt-4 flex items-center justify-center gap-2 text-[11px]" style={{ color: MUTED }}>
-                          <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
-                          Aguardando confirmação automática
-                        </div>
+                        <button
+                          type="button"
+                          onClick={submitAddress}
+                          className="flex-1 rounded-full px-6 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01]"
+                          style={{ backgroundColor: YELLOW, color: INK }}
+                        >
+                          Confirmar e gerar PIX →
+                        </button>
                       </div>
-                    </>
+                    </div>
+                  )}
+
+                  {checkoutStep === "pix" && (
+                    <div className="animate-fade-in">
+                      {pix.kind === "loading" && (
+                        <div className="text-center py-14">
+                          <div className="mx-auto h-12 w-12 rounded-full border-2 animate-spin" style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
+                          <p className="mt-5 text-sm" style={{ color: MUTED }}>Gerando QR Code...</p>
+                        </div>
+                      )}
+                      {pix.kind === "error" && (
+                        <div className="text-center py-10">
+                          <p className="font-display text-xl" style={{ color: WHITE }}>Não foi possível gerar o PIX</p>
+                          <p className="mt-2 text-sm" style={{ color: MUTED }}>{pix.message}</p>
+                          <button
+                            type="button"
+                            onClick={regeneratePix}
+                            className="mt-6 rounded-full px-6 py-2.5 text-xs font-bold"
+                            style={{ backgroundColor: YELLOW, color: INK }}
+                          >
+                            Tentar novamente
+                          </button>
+                        </div>
+                      )}
+                      {pix.kind === "ok" && (
+                        <div>
+                          {paid ? (
+                            <div className="text-center py-10 animate-pop-in">
+                              <div
+                                className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-5"
+                                style={{ backgroundColor: GREEN }}
+                              >
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                              </div>
+                              <div className="font-display text-3xl" style={{ color: WHITE }}>
+                                Pagamento confirmado
+                              </div>
+                              <p className="mt-3 text-sm" style={{ color: MUTED }}>
+                                Em instantes você receberá um e-mail com as instruções para enviar a foto.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 items-start">
+                              <div
+                                className="p-4 rounded-2xl mx-auto"
+                                style={{ backgroundColor: WHITE }}
+                              >
+                                {pix.qr_code_image ? (
+                                  <img
+                                    src={qrSrc(pix.qr_code_image)}
+                                    alt="QR Code PIX"
+                                    className="w-60 h-60 object-contain"
+                                  />
+                                ) : (
+                                  <div className="w-60 h-60" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-[11px] uppercase tracking-[0.25em]" style={{ color: MUTED }}>
+                                  Como pagar
+                                </p>
+                                <ol className="mt-3 space-y-2 text-sm" style={{ color: WHITE }}>
+                                  <li><span style={{ color: YELLOW }} className="font-bold">1.</span> Abra o app do seu banco</li>
+                                  <li><span style={{ color: YELLOW }} className="font-bold">2.</span> Escolha pagar com PIX → QR Code</li>
+                                  <li><span style={{ color: YELLOW }} className="font-bold">3.</span> Aponte a câmera para o código</li>
+                                </ol>
+                                <div className="mt-5">
+                                  <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                                    Ou copie o código PIX
+                                  </label>
+                                  <div
+                                    className="mt-2 rounded-lg p-3 text-xs break-all font-mono max-h-24 overflow-y-auto"
+                                    style={{ backgroundColor: "#08080d", border: `1px solid ${LINE}`, color: MUTED }}
+                                  >
+                                    {pix.copy_paste}
+                                  </div>
+                                  <div className="mt-3 flex flex-col sm:flex-row gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(pix.copy_paste);
+                                        setCopied(true);
+                                        setTimeout(() => setCopied(false), 2000);
+                                      }}
+                                      className="flex-1 rounded-full px-5 py-3 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01]"
+                                      style={{
+                                        backgroundColor: copied ? GREEN : YELLOW,
+                                        color: copied ? WHITE : INK,
+                                      }}
+                                    >
+                                      {copied ? "✓ Código copiado" : "Copiar código PIX"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={regeneratePix}
+                                      className="rounded-full px-5 py-3 text-xs font-semibold tracking-wide transition-colors hover:bg-white/5 inline-flex items-center justify-center gap-2"
+                                      style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                                    >
+                                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                                      Novo QR
+                                    </button>
+                                  </div>
+                                  <div className="mt-4 flex items-center gap-2 text-[11px]" style={{ color: MUTED }}>
+                                    <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
+                                    Aguardando confirmação automática
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-                </>
-              )}
+              </div>
             </div>
+
+            {/* Right: order summary */}
+            <aside className="lg:sticky lg:top-24 self-start">
+              <div
+                className="rounded-2xl overflow-hidden"
+                style={{ backgroundColor: SURFACE, border: `1px solid ${LINE}` }}
+              >
+                <div className="px-5 py-4" style={{ borderBottom: `1px solid ${LINE}` }}>
+                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase" style={{ color: MUTED }}>
+                    Resumo do pedido
+                  </p>
+                </div>
+                <div className="p-5 space-y-3 max-h-72 overflow-y-auto">
+                  {checkout.items.map((line) => {
+                    const p = PRODUCT_MAP[line.id];
+                    if (!p) return null;
+                    return (
+                      <div key={line.id} className="flex items-center gap-3">
+                        <div
+                          className="h-14 w-14 rounded-lg overflow-hidden shrink-0"
+                          style={{ backgroundColor: SURFACE_2 }}
+                        >
+                          <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold truncate" style={{ color: WHITE }}>{p.name}</p>
+                          <p className="text-[11px]" style={{ color: MUTED }}>Qtd: {line.qty}</p>
+                        </div>
+                        <span className="text-sm font-bold" style={{ color: WHITE }}>
+                          {fmt(p.price * line.qty)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="px-5 py-4 space-y-2" style={{ borderTop: `1px solid ${LINE}` }}>
+                  {(() => {
+                    const subtotal = checkout.items.reduce(
+                      (s, l) => s + (PRODUCT_MAP[l.id]?.price ?? 0) * l.qty,
+                      0,
+                    );
+                    const discount = coupon ? subtotal * coupon.pct : 0;
+                    const total = subtotal - discount;
+                    return (
+                      <>
+                        <div className="flex justify-between text-xs" style={{ color: MUTED }}>
+                          <span>Subtotal</span><span>{fmt(subtotal)}</span>
+                        </div>
+                        {coupon && (
+                          <div className="flex justify-between text-xs" style={{ color: GREEN }}>
+                            <span>Cupom {coupon.code}</span><span>−{fmt(discount)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-xs" style={{ color: MUTED }}>
+                          <span>Frete</span><span style={{ color: GREEN }}>Grátis</span>
+                        </div>
+                        <div className="flex justify-between items-baseline pt-2" style={{ borderTop: `1px solid ${LINE}` }}>
+                          <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: MUTED }}>Total</span>
+                          <span className="font-display text-2xl" style={{ color: WHITE }}>{fmt(total)}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-[11px]" style={{ color: MUTED }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Pagamento seguro · Confirmação automática
+              </div>
+            </aside>
           </div>
         </div>
       )}
@@ -1436,6 +1549,69 @@ function maskCep(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 8);
   if (d.length <= 5) return d;
   return `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+function EmailField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const DOMAINS = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "icloud.com"];
+  const [focused, setFocused] = useState(false);
+  const atIdx = value.indexOf("@");
+  const local = atIdx === -1 ? value : value.slice(0, atIdx);
+  const typedDomain = atIdx === -1 ? "" : value.slice(atIdx + 1).toLowerCase();
+  const suggestions =
+    local.length === 0
+      ? []
+      : atIdx === -1
+        ? DOMAINS.map((d) => `${local}@${d}`)
+        : DOMAINS.filter((d) => d.startsWith(typedDomain) && d !== typedDomain)
+            .map((d) => `${local}@${d}`);
+  const showList = focused && suggestions.length > 0;
+  return (
+    <div className="relative">
+      <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#7a7a85" }}>
+        E-mail
+      </label>
+      <input
+        type="email"
+        autoComplete="email"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 150)}
+        placeholder="voce@gmail.com"
+        className="mt-1 w-full rounded-lg px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+        style={{ backgroundColor: "#08080d", border: "1px solid #1f1f28", color: "#fff" }}
+      />
+      {showList && (
+        <div
+          className="absolute left-0 right-0 mt-1 z-20 rounded-lg overflow-hidden shadow-2xl animate-fade-in"
+          style={{ backgroundColor: "#0f0f17", border: "1px solid #2A2A38" }}
+        >
+          {suggestions.slice(0, 5).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(s);
+                setFocused(false);
+              }}
+              className="w-full text-left px-3 py-2.5 text-sm transition-colors hover:bg-white/5"
+              style={{ color: "#fff" }}
+            >
+              <span style={{ color: "#9CA0AE" }}>{s.split("@")[0]}</span>
+              <span style={{ color: "#F4C430" }}>@{s.split("@")[1]}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function FieldInput({
