@@ -1121,8 +1121,32 @@ function Index() {
               className="px-5 py-4 flex items-center justify-between"
               style={{ borderBottom: `1px solid ${LINE}` }}
             >
-              <div className="flex items-center gap-2">
-                <span className="font-display text-base" style={{ color: WHITE }}>Pagamento via PIX</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  {(["contact", "address", "pix"] as const).map((s, i) => {
+                    const active = checkoutStep === s;
+                    const done =
+                      (checkoutStep === "address" && i === 0) ||
+                      (checkoutStep === "pix" && i < 2);
+                    return (
+                      <span
+                        key={s}
+                        className="h-1.5 rounded-full transition-all"
+                        style={{
+                          width: active ? 22 : 10,
+                          backgroundColor: active ? YELLOW : done ? GREEN : LINE,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="font-display text-base" style={{ color: WHITE }}>
+                  {checkoutStep === "contact"
+                    ? "Seus dados"
+                    : checkoutStep === "address"
+                      ? "Endereço de entrega"
+                      : "Pagamento via PIX"}
+                </span>
               </div>
               <button
                 type="button"
@@ -1135,6 +1159,138 @@ function Index() {
             </div>
 
             <div className="p-6">
+              {checkoutStep === "contact" && (
+                <div className="space-y-3 animate-fade-in">
+                  <p className="text-xs" style={{ color: MUTED }}>
+                    Usamos para enviar o comprovante e instruções da figurinha.
+                  </p>
+                  <FieldInput
+                    label="Nome completo"
+                    value={customer.name}
+                    onChange={(v) => setCustomer((c) => ({ ...c, name: v }))}
+                    placeholder="Maria Silva"
+                  />
+                  <FieldInput
+                    label="E-mail (Gmail)"
+                    type="email"
+                    value={customer.email}
+                    onChange={(v) => setCustomer((c) => ({ ...c, email: v }))}
+                    placeholder="seuemail@gmail.com"
+                  />
+                  <FieldInput
+                    label="Telefone (WhatsApp)"
+                    value={customer.phone}
+                    onChange={(v) =>
+                      setCustomer((c) => ({ ...c, phone: maskPhone(v) }))
+                    }
+                    placeholder="(11) 99999-9999"
+                    inputMode="tel"
+                  />
+                  {formError && (
+                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={submitContact}
+                    className="mt-2 w-full rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
+                    style={{ backgroundColor: YELLOW, color: INK }}
+                  >
+                    Dados finalizados
+                  </button>
+                </div>
+              )}
+
+              {checkoutStep === "address" && (
+                <div className="space-y-3 animate-fade-in">
+                  <div>
+                    <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                      CEP
+                    </label>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        value={customer.cep}
+                        onChange={(e) => {
+                          const v = maskCep(e.target.value);
+                          setCustomer((c) => ({ ...c, cep: v }));
+                          if (v.replace(/\D/g, "").length === 8) lookupCep(v);
+                        }}
+                        placeholder="00000-000"
+                        inputMode="numeric"
+                        className="flex-1 rounded-lg px-3 py-2.5 text-sm outline-none"
+                        style={{ backgroundColor: INK, border: `1px solid ${LINE}`, color: WHITE }}
+                      />
+                      {cepLoading && (
+                        <div className="h-9 w-9 rounded-full border-2 animate-spin self-center"
+                          style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
+                      )}
+                    </div>
+                    {cepError && (
+                      <p className="mt-1 text-xs" style={{ color: "#ff6b6b" }}>{cepError}</p>
+                    )}
+                  </div>
+                  <FieldInput
+                    label="Rua"
+                    value={customer.street}
+                    onChange={(v) => setCustomer((c) => ({ ...c, street: v }))}
+                    placeholder="preenchido pelo CEP"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <FieldInput
+                      label="Número"
+                      value={customer.number}
+                      onChange={(v) => setCustomer((c) => ({ ...c, number: v }))}
+                      placeholder="123"
+                      inputMode="numeric"
+                    />
+                    <FieldInput
+                      label="Bairro"
+                      value={customer.neighborhood}
+                      onChange={(v) => setCustomer((c) => ({ ...c, neighborhood: v }))}
+                      placeholder=""
+                    />
+                  </div>
+                  <div className="grid grid-cols-[1fr_80px] gap-3">
+                    <FieldInput
+                      label="Cidade"
+                      value={customer.city}
+                      onChange={(v) => setCustomer((c) => ({ ...c, city: v }))}
+                      placeholder=""
+                    />
+                    <FieldInput
+                      label="UF"
+                      value={customer.state}
+                      onChange={(v) =>
+                        setCustomer((c) => ({ ...c, state: v.toUpperCase().slice(0, 2) }))
+                      }
+                      placeholder=""
+                    />
+                  </div>
+                  {formError && (
+                    <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                  )}
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setCheckoutStep("contact")}
+                      className="rounded-full px-5 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
+                      style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                    >
+                      Voltar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={submitAddress}
+                      className="flex-1 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition-transform hover:scale-[1.01]"
+                      style={{ backgroundColor: YELLOW, color: INK }}
+                    >
+                      Confirmar e gerar PIX
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {checkoutStep === "pix" && (
+                <>
               {pix.kind === "loading" && (
                 <div className="text-center py-14">
                   <div className="mx-auto h-10 w-10 rounded-full border-2 animate-spin" style={{ borderColor: `${YELLOW}40`, borderTopColor: YELLOW }} />
