@@ -798,6 +798,27 @@ function Index() {
           setPaid(true);
           setCart([]);
           setCoupon(null);
+          const oid = currentOrderIdRef.current;
+          if (oid) {
+            try {
+              const raw = localStorage.getItem(`copa.order.${oid}`);
+              if (raw) {
+                const o = JSON.parse(raw);
+                o.status = "paid";
+                o.paidAt = new Date().toISOString();
+                localStorage.setItem(`copa.order.${oid}`, JSON.stringify(o));
+              }
+            } catch {
+              // ignore
+            }
+            setTimeout(() => {
+              setCheckout(null);
+              setCheckoutStep("contact");
+              setPix({ kind: "idle" });
+              setPaid(false);
+              navigate({ to: "/pedido/$id", params: { id: oid } });
+            }, 1500);
+          }
         }
       } catch {
         // ignore
