@@ -258,18 +258,26 @@ function Index() {
       </div>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-copa-flow">
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(135deg, ${DARK}f2, ${DARK2}e6, ${BLUE_DEEP}cc), url(${fifaBackdrop})`,
+          backgroundSize: "cover, 600px auto",
+          backgroundPosition: "center, center",
+          backgroundRepeat: "no-repeat, repeat",
+        }}
+      >
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-20 select-none animate-spin-slow"
-          style={{ color: WHITE }}
+          className="pointer-events-none absolute -top-20 -left-20 text-[14rem] sm:text-[20rem] font-black opacity-[0.06] select-none animate-spin-slow"
+          style={{ color: YELLOW }}
         >
           ★
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-20 select-none animate-spin-slow"
-          style={{ color: WHITE, animationDirection: "reverse" }}
+          className="pointer-events-none absolute -bottom-32 -right-10 text-[16rem] sm:text-[24rem] font-black opacity-[0.06] select-none animate-spin-slow"
+          style={{ color: GREEN, animationDirection: "reverse" }}
         >
           ★
         </div>
