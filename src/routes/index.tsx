@@ -2693,7 +2693,7 @@ function Index() {
                           </div>
                         )}
                         <div className="flex justify-between text-xs" style={{ color: MUTED }}>
-                          <span>Frete · {shipping === "correios" ? "Correios" : "Sedex"}</span>
+                          <span>Frete · {shipping === "correios" ? `Correios${customer.state ? ` · ${correios.region}` : ""}` : "Sedex"}</span>
                           <span style={{ color: shippingCost === 0 ? GREEN : WHITE }}>
                             {shippingCost === 0 ? "Grátis" : fmt(shippingCost)}
                           </span>
