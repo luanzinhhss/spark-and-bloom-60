@@ -279,12 +279,13 @@ const PRODUCTS: Product[] = [
       "Ideal para colecionadores e perfeito para presentear",
     ],
     options: [
-      { name: "Personagem", values: ["Branco", "Jogadores Copa do Mundo"], default: "Branco" },
-      { name: "Nome do desenho", values: ["Porta Figurinhas", "Figurinhas Copa"], default: "Porta Figurinhas" },
-      { name: "Tipo de embalagem", values: ["Maleta", "Envelope"], default: "Maleta" },
-      { name: "Formato de venda", values: ["Unidade", "Kit"], default: "Unidade" },
-      { name: "Unidades por kit", values: ["1", "105"], default: "1" },
+      { name: "Personagem", values: ["Branco"], default: "Branco" },
+      { name: "Nome do desenho", values: ["Porta Figurinhas"], default: "Porta Figurinhas" },
+      { name: "Tipo de embalagem", values: ["Maleta"], default: "Maleta" },
+      { name: "Formato de venda", values: ["Unidade"], default: "Unidade" },
+      { name: "Unidades por kit", values: ["1"], default: "1" },
     ],
+    pinned: true,
     specs: [
       {
         group: "Características principais",
