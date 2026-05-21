@@ -25,6 +25,8 @@ import portaFigurinhas6 from "@/assets/porta-figurinhas-6.jpg";
 import portaFigurinhas7 from "@/assets/porta-figurinhas-7.jpg";
 import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
+import envelopePanini1 from "@/assets/envelope-panini-1.png";
+import envelopePanini2 from "@/assets/envelope-panini-2.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -62,6 +64,7 @@ type Product = {
   image: string;
   badge?: string;
   pinned?: boolean;
+  minQty?: number;
   gallery: { src: string; label: string }[];
   details: string[];
   variants?: {
@@ -329,6 +332,51 @@ const PRODUCTS: Product[] = [
       },
     ],
   },
+  {
+    id: "envelope-panini",
+    name: "Envelope 7 Figurinhas Cromos Copa do Mundo FIFA 2026 — Panini",
+    tag: "Envelope Oficial · Panini",
+    price: 5.6,
+    oldPrice: 7,
+    installments: "Mínimo de 5 envelopes por pedido",
+    desc: "Envelope oficial Panini com 7 figurinhas sortidas da Copa do Mundo FIFA 2026. Jogadores, seleções, escudos, estádios e momentos marcantes.",
+    image: envelopePanini1,
+    badge: "Oficial Panini",
+    pinned: true,
+    minQty: 5,
+    gallery: [
+      { src: envelopePanini1, label: "Envelope oficial" },
+      { src: envelopePanini2, label: "Pacotes lacrados" },
+    ],
+    details: [
+      "Envelope oficial Panini Group — Copa do Mundo FIFA 2026",
+      "Contém 1 envelope com 7 figurinhas sortidas",
+      "Pode incluir jogadores, seleções, escudos, estádios e momentos marcantes",
+      "Acabamento de qualidade e design oficial — fator surpresa a cada abertura",
+      "Ideal para crianças, jovens e adultos, e perfeito para troca entre amigos",
+      "Tradição que atravessa gerações — valor emocional e potencial de raridade",
+      "⚠ Quantidade mínima de 5 envelopes por pedido",
+    ],
+    specs: [
+      {
+        group: "Ficha Técnica",
+        items: [
+          { label: "Garantia", value: "Sem Garantia" },
+          { label: "Fabricante", value: "Panini" },
+          { label: "Modelo", value: "005460b7br" },
+          { label: "Formato de venda", value: "Envelope" },
+          { label: "Quantidade de figurinhas", value: "7" },
+          { label: "Evento", value: "Copa do Mundo Fifa 2026" },
+          { label: "Entrega", value: "Imediata" },
+          { label: "Conteúdo da Embalagem", value: "1 Envelope com 7 Figurinhas" },
+          { label: "Marca", value: "Panini" },
+          { label: "Prazo de Garantia", value: "Sem Garantia" },
+          { label: "Quantidade de Fotos", value: "7" },
+          { label: "Tema", value: "Copa do Mundo Fifa 2026" },
+        ],
+      },
+    ],
+  },
 ];
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -337,6 +385,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "fig-individual": "figurinhas",
   "fig-pack-10": "figurinhas",
   "fig-shiny": "figurinhas",
+  "envelope-panini": "figurinhas",
   "figurinha-canva-editavel": "digital",
   "mini-taca-porta-foto": "decoracao",
   "porta-figurinhas-copa": "decoracao",
@@ -415,6 +464,7 @@ function Index() {
   const [cepError, setCepError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
+  const [shipping, setShipping] = useState<"sedex" | "correios">("sedex");
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
   const [coupon, setCoupon] = useState<{ code: string; pct: number } | null>(null);
@@ -550,22 +600,26 @@ function Index() {
   };
 
   const addToCart = (id: string) => {
+    const prod = PRODUCT_MAP[id];
+    const min = prod?.minQty ?? 1;
     setCart((c) => {
       const existing = c.find((l) => l.id === id);
       if (existing)
         return c.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l));
-      return [...c, { id, qty: 1 }];
+      return [...c, { id, qty: min }];
     });
     setCartOpen(true);
   };
   const removeLine = (id: string) =>
     setCart((c) => c.filter((l) => l.id !== id));
-  const setQty = (id: string, qty: number) =>
+  const setQty = (id: string, qty: number) => {
+    const min = PRODUCT_MAP[id]?.minQty ?? 1;
     setCart((c) =>
-      qty <= 0
+      qty < min
         ? c.filter((l) => l.id !== id)
         : c.map((l) => (l.id === id ? { ...l, qty } : l)),
     );
+  };
 
   // Buy-now flow: open confirmation modal first
   const handleBuyClick = (id: string) => {
@@ -593,7 +647,8 @@ function Index() {
 
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
-    openCheckout([{ id, qty: 1 }]);
+    const min = PRODUCT_MAP[id]?.minQty ?? 1;
+    openCheckout([{ id, qty: min }]);
   };
   const addAndKeepShopping = (id: string) => {
     addToCart(id);
@@ -684,7 +739,8 @@ function Index() {
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
     );
-    const total = coupon ? subtotal * (1 - coupon.pct) : subtotal;
+    const shippingCost = shipping === "correios" ? 23.89 : 0;
+    const total = (coupon ? subtotal * (1 - coupon.pct) : subtotal) + shippingCost;
     const desc = checkout.items
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
       .join(", ")
@@ -748,8 +804,14 @@ function Index() {
                 price: PRODUCT_MAP[l.id].price,
               })),
               subtotal,
-              discount: coupon ? subtotal - total : 0,
+              discount: coupon ? subtotal * coupon.pct : 0,
               couponCode: coupon?.code ?? null,
+              shipping: {
+                method: shipping,
+                label: shipping === "correios" ? "Correios" : "Sedex (Grátis)",
+                cost: shipping === "correios" ? 23.89 : 0,
+                eta: shipping === "correios" ? "Até 6 dias úteis" : "Até 2 semanas",
+              },
               total: r.total ?? total,
               customer: {
                 name: customer.name,
@@ -783,7 +845,7 @@ function Index() {
     return () => {
       cancelled = true;
     };
-  }, [checkout, checkoutStep]);
+  }, [checkout, checkoutStep, shipping]);
 
   // Poll payment confirmation
   useEffect(() => {
@@ -2318,6 +2380,41 @@ function Index() {
                           placeholder=""
                         />
                       </div>
+
+                      {/* SHIPPING METHOD */}
+                      <div className="pt-2">
+                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                          Forma de envio
+                        </label>
+                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {([
+                            { id: "sedex" as const, name: "Sedex", eta: "Até 2 semanas", cost: 0, costLabel: "Grátis" },
+                            { id: "correios" as const, name: "Correios", eta: "Até 6 dias úteis", cost: 23.89, costLabel: fmt(23.89) },
+                          ]).map((opt) => {
+                            const active = shipping === opt.id;
+                            return (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => setShipping(opt.id)}
+                                className="text-left rounded-xl px-4 py-3 transition-all"
+                                style={{
+                                  backgroundColor: active ? `${YELLOW}14` : "#08080d",
+                                  border: `1px solid ${active ? YELLOW : LINE}`,
+                                  boxShadow: active ? `0 0 0 1px ${YELLOW}66` : undefined,
+                                }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-bold" style={{ color: WHITE }}>{opt.name}</span>
+                                  <span className="text-xs font-bold" style={{ color: opt.cost === 0 ? GREEN : YELLOW }}>{opt.costLabel}</span>
+                                </div>
+                                <p className="mt-1 text-[11px]" style={{ color: MUTED }}>{opt.eta}</p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
                       {formError && (
                         <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
                       )}
@@ -2499,7 +2596,8 @@ function Index() {
                       0,
                     );
                     const discount = coupon ? subtotal * coupon.pct : 0;
-                    const total = subtotal - discount;
+                    const shippingCost = shipping === "correios" ? 23.89 : 0;
+                    const total = subtotal - discount + shippingCost;
                     return (
                       <>
                         <div className="flex justify-between text-xs" style={{ color: MUTED }}>
@@ -2511,7 +2609,10 @@ function Index() {
                           </div>
                         )}
                         <div className="flex justify-between text-xs" style={{ color: MUTED }}>
-                          <span>Frete</span><span style={{ color: GREEN }}>Grátis</span>
+                          <span>Frete · {shipping === "correios" ? "Correios" : "Sedex"}</span>
+                          <span style={{ color: shippingCost === 0 ? GREEN : WHITE }}>
+                            {shippingCost === 0 ? "Grátis" : fmt(shippingCost)}
+                          </span>
                         </div>
                         <div className="flex justify-between items-baseline pt-2" style={{ borderTop: `1px solid ${LINE}` }}>
                           <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: MUTED }}>Total</span>
