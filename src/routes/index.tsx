@@ -646,7 +646,8 @@ function Index() {
 
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
-    openCheckout([{ id, qty: 1 }]);
+    const min = PRODUCT_MAP[id]?.minQty ?? 1;
+    openCheckout([{ id, qty: min }]);
   };
   const addAndKeepShopping = (id: string) => {
     addToCart(id);
