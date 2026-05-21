@@ -2344,39 +2344,43 @@ function Index() {
                         />
                       </div>
 
-                      {/* SHIPPING METHOD */}
-                      <div className="pt-2">
-                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
-                          Forma de envio
-                        </label>
-                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {([
-                            { id: "sedex" as const, name: "Sedex", eta: "Até 2 semanas", cost: 0, costLabel: "Grátis" },
-                            { id: "correios" as const, name: "Correios", eta: "Até 6 dias úteis", cost: 23.89, costLabel: fmt(23.89) },
-                          ]).map((opt) => {
-                            const active = shipping === opt.id;
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => setShipping(opt.id)}
-                                className="text-left rounded-xl px-4 py-3 transition-all"
-                                style={{
-                                  backgroundColor: active ? `${YELLOW}14` : "#08080d",
-                                  border: `1px solid ${active ? YELLOW : LINE}`,
-                                  boxShadow: active ? `0 0 0 1px ${YELLOW}66` : undefined,
-                                }}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className="text-sm font-bold" style={{ color: WHITE }}>{opt.name}</span>
-                                  <span className="text-xs font-bold" style={{ color: opt.cost === 0 ? GREEN : YELLOW }}>{opt.costLabel}</span>
-                                </div>
-                                <p className="mt-1 text-[11px]" style={{ color: MUTED }}>{opt.eta}</p>
-                              </button>
-                            );
-                          })}
+                      {/* SHIPPING METHOD — só aparece após preencher CEP, rua e número */}
+                      {customer.cep.replace(/\D/g, "").length === 8 &&
+                        customer.street.trim().length > 0 &&
+                        customer.number.trim().length > 0 && (
+                        <div className="pt-2 animate-fade-in">
+                          <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                            Forma de envio
+                          </label>
+                          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {([
+                              { id: "sedex" as const, name: "Sedex", eta: "Até 2 semanas", cost: 0, costLabel: "Grátis" },
+                              { id: "correios" as const, name: "Correios", eta: "Até 6 dias úteis", cost: 23.89, costLabel: fmt(23.89) },
+                            ]).map((opt) => {
+                              const active = shipping === opt.id;
+                              return (
+                                <button
+                                  key={opt.id}
+                                  type="button"
+                                  onClick={() => setShipping(opt.id)}
+                                  className="text-left rounded-xl px-4 py-3 transition-all"
+                                  style={{
+                                    backgroundColor: active ? `${YELLOW}14` : "#08080d",
+                                    border: `1px solid ${active ? YELLOW : LINE}`,
+                                    boxShadow: active ? `0 0 0 1px ${YELLOW}66` : undefined,
+                                  }}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-bold" style={{ color: WHITE }}>{opt.name}</span>
+                                    <span className="text-xs font-bold" style={{ color: opt.cost === 0 ? GREEN : YELLOW }}>{opt.costLabel}</span>
+                                  </div>
+                                  <p className="mt-1 text-[11px]" style={{ color: MUTED }}>{opt.eta}</p>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {formError && (
                         <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
