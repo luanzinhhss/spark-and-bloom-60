@@ -793,6 +793,53 @@ function Index() {
     if (!customer.city.trim() || !customer.state.trim())
       return setFormError("Endereço incompleto");
     setFormError(null);
+    setCheckoutStep(needsPersonalization(checkout?.items) ? "personalize" : "pix");
+  };
+
+  // Photo upload handlers
+  const handlePhotoFile = (file: File | undefined | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Arquivo precisa ser uma imagem");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setPhotoError("Imagem precisa ter no máximo 8 MB");
+      return;
+    }
+    setPhotoError(null);
+    setPhotoStatus("uploading");
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Simulate upload delay so the user sees the loading animation
+      setTimeout(() => {
+        setPhotoData(typeof reader.result === "string" ? reader.result : null);
+        setPhotoStatus("preview");
+      }, 1400);
+    };
+    reader.onerror = () => {
+      setPhotoStatus("idle");
+      setPhotoError("Não foi possível ler a imagem. Tente novamente.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const resetPhoto = () => {
+    setPhotoStatus("idle");
+    setPhotoData(null);
+    setPhotoError(null);
+  };
+
+  const submitPersonalize = () => {
+    if (photoStatus !== "confirmed") return setFormError("Confirme a foto antes de continuar");
+    const { nome, nascimento, tamanho, peso, clube, time } = personalInfo;
+    if (!nome.trim()) return setFormError("Informe o nome");
+    if (!nascimento.trim()) return setFormError("Informe a data de nascimento");
+    if (!tamanho.trim()) return setFormError("Informe o tamanho (altura)");
+    if (!peso.trim()) return setFormError("Informe o peso");
+    if (!clube.trim()) return setFormError("Informe o clube");
+    if (!time.trim()) return setFormError("Informe a seleção / time");
+    setFormError(null);
     setCheckoutStep("pix");
   };
 
