@@ -845,7 +845,7 @@ function Index() {
     return () => {
       cancelled = true;
     };
-  }, [checkout, checkoutStep, shipping, coupon, customer]);
+  }, [checkout, checkoutStep, shipping]);
 
   // Poll payment confirmation
   useEffect(() => {
