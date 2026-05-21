@@ -1318,22 +1318,38 @@ function Index() {
               </div>
             </div>
 
-            <div className="hidden sm:flex flex-col justify-center gap-4 px-2">
-              <div className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: YELLOW }}>
-                Produção artesanal
+            <div
+              className="relative rounded-2xl overflow-hidden group flex flex-col"
+              style={{
+                border: `1px solid ${LINE}`,
+                boxShadow: `0 20px 50px ${INK}80, 0 0 0 1px ${YELLOW}10 inset`,
+              }}
+            >
+              <video
+                src="/videos/kit-torcedor-brasil.mp4"
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-auto block bg-black"
+                style={{ aspectRatio: "9 / 16", objectFit: "cover" }}
+              />
+              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ backgroundColor: `${INK}d9`, color: YELLOW, border: `1px solid ${YELLOW}40` }}>
+                Kit Torcedor Brasil
               </div>
-              <h3 className="font-display text-2xl tracking-tight" style={{ color: WHITE }}>
-                Cada figurinha feita com cuidado de colecionador
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-                Acompanhe nos vídeos como produzimos nossos álbuns, figurinhas e itens exclusivos da Copa 2026. Acabamento premium, materiais selecionados e atenção a cada detalhe.
-              </p>
-              <div className="flex flex-wrap gap-2 pt-2">
-                {["Impressão alta resolução", "Material premium", "Acabamento manual"].map((t) => (
-                  <span key={t} className="text-[11px] px-3 py-1.5 rounded-full" style={{ backgroundColor: SURFACE, color: WHITE, border: `1px solid ${LINE}` }}>{t}</span>
-                ))}
-              </div>
+              <button
+                type="button"
+                onClick={() => buyOnly("fig-individual")}
+                className="absolute bottom-4 left-4 right-4 py-3 rounded-xl font-display tracking-wide text-sm transition-transform active:scale-[0.98] hover:scale-[1.01]"
+                style={{
+                  background: `linear-gradient(135deg, ${YELLOW}, #ffd83d)`,
+                  color: INK,
+                  boxShadow: `0 12px 30px ${YELLOW}55, 0 0 0 1px ${YELLOW}80 inset`,
+                }}
+              >
+                COMPRAR AGORA
+              </button>
             </div>
+
           </div>
         </div>
       </section>
