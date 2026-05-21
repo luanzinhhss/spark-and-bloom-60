@@ -464,6 +464,7 @@ function Index() {
   const [cepError, setCepError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixState>({ kind: "idle" });
+  const [shipping, setShipping] = useState<"sedex" | "correios">("sedex");
   const [copied, setCopied] = useState(false);
   const [paid, setPaid] = useState(false);
   const [coupon, setCoupon] = useState<{ code: string; pct: number } | null>(null);
