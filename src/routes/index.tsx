@@ -368,6 +368,48 @@ const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 const fmt = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+// Frete Correios por região (UF). Sedex é sempre grátis.
+const CORREIOS_BY_UF: Record<string, { cost: number; eta: string; region: string }> = {
+  // Sudeste
+  SP: { cost: 19.9, eta: "3 a 5 dias úteis", region: "Sudeste" },
+  RJ: { cost: 22.9, eta: "3 a 5 dias úteis", region: "Sudeste" },
+  MG: { cost: 24.9, eta: "3 a 6 dias úteis", region: "Sudeste" },
+  ES: { cost: 26.9, eta: "4 a 6 dias úteis", region: "Sudeste" },
+  // Sul
+  PR: { cost: 28.9, eta: "4 a 6 dias úteis", region: "Sul" },
+  SC: { cost: 31.9, eta: "4 a 7 dias úteis", region: "Sul" },
+  RS: { cost: 34.9, eta: "5 a 8 dias úteis", region: "Sul" },
+  // Centro-Oeste
+  DF: { cost: 36.9, eta: "5 a 8 dias úteis", region: "Centro-Oeste" },
+  GO: { cost: 38.9, eta: "5 a 8 dias úteis", region: "Centro-Oeste" },
+  MT: { cost: 42.9, eta: "6 a 9 dias úteis", region: "Centro-Oeste" },
+  MS: { cost: 41.9, eta: "6 a 9 dias úteis", region: "Centro-Oeste" },
+  // Nordeste
+  BA: { cost: 44.9, eta: "6 a 9 dias úteis", region: "Nordeste" },
+  SE: { cost: 46.9, eta: "7 a 10 dias úteis", region: "Nordeste" },
+  AL: { cost: 47.9, eta: "7 a 10 dias úteis", region: "Nordeste" },
+  PE: { cost: 48.9, eta: "7 a 10 dias úteis", region: "Nordeste" },
+  PB: { cost: 49.9, eta: "7 a 10 dias úteis", region: "Nordeste" },
+  RN: { cost: 50.9, eta: "7 a 11 dias úteis", region: "Nordeste" },
+  CE: { cost: 51.9, eta: "7 a 11 dias úteis", region: "Nordeste" },
+  PI: { cost: 52.9, eta: "8 a 11 dias úteis", region: "Nordeste" },
+  MA: { cost: 53.9, eta: "8 a 12 dias úteis", region: "Nordeste" },
+  // Norte
+  TO: { cost: 52.9, eta: "8 a 12 dias úteis", region: "Norte" },
+  PA: { cost: 55.9, eta: "9 a 13 dias úteis", region: "Norte" },
+  AP: { cost: 57.9, eta: "9 a 14 dias úteis", region: "Norte" },
+  RO: { cost: 56.9, eta: "9 a 14 dias úteis", region: "Norte" },
+  AC: { cost: 59.9, eta: "10 a 15 dias úteis", region: "Norte" },
+  AM: { cost: 58.9, eta: "10 a 15 dias úteis", region: "Norte" },
+  RR: { cost: 59.9, eta: "10 a 15 dias úteis", region: "Norte" },
+};
+
+const correiosFor = (uf: string | undefined | null) => {
+  const key = (uf ?? "").trim().toUpperCase();
+  return CORREIOS_BY_UF[key] ?? { cost: 29.9, eta: "5 a 9 dias úteis", region: "Brasil" };
+};
+
+
 type CartLine = { id: string; qty: number };
 
 type PixState =
