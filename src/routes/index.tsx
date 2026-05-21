@@ -27,6 +27,7 @@ import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 import envelopePanini1 from "@/assets/envelope-panini-1.png";
 import envelopePanini2 from "@/assets/envelope-panini-2.png";
+import miguelExtraStickers from "@/assets/miguel-extra-stickers.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -112,6 +113,27 @@ const PRODUCTS: Product[] = [
       "10 figurinhas personalizadas no mesmo pedido",
       "Misture pessoas, fotos e números",
       "Embalagem premium em estilo coleção",
+    ],
+  },
+  {
+    id: "miguel-extra-stickers",
+    name: "Figurinhas Extra Panini — 4 Variantes Metálicas",
+    tag: "Extra Sticker · Panini",
+    price: 24.9,
+    oldPrice: 39.9,
+    installments: "Kit com 4 figurinhas extras nas cores ouro, prata, bronze e roxo",
+    desc: "Conjunto colecionável de figurinhas Extra Sticker Panini Copa 2026 com fundo metálico nas 4 cores oficiais — ouro, prata, bronze e roxo.",
+    image: miguelExtraStickers,
+    badge: "Edição limitada",
+    gallery: [
+      { src: miguelExtraStickers, label: "Kit 4 variantes" },
+    ],
+    details: [
+      "Kit colecionável com 4 figurinhas Extra Sticker oficiais",
+      "Cores exclusivas: Ouro, Prata, Bronze e Roxo",
+      "Acabamento metálico premium da linha Panini",
+      "Personalização opcional com foto e nome",
+      "Embalagem protetora individual para colecionador",
     ],
   },
   {
@@ -349,6 +371,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "fig-pack-10": "figurinhas",
   "fig-shiny": "figurinhas",
   "envelope-panini": "figurinhas",
+  "miguel-extra-stickers": "figurinhas",
   "figurinha-canva-editavel": "digital",
   "mini-taca-porta-foto": "decoracao",
   "porta-figurinhas-copa": "decoracao",
