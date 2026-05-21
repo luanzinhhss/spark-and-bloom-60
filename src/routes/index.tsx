@@ -2680,10 +2680,10 @@ function Index() {
                                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                               </div>
                               <div className="font-display text-3xl" style={{ color: WHITE }}>
-                                Pagamento confirmado
+                                Compra concluída com sucesso
                               </div>
                               <p className="mt-3 text-sm" style={{ color: MUTED }}>
-                                Em instantes você receberá um e-mail com as instruções para enviar a foto.
+                                Pagamento confirmado! Em instantes você receberá um e-mail com o resumo do pedido e os próximos passos.
                               </p>
                             </div>
                           ) : (
