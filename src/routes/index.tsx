@@ -760,7 +760,8 @@ function Index() {
       (a, l) => a + PRODUCT_MAP[l.id].price * l.qty,
       0,
     );
-    const shippingCost = shipping === "correios" ? 23.89 : 0;
+    const correios = correiosFor(customer.state);
+    const shippingCost = shipping === "correios" ? correios.cost : 0;
     const total = (coupon ? subtotal * (1 - coupon.pct) : subtotal) + shippingCost;
     const desc = checkout.items
       .map((l) => `${l.qty}x ${PRODUCT_MAP[l.id].name}`)
