@@ -683,8 +683,17 @@ function Index() {
     setCheckoutStep("contact");
     setFormError(null);
     setCepError(null);
+    setPhotoStatus("idle");
+    setPhotoData(null);
+    setPhotoError(null);
+    setPersonalInfo({ nome: "", nascimento: "", tamanho: "", peso: "", clube: "", time: "" });
     setCheckout({ items });
   };
+
+  // Products that require photo + personal info
+  const PERSONALIZED_IDS = new Set(["fig-individual", "fig-pack-10"]);
+  const needsPersonalization = (items: CartLine[] | undefined) =>
+    !!items?.some((l) => PERSONALIZED_IDS.has(l.id));
 
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
