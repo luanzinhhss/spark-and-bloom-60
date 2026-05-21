@@ -2366,7 +2366,7 @@ function Index() {
                   personalize: "Personalização",
                   pix: "Pagamento",
                 };
-                const currentIdx = steps.indexOf(checkoutStep as (typeof steps)[number]);
+                const currentIdx = steps.indexOf(checkoutStep as never);
                 return (
                   <>
                     <div className="hidden sm:flex items-center gap-2">
@@ -2420,7 +2420,7 @@ function Index() {
               const steps = personalize
                 ? (["contact", "address", "personalize", "pix"] as const)
                 : (["contact", "address", "pix"] as const);
-              const currentIdx = steps.indexOf(checkoutStep as (typeof steps)[number]);
+              const currentIdx = steps.indexOf(checkoutStep as never);
               return (
                 <div className="flex items-center gap-1.5">
                   {steps.map((s, i) => {
@@ -2449,7 +2449,7 @@ function Index() {
                   const steps = personalize
                     ? (["contact", "address", "personalize", "pix"] as const)
                     : (["contact", "address", "pix"] as const);
-                  const idx = steps.indexOf(checkoutStep as (typeof steps)[number]) + 1;
+                  const idx = steps.indexOf(checkoutStep as never) + 1;
                   const titleMap: Record<string, string> = {
                     contact: "Seus dados de contato",
                     address: "Endereço de entrega",
