@@ -804,8 +804,14 @@ function Index() {
                 price: PRODUCT_MAP[l.id].price,
               })),
               subtotal,
-              discount: coupon ? subtotal - total : 0,
+              discount: coupon ? subtotal * coupon.pct : 0,
               couponCode: coupon?.code ?? null,
+              shipping: {
+                method: shipping,
+                label: shipping === "correios" ? "Correios" : "Sedex (Grátis)",
+                cost: shipping === "correios" ? 23.89 : 0,
+                eta: shipping === "correios" ? "Até 6 dias úteis" : "Até 2 semanas",
+              },
               total: r.total ?? total,
               customer: {
                 name: customer.name,
