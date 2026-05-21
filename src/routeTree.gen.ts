@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MeusPedidosRouteImport } from './routes/meus-pedidos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as ApiPixRouteImport } from './routes/api/pix'
 
+const MeusPedidosRoute = MeusPedidosRouteImport.update({
+  id: '/meus-pedidos',
+  path: '/meus-pedidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const ApiPixRoute = ApiPixRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/meus-pedidos': typeof MeusPedidosRoute
   '/api/pix': typeof ApiPixRoute
   '/pedido/$id': typeof PedidoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/meus-pedidos': typeof MeusPedidosRoute
   '/api/pix': typeof ApiPixRoute
   '/pedido/$id': typeof PedidoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/meus-pedidos': typeof MeusPedidosRoute
   '/api/pix': typeof ApiPixRoute
   '/pedido/$id': typeof PedidoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/pix' | '/pedido/$id'
+  fullPaths: '/' | '/meus-pedidos' | '/api/pix' | '/pedido/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/pix' | '/pedido/$id'
-  id: '__root__' | '/' | '/api/pix' | '/pedido/$id'
+  to: '/' | '/meus-pedidos' | '/api/pix' | '/pedido/$id'
+  id: '__root__' | '/' | '/meus-pedidos' | '/api/pix' | '/pedido/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MeusPedidosRoute: typeof MeusPedidosRoute
   ApiPixRoute: typeof ApiPixRoute
   PedidoIdRoute: typeof PedidoIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/meus-pedidos': {
+      id: '/meus-pedidos'
+      path: '/meus-pedidos'
+      fullPath: '/meus-pedidos'
+      preLoaderRoute: typeof MeusPedidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MeusPedidosRoute: MeusPedidosRoute,
   ApiPixRoute: ApiPixRoute,
   PedidoIdRoute: PedidoIdRoute,
 }
