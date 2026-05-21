@@ -477,7 +477,19 @@ function Index() {
     }
   }, [detailsId]);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
-  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
+  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "personalize" | "pix">("contact");
+  // Personalization state (foto + dados pessoais)
+  const [photoStatus, setPhotoStatus] = useState<"idle" | "uploading" | "preview" | "confirmed">("idle");
+  const [photoData, setPhotoData] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [personalInfo, setPersonalInfo] = useState({
+    nome: "",
+    nascimento: "",
+    tamanho: "",
+    peso: "",
+    clube: "",
+    time: "",
+  });
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
