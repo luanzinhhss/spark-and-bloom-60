@@ -2563,6 +2563,49 @@ function Index() {
                     );
                   })}
                 </div>
+
+                {/* ORDER BUMPS */}
+                {(() => {
+                  const inCart = new Set(checkout.items.map((l) => l.id));
+                  const bumps = PRODUCTS.filter((p) => !inCart.has(p.id))
+                    .sort((a, b) => a.price - b.price)
+                    .slice(0, 3);
+                  if (bumps.length === 0) return null;
+                  return (
+                    <div className="px-5 py-4 space-y-2" style={{ borderTop: `1px solid ${LINE}`, backgroundColor: "#08080d" }}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] font-bold tracking-[0.25em] uppercase px-2 py-0.5 rounded" style={{ backgroundColor: `${YELLOW}22`, color: YELLOW }}>
+                          Oferta exclusiva
+                        </span>
+                        <span className="text-[10px]" style={{ color: MUTED }}>aproveite e leve junto</span>
+                      </div>
+                      {bumps.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => addBumpToCheckout(p.id)}
+                          className="w-full flex items-center gap-3 rounded-xl p-2.5 text-left transition-all hover:bg-white/5"
+                          style={{ border: `1px dashed ${YELLOW}55` }}
+                        >
+                          <div className="h-12 w-12 rounded-lg overflow-hidden shrink-0" style={{ backgroundColor: SURFACE_2 }}>
+                            <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate" style={{ color: WHITE }}>{p.name}</p>
+                            <p className="text-[11px]" style={{ color: MUTED }}>
+                              {p.oldPrice ? <span className="line-through mr-1">{fmt(p.oldPrice)}</span> : null}
+                              <span style={{ color: GREEN }}>{fmt(p.price)}</span>
+                            </p>
+                          </div>
+                          <span className="text-[11px] font-bold px-2 py-1 rounded-full shrink-0" style={{ backgroundColor: YELLOW, color: INK }}>
+                            + Adicionar
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
+
                 <div className="px-5 py-4 space-y-2" style={{ borderTop: `1px solid ${LINE}` }}>
                   {(() => {
                     const subtotal = checkout.items.reduce(
