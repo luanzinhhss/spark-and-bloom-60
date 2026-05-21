@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const GATEWAY_URL =
   "https://bqckqgmorberurjolzmq.supabase.co/functions/v1/api-generate-pix-qr";
@@ -11,6 +12,10 @@ const Schema = z.object({
   description: z.string().min(1).max(255),
   external_id: z.string().min(1).max(120),
   expiration_minutes: z.number().int().min(5).max(1440).optional(),
+  email: z.string().email().max(255).optional(),
+  items: z.array(z.unknown()).max(50).optional(),
+  customer: z.unknown().optional(),
+  shipping: z.unknown().optional(),
 });
 
 export const Route = createFileRoute("/api/pix")({
@@ -65,6 +70,30 @@ export const Route = createFileRoute("/api/pix")({
               { status: 502 },
             );
           }
+
+          // Persist order in DB (best-effort)
+          try {
+            await supabaseAdmin.from("orders").upsert(
+              {
+                id: data.external_id,
+                email: data.email ?? null,
+                status: "pending",
+                total: data.amount,
+                items: (data.items ?? []) as any,
+                customer: (data.customer ?? null) as any,
+                shipping: (data.shipping ?? null) as any,
+                transaction_id: json.transaction_id,
+                pix: {
+                  copy_paste: json.pix?.copy_paste,
+                  qr_code_image: json.pix?.qr_code_image,
+                },
+              },
+              { onConflict: "id" },
+            );
+          } catch (e) {
+            console.error("orders persist error", e);
+          }
+
           return Response.json({
             success: true,
             transaction_id: json.transaction_id,
@@ -99,9 +128,23 @@ export const Route = createFileRoute("/api/pix")({
             { headers: { "X-API-Key": apiKey } },
           );
           const json = (await res.json()) as any;
+          const status = (json?.status ?? "pending") as string;
+
+          if (status === "paid" || status === "approved" || status === "completed") {
+            try {
+              await supabaseAdmin
+                .from("orders")
+                .update({ status: "paid", paid_at: new Date().toISOString() })
+                .eq("transaction_id", id)
+                .neq("status", "paid");
+            } catch (e) {
+              console.error("orders mark paid error", e);
+            }
+          }
+
           return Response.json({
             success: !!json?.success,
-            status: json?.status ?? "pending",
+            status,
           });
         } catch {
           return Response.json({ success: false, status: "unknown" });
