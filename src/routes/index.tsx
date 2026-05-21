@@ -77,27 +77,6 @@ type Product = {
 
 const PRODUCTS: Product[] = [
   {
-    id: "album",
-    name: "Álbum Oficial Copa Namorados 2026",
-    tag: "Álbum",
-    price: 197,
-    oldPrice: 297,
-    installments: "ou 12x de R$ 19,90 sem juros",
-    desc: "Capa dura, 60 espaços numerados para colar suas figurinhas personalizadas.",
-    image: albumFront,
-    badge: "Mais vendido",
-    gallery: [
-      { src: albumFront, label: "Capa" },
-      { src: albumInterior, label: "Interior" },
-    ],
-    details: [
-      "Formato A4 — 60 espaços numerados",
-      "Capa dura com acabamento foil dourado",
-      "Páginas internas em papel couché 170g",
-      "Inclui adesivos de identificação por jogador",
-    ],
-  },
-  {
     id: "fig-individual",
     name: "Figurinha Personalizada",
     tag: "Figurinha",
