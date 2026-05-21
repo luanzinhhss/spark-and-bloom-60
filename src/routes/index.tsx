@@ -2596,7 +2596,8 @@ function Index() {
                       0,
                     );
                     const discount = coupon ? subtotal * coupon.pct : 0;
-                    const total = subtotal - discount;
+                    const shippingCost = shipping === "correios" ? 23.89 : 0;
+                    const total = subtotal - discount + shippingCost;
                     return (
                       <>
                         <div className="flex justify-between text-xs" style={{ color: MUTED }}>
@@ -2608,7 +2609,10 @@ function Index() {
                           </div>
                         )}
                         <div className="flex justify-between text-xs" style={{ color: MUTED }}>
-                          <span>Frete</span><span style={{ color: GREEN }}>Grátis</span>
+                          <span>Frete · {shipping === "correios" ? "Correios" : "Sedex"}</span>
+                          <span style={{ color: shippingCost === 0 ? GREEN : WHITE }}>
+                            {shippingCost === 0 ? "Grátis" : fmt(shippingCost)}
+                          </span>
                         </div>
                         <div className="flex justify-between items-baseline pt-2" style={{ borderTop: `1px solid ${LINE}` }}>
                           <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: MUTED }}>Total</span>
