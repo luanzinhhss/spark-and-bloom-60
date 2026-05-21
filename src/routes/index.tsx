@@ -2434,6 +2434,7 @@ function Index() {
                                     <span className="text-xs font-bold" style={{ color: opt.cost === 0 ? GREEN : YELLOW }}>{opt.costLabel}</span>
                                   </div>
                                   <p className="mt-1 text-[11px]" style={{ color: MUTED }}>{opt.eta}</p>
+                                  <p className="text-[10px] mt-0.5" style={{ color: MUTED, opacity: 0.7 }}>{opt.region}</p>
                                 </button>
                               );
                             })}
