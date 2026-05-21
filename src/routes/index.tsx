@@ -2647,6 +2647,247 @@ function Index() {
                     </div>
                   )}
 
+                  {checkoutStep === "personalize" && (
+                    <div className="space-y-6 animate-fade-in">
+                      {/* PHOTO UPLOAD */}
+                      <div>
+                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                          Foto 3x4 (frente)
+                        </label>
+                        <p className="mt-1 text-xs" style={{ color: MUTED, opacity: 0.85 }}>
+                          Envie uma foto frontal, bem iluminada, estilo 3x4. PNG ou JPG, até 8 MB.
+                        </p>
+
+                        {/* IDLE — Dropzone */}
+                        {photoStatus === "idle" && (
+                          <label
+                            htmlFor="photo-upload"
+                            onDragOver={(e) => { e.preventDefault(); }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const f = e.dataTransfer.files?.[0];
+                              handlePhotoFile(f);
+                            }}
+                            className="mt-3 flex flex-col items-center justify-center text-center rounded-2xl px-6 py-10 cursor-pointer transition-colors hover:bg-white/5"
+                            style={{
+                              border: `2px dashed ${YELLOW}55`,
+                              backgroundColor: "#08080d",
+                            }}
+                          >
+                            <div
+                              className="h-14 w-14 rounded-full flex items-center justify-center mb-3"
+                              style={{ backgroundColor: `${YELLOW}18`, border: `1px solid ${YELLOW}40` }}
+                            >
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={YELLOW} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                              </svg>
+                            </div>
+                            <div className="font-display text-base" style={{ color: WHITE }}>
+                              Arraste a foto aqui
+                            </div>
+                            <div className="mt-1 text-xs" style={{ color: MUTED }}>
+                              ou <span style={{ color: YELLOW, textDecoration: "underline" }}>clique para escolher</span>
+                            </div>
+                            <input
+                              id="photo-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handlePhotoFile(e.target.files?.[0])}
+                            />
+                          </label>
+                        )}
+
+                        {/* UPLOADING */}
+                        {photoStatus === "uploading" && (
+                          <div
+                            className="mt-3 flex flex-col items-center justify-center text-center rounded-2xl px-6 py-12 animate-fade-in"
+                            style={{ border: `1px solid ${LINE}`, backgroundColor: "#08080d" }}
+                          >
+                            <div
+                              className="h-14 w-14 rounded-full border-[3px] animate-spin"
+                              style={{ borderColor: `${YELLOW}30`, borderTopColor: YELLOW }}
+                            />
+                            <div className="mt-5 font-display text-lg" style={{ color: WHITE }}>
+                              Carregando imagem...
+                            </div>
+                            <div className="mt-1 text-xs tracking-wide" style={{ color: MUTED }}>
+                              Aguarde um instante
+                            </div>
+                          </div>
+                        )}
+
+                        {/* PREVIEW — aguarda confirmação */}
+                        {photoStatus === "preview" && photoData && (
+                          <div
+                            className="mt-3 rounded-2xl p-5 animate-fade-in"
+                            style={{ border: `1px solid ${GREEN}55`, backgroundColor: "#08080d" }}
+                          >
+                            <div className="flex items-center gap-2 mb-4">
+                              <div
+                                className="h-7 w-7 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: GREEN }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                              </div>
+                              <div className="font-display text-sm tracking-wide" style={{ color: WHITE }}>
+                                Foto enviada com sucesso
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
+                              <img
+                                src={photoData}
+                                alt="Foto enviada"
+                                className="h-32 w-24 sm:h-40 sm:w-32 object-cover rounded-lg"
+                                style={{ border: `1px solid ${LINE}` }}
+                              />
+                              <div>
+                                <div className="font-display text-lg leading-tight" style={{ color: WHITE }}>
+                                  A foto está certa?
+                                </div>
+                                <p className="mt-1 text-xs" style={{ color: MUTED }}>
+                                  Depois de confirmar você não poderá mudar a foto deste pedido.
+                                </p>
+                                <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={resetPhoto}
+                                    className="rounded-full px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-white/5"
+                                    style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                                  >
+                                    Mandar nova foto
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPhotoStatus("confirmed")}
+                                    className="rounded-full px-5 py-2.5 text-xs font-bold tracking-wide transition-transform hover:scale-[1.02]"
+                                    style={{ backgroundColor: GREEN, color: WHITE }}
+                                  >
+                                    ✓ Confirmar foto
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* CONFIRMED */}
+                        {photoStatus === "confirmed" && photoData && (
+                          <div
+                            className="mt-3 rounded-2xl p-4 flex items-center gap-4 animate-fade-in"
+                            style={{ border: `1px solid ${YELLOW}40`, backgroundColor: `${YELLOW}08` }}
+                          >
+                            <img
+                              src={photoData}
+                              alt="Foto confirmada"
+                              className="h-20 w-16 object-cover rounded-md"
+                              style={{ border: `1px solid ${LINE}` }}
+                            />
+                            <div className="flex-1">
+                              <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: GREEN }}>
+                                Foto confirmada
+                              </div>
+                              <div className="mt-0.5 text-sm font-semibold" style={{ color: WHITE }}>
+                                Pronta para virar figurinha
+                              </div>
+                              <div className="text-[11px]" style={{ color: MUTED }}>
+                                A foto não poderá ser alterada após este passo.
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {photoError && (
+                          <p className="mt-2 text-xs" style={{ color: "#ff6b6b" }}>{photoError}</p>
+                        )}
+                      </div>
+
+                      {/* PERSONAL DATA — só após foto confirmada */}
+                      {photoStatus === "confirmed" && (
+                        <div className="space-y-4 animate-fade-in pt-2">
+                          <div>
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-3" style={{ color: YELLOW }}>
+                              Dados que vão na figurinha
+                            </div>
+                          </div>
+                          <FieldInput
+                            label="Nome"
+                            value={personalInfo.nome}
+                            onChange={(v) => setPersonalInfo((p) => ({ ...p, nome: v }))}
+                            placeholder="Ex.: Miguel Souza"
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                                Nascimento
+                              </label>
+                              <input
+                                type="date"
+                                value={personalInfo.nascimento}
+                                onChange={(e) => setPersonalInfo((p) => ({ ...p, nascimento: e.target.value }))}
+                                className="mt-1 w-full rounded-lg px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+                                style={{ backgroundColor: "#08080d", border: `1px solid ${LINE}`, color: WHITE, colorScheme: "dark" }}
+                              />
+                            </div>
+                            <FieldInput
+                              label="Tamanho (altura)"
+                              value={personalInfo.tamanho}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, tamanho: v }))}
+                              placeholder="Ex.: 1,72 m"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <FieldInput
+                              label="Peso"
+                              value={personalInfo.peso}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, peso: v }))}
+                              placeholder="Ex.: 68 kg"
+                            />
+                            <FieldInput
+                              label="Clube"
+                              value={personalInfo.clube}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, clube: v }))}
+                              placeholder="Ex.: Flamengo"
+                            />
+                          </div>
+                          <FieldInput
+                            label="Seleção / Time"
+                            value={personalInfo.time}
+                            onChange={(v) => setPersonalInfo((p) => ({ ...p, time: v }))}
+                            placeholder="Ex.: Brasil"
+                          />
+                        </div>
+                      )}
+
+                      {formError && (
+                        <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                      )}
+
+                      <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutStep("address")}
+                          className="rounded-full px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-white/5"
+                          style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                        >
+                          ← Voltar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={submitPersonalize}
+                          disabled={photoStatus !== "confirmed"}
+                          className="flex-1 rounded-full px-6 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          style={{ backgroundColor: YELLOW, color: INK }}
+                        >
+                          Avançar para o pagamento →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {checkoutStep === "pix" && (
                     <div className="animate-fade-in">
                       {pix.kind === "loading" && (
