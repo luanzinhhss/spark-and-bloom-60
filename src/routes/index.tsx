@@ -28,6 +28,14 @@ import fifaBackdrop from "@/assets/fifa-backdrop.png";
 import envelopePanini1 from "@/assets/envelope-panini-1.png";
 import envelopePanini2 from "@/assets/envelope-panini-2.png";
 import miguelExtraStickers from "@/assets/miguel-extra-stickers.png";
+import capinhaNeymarThumb from "@/assets/capinha-neymar-thumb.png";
+import paniniExtraVariantes from "@/assets/panini-extra-variantes.png";
+import miniTacaThumb from "@/assets/mini-taca-thumb.png";
+import miniTacaDetalhe from "@/assets/mini-taca-detalhe.png";
+import caseThumb from "@/assets/case-porta-thumb.png";
+import caseDetalhe from "@/assets/case-porta-detalhe.png";
+import albumCasalThumb from "@/assets/album-casal-thumb.png";
+import albumCasalDetalhe from "@/assets/album-casal-detalhe.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -127,6 +135,7 @@ const PRODUCTS: Product[] = [
     badge: "Edição limitada",
     gallery: [
       { src: miguelExtraStickers, label: "Kit 4 variantes" },
+      { src: paniniExtraVariantes, label: "Variantes em detalhe" },
     ],
     details: [
       "Kit colecionável com 4 figurinhas Extra Sticker oficiais",
@@ -144,9 +153,11 @@ const PRODUCTS: Product[] = [
     oldPrice: 22.9,
     installments: "Acompanha uma MiniPic pronta para encaixe",
     desc: "Mini taça em 3D que transforma uma foto especial em destaque na sua mesa ou estante.",
-    image: miniTacaPortaFoto,
+    image: miniTacaThumb,
     gallery: [
-      { src: miniTacaPortaFoto, label: "Mini Taça" },
+      { src: miniTacaThumb, label: "Mini Taça Porta Foto" },
+      { src: miniTacaDetalhe, label: "Detalhe da peça" },
+      { src: miniTacaPortaFoto, label: "Outra visão" },
     ],
     details: [
       "Impressão 3D — altura aproximada 7,5 cm",
@@ -189,10 +200,12 @@ const PRODUCTS: Product[] = [
     oldPrice: 79.99,
     installments: "ou 6x de R$ 8,33 sem juros",
     desc: "Memory Album Copa 2026: álbum personalizado para casal com 50 figurinhas em 3 tamanhos diferentes.",
-    image: albumCasalMain,
+    image: albumCasalThumb,
     badge: "Fixado",
     pinned: true,
     gallery: [
+      { src: albumCasalThumb, label: "Álbum + envelopes" },
+      { src: albumCasalDetalhe, label: "Capa em detalhe" },
       { src: albumCasalMain, label: "Kit completo" },
       { src: albumCasalInterior, label: "Páginas internas" },
     ],
@@ -213,9 +226,10 @@ const PRODUCTS: Product[] = [
     oldPrice: 15.99,
     installments: "Frete econômico disponível",
     desc: "Capa de silicone fosco anti-impacto com estampa exclusiva do Neymar Jr. Compatível com Samsung Galaxy A/S e iPhone 7 ao 17 Pro Max.",
-    image: capinhaNeymar,
+    image: capinhaNeymarThumb,
     badge: "Lançamento",
     gallery: [
+      { src: capinhaNeymarThumb, label: "Apresentação" },
       { src: capinhaNeymar, label: "Estampa J1 — Neymar Jr" },
       { src: capinhaNeymarJ2, label: "Estampa J2 — Neymar Jr Amarelo" },
     ],
@@ -258,9 +272,11 @@ const PRODUCTS: Product[] = [
     oldPrice: 59.9,
     installments: "ou 3x de R$ 9,97 sem juros",
     desc: "Maleta organizadora oficial estilo Copa 2026 com até 200 figurinhas, travas reforçadas e chaveiro mini troféu de brinde exclusivo.",
-    image: portaFigurinhas1,
+    image: caseThumb,
     badge: "Lançamento exclusivo",
     gallery: [
+      { src: caseThumb, label: "Maleta Copa 2026" },
+      { src: caseDetalhe, label: "Vitrine + chaveiro troféu" },
       { src: portaFigurinhas1, label: "Apresentação" },
       { src: portaFigurinhas2, label: "Detalhes da tampa" },
       { src: portaFigurinhas3, label: "Alta capacidade — 200 figurinhas" },
