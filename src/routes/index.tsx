@@ -830,9 +830,9 @@ function Index() {
               couponCode: coupon?.code ?? null,
               shipping: {
                 method: shipping,
-                label: shipping === "correios" ? "Correios" : "Sedex (Grátis)",
-                cost: shipping === "correios" ? 23.89 : 0,
-                eta: shipping === "correios" ? "Até 6 dias úteis" : "Até 2 semanas",
+                label: shipping === "correios" ? `Correios · ${correios.region}` : "Sedex (Grátis)",
+                cost: shippingCost,
+                eta: shipping === "correios" ? correios.eta : "Até 2 semanas",
               },
               total: r.total ?? total,
               customer: {
