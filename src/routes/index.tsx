@@ -873,6 +873,13 @@ function Index() {
             amount: Number(total.toFixed(2)),
             description: desc || "Copa Album 2026",
             external_id: orderId,
+            email: customer.email,
+            items: checkout.items.map((l) => ({
+              id: l.id,
+              name: PRODUCT_MAP[l.id].name,
+              qty: l.qty,
+              price: PRODUCT_MAP[l.id].price,
+            })),
             customer: {
               name: customer.name,
               email: customer.email,
@@ -885,6 +892,12 @@ function Index() {
                 city: customer.city,
                 state: customer.state,
               },
+            },
+            shipping: {
+              method: shipping,
+              label: shipping === "correios" ? `Correios · ${correios.region}` : "Sedex (Grátis)",
+              cost: shippingCost,
+              eta: shipping === "correios" ? correios.eta : "Até 2 semanas",
             },
           }),
         });
