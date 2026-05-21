@@ -1265,9 +1265,6 @@ function Index() {
                 Escolha sua jogada
               </h2>
             </div>
-            <p className="text-sm max-w-sm" style={{ color: MUTED }}>
-              Álbum, figurinhas avulsas, packs e a rara dourada. Tudo impresso com qualidade premium.
-            </p>
           </div>
 
           <div className="-mx-4 sm:mx-0 mb-8 sm:mb-10 overflow-x-auto">
