@@ -25,6 +25,8 @@ import portaFigurinhas6 from "@/assets/porta-figurinhas-6.jpg";
 import portaFigurinhas7 from "@/assets/porta-figurinhas-7.jpg";
 import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
+import envelopePanini1 from "@/assets/envelope-panini-1.png";
+import envelopePanini2 from "@/assets/envelope-panini-2.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -62,6 +64,7 @@ type Product = {
   image: string;
   badge?: string;
   pinned?: boolean;
+  minQty?: number;
   gallery: { src: string; label: string }[];
   details: string[];
   variants?: {
