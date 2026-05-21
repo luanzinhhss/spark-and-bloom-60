@@ -182,9 +182,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthGate>
-        <Outlet />
-      </AuthGate>
+      <Outlet />
     </QueryClientProvider>
   );
 }
