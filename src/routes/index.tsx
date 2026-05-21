@@ -1219,6 +1219,9 @@ function Index() {
             <a href="#catalogo" className="hover:text-white transition-colors">Catálogo</a>
             <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <Link to="/meus-pedidos" className="hover:text-white transition-colors" style={{ color: YELLOW }}>
+              Meus pedidos
+            </Link>
           </nav>
           <button
             type="button"
