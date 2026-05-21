@@ -96,7 +96,7 @@ const PRODUCTS: Product[] = [
   },
   {
     id: "fig-pack-10",
-    name: "Pack 10 Figurinhas",
+    name: "Pack 10 Figurinhas Casal",
     tag: "Pack",
     price: 79,
     oldPrice: 99,
