@@ -75,6 +75,51 @@ function StatusBadge({ status }: { status: Order["status"] }) {
   );
 }
 
+function TimelineItem({
+  title,
+  meta,
+  desc,
+  done,
+  pulse,
+  last,
+}: {
+  title: string;
+  meta: string;
+  desc: string;
+  done?: boolean;
+  pulse?: boolean;
+  last?: boolean;
+}) {
+  const color = done ? GREEN : pulse ? YELLOW : LINE;
+  return (
+    <div className="flex gap-3">
+      <div className="flex flex-col items-center">
+        <div
+          className={`h-3 w-3 rounded-full mt-1.5 ${pulse ? "animate-pulse" : ""}`}
+          style={{
+            backgroundColor: color,
+            boxShadow: done || pulse ? `0 0 0 4px ${color}22` : "none",
+          }}
+        />
+        {!last && <div className="flex-1 w-px my-1" style={{ backgroundColor: LINE }} />}
+      </div>
+      <div className={`flex-1 ${last ? "" : "pb-4"}`}>
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-sm font-semibold" style={{ color: done || pulse ? WHITE : MUTED }}>
+            {title}
+          </div>
+          <div className="text-[10px] uppercase tracking-wider shrink-0" style={{ color: MUTED }}>
+            {meta}
+          </div>
+        </div>
+        <div className="text-xs mt-0.5" style={{ color: MUTED }}>
+          {desc}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OrderPage() {
   const { id } = Route.useParams();
   const [order, setOrder] = useState<Order | null>(null);
@@ -384,47 +429,3 @@ function OrderPage() {
   );
 }
 
-function TimelineItem({
-  title,
-  meta,
-  desc,
-  done,
-  pulse,
-  last,
-}: {
-  title: string;
-  meta: string;
-  desc: string;
-  done?: boolean;
-  pulse?: boolean;
-  last?: boolean;
-}) {
-  const color = done ? GREEN : pulse ? YELLOW : LINE;
-  return (
-    <div className="flex gap-3">
-      <div className="flex flex-col items-center">
-        <div
-          className={`h-3 w-3 rounded-full mt-1.5 ${pulse ? "animate-pulse" : ""}`}
-          style={{
-            backgroundColor: color,
-            boxShadow: done || pulse ? `0 0 0 4px ${color}22` : "none",
-          }}
-        />
-        {!last && <div className="flex-1 w-px my-1" style={{ backgroundColor: LINE }} />}
-      </div>
-      <div className={`flex-1 ${last ? "" : "pb-4"}`}>
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="text-sm font-semibold" style={{ color: done || pulse ? WHITE : MUTED }}>
-            {title}
-          </div>
-          <div className="text-[10px] uppercase tracking-wider shrink-0" style={{ color: MUTED }}>
-            {meta}
-          </div>
-        </div>
-        <div className="text-xs mt-0.5" style={{ color: MUTED }}>
-          {desc}
-        </div>
-      </div>
-    </div>
-  );
-}
