@@ -2679,7 +2679,8 @@ function Index() {
                       0,
                     );
                     const discount = coupon ? subtotal * coupon.pct : 0;
-                    const shippingCost = shipping === "correios" ? 23.89 : 0;
+                    const correios = correiosFor(customer.state);
+                    const shippingCost = shipping === "correios" ? correios.cost : 0;
                     const total = subtotal - discount + shippingCost;
                     return (
                       <>
