@@ -2354,39 +2354,53 @@ function Index() {
                   Finalizar pedido
                 </span>
               </div>
-              {/* Step indicator */}
-              <div className="hidden sm:flex items-center gap-2">
-                {(["contact", "address", "pix"] as const).map((s, i) => {
-                  const labels = ["Contato", "Endereço", "Pagamento"];
-                  const active = checkoutStep === s;
-                  const done =
-                    (checkoutStep === "address" && i === 0) ||
-                    (checkoutStep === "pix" && i < 2);
-                  return (
-                    <div key={s} className="flex items-center gap-2">
-                      <span
-                        className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
-                        style={{
-                          backgroundColor: active ? YELLOW : done ? GREEN : "transparent",
-                          color: active ? INK : done ? WHITE : MUTED,
-                          border: active || done ? "none" : `1px solid ${LINE}`,
-                        }}
-                      >
-                        {done ? "✓" : i + 1}
-                      </span>
-                      <span
-                        className="text-xs font-semibold tracking-wide"
-                        style={{ color: active ? WHITE : MUTED }}
-                      >
-                        {labels[i]}
-                      </span>
-                      {i < 2 && (
-                        <span className="h-px w-6" style={{ backgroundColor: LINE }} />
-                      )}
+              {/* Step indicator (dynamic) */}
+              {(() => {
+                const personalize = needsPersonalization(checkout?.items);
+                const steps = personalize
+                  ? (["contact", "address", "personalize", "pix"] as const)
+                  : (["contact", "address", "pix"] as const);
+                const labels: Record<string, string> = {
+                  contact: "Contato",
+                  address: "Endereço",
+                  personalize: "Personalização",
+                  pix: "Pagamento",
+                };
+                const currentIdx = steps.indexOf(checkoutStep as (typeof steps)[number]);
+                return (
+                  <>
+                    <div className="hidden sm:flex items-center gap-2">
+                      {steps.map((s, i) => {
+                        const active = checkoutStep === s;
+                        const done = currentIdx > i;
+                        return (
+                          <div key={s} className="flex items-center gap-2">
+                            <span
+                              className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
+                              style={{
+                                backgroundColor: active ? YELLOW : done ? GREEN : "transparent",
+                                color: active ? INK : done ? WHITE : MUTED,
+                                border: active || done ? "none" : `1px solid ${LINE}`,
+                              }}
+                            >
+                              {done ? "✓" : i + 1}
+                            </span>
+                            <span
+                              className="text-xs font-semibold tracking-wide"
+                              style={{ color: active ? WHITE : MUTED }}
+                            >
+                              {labels[s]}
+                            </span>
+                            {i < steps.length - 1 && (
+                              <span className="h-px w-6" style={{ backgroundColor: LINE }} />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </>
+                );
+              })()}
               <button
                 type="button"
                 onClick={closeCheckout}
@@ -2401,21 +2415,28 @@ function Index() {
 
           {/* Mobile step indicator */}
           <div className="sm:hidden px-5 pt-5 max-w-6xl mx-auto">
-            <div className="flex items-center gap-1.5">
-              {(["contact", "address", "pix"] as const).map((s, i) => {
-                const active = checkoutStep === s;
-                const done =
-                  (checkoutStep === "address" && i === 0) ||
-                  (checkoutStep === "pix" && i < 2);
-                return (
-                  <span
-                    key={s}
-                    className="h-1 flex-1 rounded-full transition-all"
-                    style={{ backgroundColor: active ? YELLOW : done ? GREEN : LINE }}
-                  />
-                );
-              })}
-            </div>
+            {(() => {
+              const personalize = needsPersonalization(checkout?.items);
+              const steps = personalize
+                ? (["contact", "address", "personalize", "pix"] as const)
+                : (["contact", "address", "pix"] as const);
+              const currentIdx = steps.indexOf(checkoutStep as (typeof steps)[number]);
+              return (
+                <div className="flex items-center gap-1.5">
+                  {steps.map((s, i) => {
+                    const active = checkoutStep === s;
+                    const done = currentIdx > i;
+                    return (
+                      <span
+                        key={s}
+                        className="h-1 flex-1 rounded-full transition-all"
+                        style={{ backgroundColor: active ? YELLOW : done ? GREEN : LINE }}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Body */}
@@ -2423,23 +2444,38 @@ function Index() {
             {/* Left: form */}
             <div>
               <div className="max-w-xl">
-                <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: YELLOW }}>
-                  Etapa {checkoutStep === "contact" ? "1" : checkoutStep === "address" ? "2" : "3"} de 3
-                </p>
-                <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
-                  {checkoutStep === "contact"
-                    ? "Seus dados de contato"
-                    : checkoutStep === "address"
-                      ? "Endereço de entrega"
-                      : "Pague com PIX"}
-                </h2>
-                <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                  {checkoutStep === "contact"
-                    ? "Para enviar o comprovante e as instruções da sua figurinha."
-                    : checkoutStep === "address"
-                      ? "Digite seu CEP e completamos o resto pra você."
-                      : "Escaneie o QR Code abaixo. A confirmação é automática."}
-                </p>
+                {(() => {
+                  const personalize = needsPersonalization(checkout?.items);
+                  const steps = personalize
+                    ? (["contact", "address", "personalize", "pix"] as const)
+                    : (["contact", "address", "pix"] as const);
+                  const idx = steps.indexOf(checkoutStep as (typeof steps)[number]) + 1;
+                  const titleMap: Record<string, string> = {
+                    contact: "Seus dados de contato",
+                    address: "Endereço de entrega",
+                    personalize: "Personalize sua figurinha",
+                    pix: "Pague com PIX",
+                  };
+                  const descMap: Record<string, string> = {
+                    contact: "Para enviar o comprovante e as instruções da sua figurinha.",
+                    address: "Digite seu CEP e completamos o resto pra você.",
+                    personalize: "Envie a foto e os dados que vão estampar a figurinha.",
+                    pix: "Escaneie o QR Code abaixo. A confirmação é automática.",
+                  };
+                  return (
+                    <>
+                      <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: YELLOW }}>
+                        Etapa {idx} de {steps.length}
+                      </p>
+                      <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
+                        {titleMap[checkoutStep]}
+                      </h2>
+                      <p className="mt-2 text-sm" style={{ color: MUTED }}>
+                        {descMap[checkoutStep]}
+                      </p>
+                    </>
+                  );
+                })()}
 
                 <div className="mt-7">
                   {checkoutStep === "contact" && (
