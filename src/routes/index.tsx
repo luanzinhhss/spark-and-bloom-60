@@ -2641,7 +2641,7 @@ function Index() {
                           className="flex-1 rounded-full px-6 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01]"
                           style={{ backgroundColor: YELLOW, color: INK }}
                         >
-                          Confirmar e gerar PIX →
+                          {needsPersonalization(checkout?.items) ? "Continuar para personalização →" : "Confirmar e gerar PIX →"}
                         </button>
                       </div>
                     </div>
