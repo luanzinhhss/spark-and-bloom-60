@@ -599,22 +599,26 @@ function Index() {
   };
 
   const addToCart = (id: string) => {
+    const prod = PRODUCT_MAP[id];
+    const min = prod?.minQty ?? 1;
     setCart((c) => {
       const existing = c.find((l) => l.id === id);
       if (existing)
         return c.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l));
-      return [...c, { id, qty: 1 }];
+      return [...c, { id, qty: min }];
     });
     setCartOpen(true);
   };
   const removeLine = (id: string) =>
     setCart((c) => c.filter((l) => l.id !== id));
-  const setQty = (id: string, qty: number) =>
+  const setQty = (id: string, qty: number) => {
+    const min = PRODUCT_MAP[id]?.minQty ?? 1;
     setCart((c) =>
-      qty <= 0
+      qty < min
         ? c.filter((l) => l.id !== id)
         : c.map((l) => (l.id === id ? { ...l, qty } : l)),
     );
+  };
 
   // Buy-now flow: open confirmation modal first
   const handleBuyClick = (id: string) => {
