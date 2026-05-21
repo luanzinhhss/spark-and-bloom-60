@@ -27,6 +27,7 @@ import portaFigurinhas8 from "@/assets/porta-figurinhas-8.jpg";
 import fifaBackdrop from "@/assets/fifa-backdrop.png";
 import envelopePanini1 from "@/assets/envelope-panini-1.png";
 import envelopePanini2 from "@/assets/envelope-panini-2.png";
+import miguelExtraStickers from "@/assets/miguel-extra-stickers.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -112,6 +113,27 @@ const PRODUCTS: Product[] = [
       "10 figurinhas personalizadas no mesmo pedido",
       "Misture pessoas, fotos e números",
       "Embalagem premium em estilo coleção",
+    ],
+  },
+  {
+    id: "miguel-extra-stickers",
+    name: "Figurinhas Extra Panini — 4 Variantes Metálicas",
+    tag: "Extra Sticker · Panini",
+    price: 24.9,
+    oldPrice: 39.9,
+    installments: "Kit com 4 figurinhas extras nas cores ouro, prata, bronze e roxo",
+    desc: "Conjunto colecionável de figurinhas Extra Sticker Panini Copa 2026 com fundo metálico nas 4 cores oficiais — ouro, prata, bronze e roxo.",
+    image: miguelExtraStickers,
+    badge: "Edição limitada",
+    gallery: [
+      { src: miguelExtraStickers, label: "Kit 4 variantes" },
+    ],
+    details: [
+      "Kit colecionável com 4 figurinhas Extra Sticker oficiais",
+      "Cores exclusivas: Ouro, Prata, Bronze e Roxo",
+      "Acabamento metálico premium da linha Panini",
+      "Personalização opcional com foto e nome",
+      "Embalagem protetora individual para colecionador",
     ],
   },
   {
@@ -349,6 +371,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "fig-pack-10": "figurinhas",
   "fig-shiny": "figurinhas",
   "envelope-panini": "figurinhas",
+  "miguel-extra-stickers": "figurinhas",
   "figurinha-canva-editavel": "digital",
   "mini-taca-porta-foto": "decoracao",
   "porta-figurinhas-copa": "decoracao",
@@ -1258,8 +1281,65 @@ function Index() {
         </div>
       </section>
 
+      {/* VIDEOS SECTION */}
+      <section id="videos" style={{ backgroundColor: INK, borderTop: `1px solid ${LINE}` }}>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <div className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-3" style={{ color: GREEN }}>
+              Em vídeo
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
+              Veja de pertinho
+            </h2>
+            <p className="mt-3 text-sm" style={{ color: MUTED }}>
+              Conheça nossos produtos em movimento — qualidade, acabamento e detalhes que fazem a diferença.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
+            <div
+              className="relative rounded-2xl overflow-hidden group"
+              style={{
+                border: `1px solid ${LINE}`,
+                boxShadow: `0 20px 50px ${INK}80, 0 0 0 1px ${YELLOW}10 inset`,
+              }}
+            >
+              <video
+                src="/videos/arteoficina-1.mp4"
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-auto block bg-black"
+                style={{ aspectRatio: "9 / 16", objectFit: "cover" }}
+              />
+              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ backgroundColor: `${INK}d9`, color: YELLOW, border: `1px solid ${YELLOW}40` }}>
+                Bastidores
+              </div>
+            </div>
+
+            <div className="hidden sm:flex flex-col justify-center gap-4 px-2">
+              <div className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: YELLOW }}>
+                Produção artesanal
+              </div>
+              <h3 className="font-display text-2xl tracking-tight" style={{ color: WHITE }}>
+                Cada figurinha feita com cuidado de colecionador
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
+                Acompanhe nos vídeos como produzimos nossos álbuns, figurinhas e itens exclusivos da Copa 2026. Acabamento premium, materiais selecionados e atenção a cada detalhe.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-2">
+                {["Impressão alta resolução", "Material premium", "Acabamento manual"].map((t) => (
+                  <span key={t} className="text-[11px] px-3 py-1.5 rounded-full" style={{ backgroundColor: SURFACE, color: WHITE, border: `1px solid ${LINE}` }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* COUPONS SECTION */}
       <section id="cupons" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
+
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20">
           <div className="text-center max-w-xl mx-auto mb-10">
             <div className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-3" style={{ color: YELLOW }}>
