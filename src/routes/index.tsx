@@ -649,6 +649,12 @@ function Index() {
     setCheckout({ ...checkout, items });
   };
 
+  const removeCheckoutItem = (id: string) => {
+    if (!checkout) return;
+    const items = checkout.items.filter((l) => l.id !== id);
+    setCheckout({ ...checkout, items });
+  };
+
   // CEP lookup via ViaCEP
   const lookupCep = async (rawCep: string) => {
     const cep = rawCep.replace(/\D/g, "");
