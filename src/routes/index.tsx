@@ -2562,9 +2562,22 @@ function Index() {
                           <p className="text-xs font-semibold truncate" style={{ color: WHITE }}>{p.name}</p>
                           <p className="text-[11px]" style={{ color: MUTED }}>Qtd: {line.qty}</p>
                         </div>
-                        <span className="text-sm font-bold" style={{ color: WHITE }}>
-                          {fmt(p.price * line.qty)}
-                        </span>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <span className="text-sm font-bold" style={{ color: WHITE }}>
+                            {fmt(p.price * line.qty)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeCheckoutItem(line.id)}
+                            aria-label={`Remover ${p.name}`}
+                            title="Remover"
+                            className="inline-flex items-center gap-1 text-[10px] font-medium tracking-wide transition-colors hover:opacity-100"
+                            style={{ color: MUTED, opacity: 0.75 }}
+                          >
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                            Remover
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
