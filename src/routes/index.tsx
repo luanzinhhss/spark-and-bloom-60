@@ -477,7 +477,19 @@ function Index() {
     }
   }, [detailsId]);
   const [checkout, setCheckout] = useState<{ items: CartLine[]; nonce?: number } | null>(null);
-  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "pix">("contact");
+  const [checkoutStep, setCheckoutStep] = useState<"contact" | "address" | "personalize" | "pix">("contact");
+  // Personalization state (foto + dados pessoais)
+  const [photoStatus, setPhotoStatus] = useState<"idle" | "uploading" | "preview" | "confirmed">("idle");
+  const [photoData, setPhotoData] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [personalInfo, setPersonalInfo] = useState({
+    nome: "",
+    nascimento: "",
+    tamanho: "",
+    peso: "",
+    clube: "",
+    time: "",
+  });
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
@@ -671,8 +683,17 @@ function Index() {
     setCheckoutStep("contact");
     setFormError(null);
     setCepError(null);
+    setPhotoStatus("idle");
+    setPhotoData(null);
+    setPhotoError(null);
+    setPersonalInfo({ nome: "", nascimento: "", tamanho: "", peso: "", clube: "", time: "" });
     setCheckout({ items });
   };
+
+  // Products that require photo + personal info
+  const PERSONALIZED_IDS = new Set(["fig-individual", "fig-pack-10"]);
+  const needsPersonalization = (items: CartLine[] | undefined) =>
+    !!items?.some((l) => PERSONALIZED_IDS.has(l.id));
 
   const buyOnly = (id: string) => {
     setConfirmBuy(null);
@@ -771,6 +792,53 @@ function Index() {
     if (!customer.number.trim()) return setFormError("Informe o número");
     if (!customer.city.trim() || !customer.state.trim())
       return setFormError("Endereço incompleto");
+    setFormError(null);
+    setCheckoutStep(needsPersonalization(checkout?.items) ? "personalize" : "pix");
+  };
+
+  // Photo upload handlers
+  const handlePhotoFile = (file: File | undefined | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Arquivo precisa ser uma imagem");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setPhotoError("Imagem precisa ter no máximo 8 MB");
+      return;
+    }
+    setPhotoError(null);
+    setPhotoStatus("uploading");
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Simulate upload delay so the user sees the loading animation
+      setTimeout(() => {
+        setPhotoData(typeof reader.result === "string" ? reader.result : null);
+        setPhotoStatus("preview");
+      }, 1400);
+    };
+    reader.onerror = () => {
+      setPhotoStatus("idle");
+      setPhotoError("Não foi possível ler a imagem. Tente novamente.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const resetPhoto = () => {
+    setPhotoStatus("idle");
+    setPhotoData(null);
+    setPhotoError(null);
+  };
+
+  const submitPersonalize = () => {
+    if (photoStatus !== "confirmed") return setFormError("Confirme a foto antes de continuar");
+    const { nome, nascimento, tamanho, peso, clube, time } = personalInfo;
+    if (!nome.trim()) return setFormError("Informe o nome");
+    if (!nascimento.trim()) return setFormError("Informe a data de nascimento");
+    if (!tamanho.trim()) return setFormError("Informe o tamanho (altura)");
+    if (!peso.trim()) return setFormError("Informe o peso");
+    if (!clube.trim()) return setFormError("Informe o clube");
+    if (!time.trim()) return setFormError("Informe a seleção / time");
     setFormError(null);
     setCheckoutStep("pix");
   };
@@ -1000,7 +1068,7 @@ function Index() {
       </div>
 
       {/* WELCOME COUPON MODAL with countdown */}
-      {welcomeOpen && countdown && !countdown.expired && (
+      {welcomeOpen && (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setWelcomeOpen(false)}
@@ -1051,26 +1119,6 @@ function Index() {
                 Toque para aplicar
               </div>
 
-              <div className="mt-6">
-                <div className="text-[10px] tracking-[0.3em] uppercase mb-2" style={{ color: MUTED }}>
-                  Expira em
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { v: countdown.d, l: "Dias" },
-                    { v: countdown.h, l: "Horas" },
-                    { v: countdown.m, l: "Min" },
-                    { v: countdown.s, l: "Seg" },
-                  ].map((t) => (
-                    <div key={t.l} className="rounded-lg py-2.5" style={{ backgroundColor: INK, border: `1px solid ${LINE}` }}>
-                      <div className="font-display text-2xl tabular-nums" style={{ color: WHITE }}>
-                        {String(t.v).padStart(2, "0")}
-                      </div>
-                      <div className="text-[9px] tracking-[0.2em] uppercase mt-0.5" style={{ color: MUTED }}>{t.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -2306,39 +2354,53 @@ function Index() {
                   Finalizar pedido
                 </span>
               </div>
-              {/* Step indicator */}
-              <div className="hidden sm:flex items-center gap-2">
-                {(["contact", "address", "pix"] as const).map((s, i) => {
-                  const labels = ["Contato", "Endereço", "Pagamento"];
-                  const active = checkoutStep === s;
-                  const done =
-                    (checkoutStep === "address" && i === 0) ||
-                    (checkoutStep === "pix" && i < 2);
-                  return (
-                    <div key={s} className="flex items-center gap-2">
-                      <span
-                        className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
-                        style={{
-                          backgroundColor: active ? YELLOW : done ? GREEN : "transparent",
-                          color: active ? INK : done ? WHITE : MUTED,
-                          border: active || done ? "none" : `1px solid ${LINE}`,
-                        }}
-                      >
-                        {done ? "✓" : i + 1}
-                      </span>
-                      <span
-                        className="text-xs font-semibold tracking-wide"
-                        style={{ color: active ? WHITE : MUTED }}
-                      >
-                        {labels[i]}
-                      </span>
-                      {i < 2 && (
-                        <span className="h-px w-6" style={{ backgroundColor: LINE }} />
-                      )}
+              {/* Step indicator (dynamic) */}
+              {(() => {
+                const personalize = needsPersonalization(checkout?.items);
+                const steps = personalize
+                  ? (["contact", "address", "personalize", "pix"] as const)
+                  : (["contact", "address", "pix"] as const);
+                const labels: Record<string, string> = {
+                  contact: "Contato",
+                  address: "Endereço",
+                  personalize: "Personalização",
+                  pix: "Pagamento",
+                };
+                const currentIdx = steps.indexOf(checkoutStep as never);
+                return (
+                  <>
+                    <div className="hidden sm:flex items-center gap-2">
+                      {steps.map((s, i) => {
+                        const active = checkoutStep === s;
+                        const done = currentIdx > i;
+                        return (
+                          <div key={s} className="flex items-center gap-2">
+                            <span
+                              className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
+                              style={{
+                                backgroundColor: active ? YELLOW : done ? GREEN : "transparent",
+                                color: active ? INK : done ? WHITE : MUTED,
+                                border: active || done ? "none" : `1px solid ${LINE}`,
+                              }}
+                            >
+                              {done ? "✓" : i + 1}
+                            </span>
+                            <span
+                              className="text-xs font-semibold tracking-wide"
+                              style={{ color: active ? WHITE : MUTED }}
+                            >
+                              {labels[s]}
+                            </span>
+                            {i < steps.length - 1 && (
+                              <span className="h-px w-6" style={{ backgroundColor: LINE }} />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </>
+                );
+              })()}
               <button
                 type="button"
                 onClick={closeCheckout}
@@ -2353,21 +2415,28 @@ function Index() {
 
           {/* Mobile step indicator */}
           <div className="sm:hidden px-5 pt-5 max-w-6xl mx-auto">
-            <div className="flex items-center gap-1.5">
-              {(["contact", "address", "pix"] as const).map((s, i) => {
-                const active = checkoutStep === s;
-                const done =
-                  (checkoutStep === "address" && i === 0) ||
-                  (checkoutStep === "pix" && i < 2);
-                return (
-                  <span
-                    key={s}
-                    className="h-1 flex-1 rounded-full transition-all"
-                    style={{ backgroundColor: active ? YELLOW : done ? GREEN : LINE }}
-                  />
-                );
-              })}
-            </div>
+            {(() => {
+              const personalize = needsPersonalization(checkout?.items);
+              const steps = personalize
+                ? (["contact", "address", "personalize", "pix"] as const)
+                : (["contact", "address", "pix"] as const);
+              const currentIdx = steps.indexOf(checkoutStep as never);
+              return (
+                <div className="flex items-center gap-1.5">
+                  {steps.map((s, i) => {
+                    const active = checkoutStep === s;
+                    const done = currentIdx > i;
+                    return (
+                      <span
+                        key={s}
+                        className="h-1 flex-1 rounded-full transition-all"
+                        style={{ backgroundColor: active ? YELLOW : done ? GREEN : LINE }}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Body */}
@@ -2375,23 +2444,38 @@ function Index() {
             {/* Left: form */}
             <div>
               <div className="max-w-xl">
-                <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: YELLOW }}>
-                  Etapa {checkoutStep === "contact" ? "1" : checkoutStep === "address" ? "2" : "3"} de 3
-                </p>
-                <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
-                  {checkoutStep === "contact"
-                    ? "Seus dados de contato"
-                    : checkoutStep === "address"
-                      ? "Endereço de entrega"
-                      : "Pague com PIX"}
-                </h2>
-                <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                  {checkoutStep === "contact"
-                    ? "Para enviar o comprovante e as instruções da sua figurinha."
-                    : checkoutStep === "address"
-                      ? "Digite seu CEP e completamos o resto pra você."
-                      : "Escaneie o QR Code abaixo. A confirmação é automática."}
-                </p>
+                {(() => {
+                  const personalize = needsPersonalization(checkout?.items);
+                  const steps = personalize
+                    ? (["contact", "address", "personalize", "pix"] as const)
+                    : (["contact", "address", "pix"] as const);
+                  const idx = steps.indexOf(checkoutStep as never) + 1;
+                  const titleMap: Record<string, string> = {
+                    contact: "Seus dados de contato",
+                    address: "Endereço de entrega",
+                    personalize: "Personalize sua figurinha",
+                    pix: "Pague com PIX",
+                  };
+                  const descMap: Record<string, string> = {
+                    contact: "Para enviar o comprovante e as instruções da sua figurinha.",
+                    address: "Digite seu CEP e completamos o resto pra você.",
+                    personalize: "Envie a foto e os dados que vão estampar a figurinha.",
+                    pix: "Escaneie o QR Code abaixo. A confirmação é automática.",
+                  };
+                  return (
+                    <>
+                      <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: YELLOW }}>
+                        Etapa {idx} de {steps.length}
+                      </p>
+                      <h2 className="font-display text-3xl sm:text-4xl tracking-tight" style={{ color: WHITE }}>
+                        {titleMap[checkoutStep]}
+                      </h2>
+                      <p className="mt-2 text-sm" style={{ color: MUTED }}>
+                        {descMap[checkoutStep]}
+                      </p>
+                    </>
+                  );
+                })()}
 
                 <div className="mt-7">
                   {checkoutStep === "contact" && (
@@ -2557,7 +2641,248 @@ function Index() {
                           className="flex-1 rounded-full px-6 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01]"
                           style={{ backgroundColor: YELLOW, color: INK }}
                         >
-                          Confirmar e gerar PIX →
+                          {needsPersonalization(checkout?.items) ? "Continuar para personalização →" : "Confirmar e gerar PIX →"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {checkoutStep === "personalize" && (
+                    <div className="space-y-6 animate-fade-in">
+                      {/* PHOTO UPLOAD */}
+                      <div>
+                        <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                          Foto 3x4 (frente)
+                        </label>
+                        <p className="mt-1 text-xs" style={{ color: MUTED, opacity: 0.85 }}>
+                          Envie uma foto frontal, bem iluminada, estilo 3x4. PNG ou JPG, até 8 MB.
+                        </p>
+
+                        {/* IDLE — Dropzone */}
+                        {photoStatus === "idle" && (
+                          <label
+                            htmlFor="photo-upload"
+                            onDragOver={(e) => { e.preventDefault(); }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const f = e.dataTransfer.files?.[0];
+                              handlePhotoFile(f);
+                            }}
+                            className="mt-3 flex flex-col items-center justify-center text-center rounded-2xl px-6 py-10 cursor-pointer transition-colors hover:bg-white/5"
+                            style={{
+                              border: `2px dashed ${YELLOW}55`,
+                              backgroundColor: "#08080d",
+                            }}
+                          >
+                            <div
+                              className="h-14 w-14 rounded-full flex items-center justify-center mb-3"
+                              style={{ backgroundColor: `${YELLOW}18`, border: `1px solid ${YELLOW}40` }}
+                            >
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={YELLOW} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                              </svg>
+                            </div>
+                            <div className="font-display text-base" style={{ color: WHITE }}>
+                              Arraste a foto aqui
+                            </div>
+                            <div className="mt-1 text-xs" style={{ color: MUTED }}>
+                              ou <span style={{ color: YELLOW, textDecoration: "underline" }}>clique para escolher</span>
+                            </div>
+                            <input
+                              id="photo-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handlePhotoFile(e.target.files?.[0])}
+                            />
+                          </label>
+                        )}
+
+                        {/* UPLOADING */}
+                        {photoStatus === "uploading" && (
+                          <div
+                            className="mt-3 flex flex-col items-center justify-center text-center rounded-2xl px-6 py-12 animate-fade-in"
+                            style={{ border: `1px solid ${LINE}`, backgroundColor: "#08080d" }}
+                          >
+                            <div
+                              className="h-14 w-14 rounded-full border-[3px] animate-spin"
+                              style={{ borderColor: `${YELLOW}30`, borderTopColor: YELLOW }}
+                            />
+                            <div className="mt-5 font-display text-lg" style={{ color: WHITE }}>
+                              Carregando imagem...
+                            </div>
+                            <div className="mt-1 text-xs tracking-wide" style={{ color: MUTED }}>
+                              Aguarde um instante
+                            </div>
+                          </div>
+                        )}
+
+                        {/* PREVIEW — aguarda confirmação */}
+                        {photoStatus === "preview" && photoData && (
+                          <div
+                            className="mt-3 rounded-2xl p-5 animate-fade-in"
+                            style={{ border: `1px solid ${GREEN}55`, backgroundColor: "#08080d" }}
+                          >
+                            <div className="flex items-center gap-2 mb-4">
+                              <div
+                                className="h-7 w-7 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: GREEN }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                              </div>
+                              <div className="font-display text-sm tracking-wide" style={{ color: WHITE }}>
+                                Foto enviada com sucesso
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-[auto_1fr] gap-4 items-start">
+                              <img
+                                src={photoData}
+                                alt="Foto enviada"
+                                className="h-32 w-24 sm:h-40 sm:w-32 object-cover rounded-lg"
+                                style={{ border: `1px solid ${LINE}` }}
+                              />
+                              <div>
+                                <div className="font-display text-lg leading-tight" style={{ color: WHITE }}>
+                                  A foto está certa?
+                                </div>
+                                <p className="mt-1 text-xs" style={{ color: MUTED }}>
+                                  Depois de confirmar você não poderá mudar a foto deste pedido.
+                                </p>
+                                <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={resetPhoto}
+                                    className="rounded-full px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-white/5"
+                                    style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                                  >
+                                    Mandar nova foto
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPhotoStatus("confirmed")}
+                                    className="rounded-full px-5 py-2.5 text-xs font-bold tracking-wide transition-transform hover:scale-[1.02]"
+                                    style={{ backgroundColor: GREEN, color: WHITE }}
+                                  >
+                                    ✓ Confirmar foto
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* CONFIRMED */}
+                        {photoStatus === "confirmed" && photoData && (
+                          <div
+                            className="mt-3 rounded-2xl p-4 flex items-center gap-4 animate-fade-in"
+                            style={{ border: `1px solid ${YELLOW}40`, backgroundColor: `${YELLOW}08` }}
+                          >
+                            <img
+                              src={photoData}
+                              alt="Foto confirmada"
+                              className="h-20 w-16 object-cover rounded-md"
+                              style={{ border: `1px solid ${LINE}` }}
+                            />
+                            <div className="flex-1">
+                              <div className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: GREEN }}>
+                                Foto confirmada
+                              </div>
+                              <div className="mt-0.5 text-sm font-semibold" style={{ color: WHITE }}>
+                                Pronta para virar figurinha
+                              </div>
+                              <div className="text-[11px]" style={{ color: MUTED }}>
+                                A foto não poderá ser alterada após este passo.
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {photoError && (
+                          <p className="mt-2 text-xs" style={{ color: "#ff6b6b" }}>{photoError}</p>
+                        )}
+                      </div>
+
+                      {/* PERSONAL DATA — só após foto confirmada */}
+                      {photoStatus === "confirmed" && (
+                        <div className="space-y-4 animate-fade-in pt-2">
+                          <div>
+                            <div className="text-[10px] font-semibold tracking-[0.25em] uppercase mb-3" style={{ color: YELLOW }}>
+                              Dados que vão na figurinha
+                            </div>
+                          </div>
+                          <FieldInput
+                            label="Nome"
+                            value={personalInfo.nome}
+                            onChange={(v) => setPersonalInfo((p) => ({ ...p, nome: v }))}
+                            placeholder="Ex.: Miguel Souza"
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: MUTED }}>
+                                Nascimento
+                              </label>
+                              <input
+                                type="date"
+                                value={personalInfo.nascimento}
+                                onChange={(e) => setPersonalInfo((p) => ({ ...p, nascimento: e.target.value }))}
+                                className="mt-1 w-full rounded-lg px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-yellow-400/40"
+                                style={{ backgroundColor: "#08080d", border: `1px solid ${LINE}`, color: WHITE, colorScheme: "dark" }}
+                              />
+                            </div>
+                            <FieldInput
+                              label="Tamanho (altura)"
+                              value={personalInfo.tamanho}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, tamanho: v }))}
+                              placeholder="Ex.: 1,72 m"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <FieldInput
+                              label="Peso"
+                              value={personalInfo.peso}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, peso: v }))}
+                              placeholder="Ex.: 68 kg"
+                            />
+                            <FieldInput
+                              label="Clube"
+                              value={personalInfo.clube}
+                              onChange={(v) => setPersonalInfo((p) => ({ ...p, clube: v }))}
+                              placeholder="Ex.: Flamengo"
+                            />
+                          </div>
+                          <FieldInput
+                            label="Seleção / Time"
+                            value={personalInfo.time}
+                            onChange={(v) => setPersonalInfo((p) => ({ ...p, time: v }))}
+                            placeholder="Ex.: Brasil"
+                          />
+                        </div>
+                      )}
+
+                      {formError && (
+                        <p className="text-xs" style={{ color: "#ff6b6b" }}>{formError}</p>
+                      )}
+
+                      <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutStep("address")}
+                          className="rounded-full px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-white/5"
+                          style={{ color: WHITE, border: `1px solid ${LINE}` }}
+                        >
+                          ← Voltar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={submitPersonalize}
+                          disabled={photoStatus !== "confirmed"}
+                          className="flex-1 rounded-full px-6 py-3.5 text-sm font-bold tracking-wide transition-transform hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          style={{ backgroundColor: YELLOW, color: INK }}
+                        >
+                          Avançar para o pagamento →
                         </button>
                       </div>
                     </div>
@@ -2596,10 +2921,10 @@ function Index() {
                                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                               </div>
                               <div className="font-display text-3xl" style={{ color: WHITE }}>
-                                Pagamento confirmado
+                                Compra concluída com sucesso
                               </div>
                               <p className="mt-3 text-sm" style={{ color: MUTED }}>
-                                Em instantes você receberá um e-mail com as instruções para enviar a foto.
+                                Pagamento confirmado! Em instantes você receberá um e-mail com o resumo do pedido e os próximos passos.
                               </p>
                             </div>
                           ) : (
