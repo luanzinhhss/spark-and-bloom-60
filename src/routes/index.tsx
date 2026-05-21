@@ -1051,26 +1051,6 @@ function Index() {
                 Toque para aplicar
               </div>
 
-              <div className="mt-6">
-                <div className="text-[10px] tracking-[0.3em] uppercase mb-2" style={{ color: MUTED }}>
-                  Expira em
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { v: countdown.d, l: "Dias" },
-                    { v: countdown.h, l: "Horas" },
-                    { v: countdown.m, l: "Min" },
-                    { v: countdown.s, l: "Seg" },
-                  ].map((t) => (
-                    <div key={t.l} className="rounded-lg py-2.5" style={{ backgroundColor: INK, border: `1px solid ${LINE}` }}>
-                      <div className="font-display text-2xl tabular-nums" style={{ color: WHITE }}>
-                        {String(t.v).padStart(2, "0")}
-                      </div>
-                      <div className="text-[9px] tracking-[0.2em] uppercase mt-0.5" style={{ color: MUTED }}>{t.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
