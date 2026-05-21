@@ -639,6 +639,16 @@ function Index() {
     setCheckout({ items: checkout.items, nonce: Date.now() });
   };
 
+  const addBumpToCheckout = (id: string) => {
+    if (!checkout) return;
+    const min = PRODUCT_MAP[id]?.minQty ?? 1;
+    const exists = checkout.items.find((l) => l.id === id);
+    const items = exists
+      ? checkout.items.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l))
+      : [...checkout.items, { id, qty: min }];
+    setCheckout({ ...checkout, items });
+  };
+
   // CEP lookup via ViaCEP
   const lookupCep = async (rawCep: string) => {
     const cep = rawCep.replace(/\D/g, "");
