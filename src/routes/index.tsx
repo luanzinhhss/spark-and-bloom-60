@@ -115,24 +115,6 @@ const PRODUCTS: Product[] = [
     ],
   },
   {
-    id: "fig-shiny",
-    name: "Figurinha Dourada Shiny",
-    tag: "Edição rara",
-    price: 24.9,
-    installments: "Acabamento holográfico premium",
-    desc: "Edição limitada com brilho dourado. A craque do seu álbum.",
-    image: cardHelena,
-    badge: "Limitada",
-    gallery: [
-      { src: cardHelena, label: "Frente Shiny" },
-    ],
-    details: [
-      "Acabamento holográfico foil dourado",
-      "Numeração limitada por edição",
-      "Embalagem individual em sleeve protetor",
-    ],
-  },
-  {
     id: "mini-taca-porta-foto",
     name: "Mini Taça Porta Foto",
     tag: "Decoração 3D",
