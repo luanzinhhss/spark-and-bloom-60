@@ -2409,10 +2409,13 @@ function Index() {
                             Forma de envio
                           </label>
                           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {([
-                              { id: "sedex" as const, name: "Sedex", eta: "Até 2 semanas", cost: 0, costLabel: "Grátis" },
-                              { id: "correios" as const, name: "Correios", eta: "Até 6 dias úteis", cost: 23.89, costLabel: fmt(23.89) },
-                            ]).map((opt) => {
+                            {(() => {
+                              const c = correiosFor(customer.state);
+                              return [
+                                { id: "sedex" as const, name: "Sedex", eta: "Até 2 semanas", cost: 0, costLabel: "Grátis", region: "Para todo o Brasil" },
+                                { id: "correios" as const, name: "Correios", eta: c.eta, cost: c.cost, costLabel: fmt(c.cost), region: c.region },
+                              ];
+                            })().map((opt) => {
                               const active = shipping === opt.id;
                               return (
                                 <button
