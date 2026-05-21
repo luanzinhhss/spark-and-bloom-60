@@ -35,6 +35,12 @@ type Order = {
   };
   transactionId: string;
   paidAt: string | null;
+  shipping?: {
+    method?: string;
+    label?: string;
+    price?: number;
+    eta?: string;
+  } | null;
 };
 
 export const Route = createFileRoute("/pedido/$id")({
@@ -285,6 +291,67 @@ function OrderPage() {
                 {order.customer.address.neighborhood} · {order.customer.address.city}/{order.customer.address.state}
               </div>
               <div className="text-sm" style={{ color: MUTED }}>CEP {order.customer.address.cep}</div>
+            </div>
+          </div>
+
+          {/* Shipping */}
+          {order.shipping && (
+            <div className="mt-4 rounded-2xl p-4" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE_2 }}>
+              <div className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2" style={{ color: GREEN }}>
+                Forma de envio
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div>
+                  <div style={{ color: WHITE }}>{order.shipping.label ?? order.shipping.method ?? "—"}</div>
+                  {order.shipping.eta && (
+                    <div className="text-xs mt-0.5" style={{ color: MUTED }}>
+                      Prazo estimado: {order.shipping.eta}
+                    </div>
+                  )}
+                </div>
+                <div className="font-display text-base" style={{ color: WHITE }}>
+                  {order.shipping.price ? fmt(order.shipping.price) : "Grátis"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Timeline / payment history */}
+          <div className="mt-8">
+            <div className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-3" style={{ color: MUTED }}>
+              Histórico do pagamento
+            </div>
+            <div className="rounded-2xl p-4 sm:p-5" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE_2 }}>
+              <TimelineItem
+                done
+                title="Pedido criado"
+                meta={createdDate}
+                desc={`Pedido ${order.id} registrado com sucesso.`}
+              />
+              <TimelineItem
+                done
+                title="QR Code PIX gerado"
+                meta={createdDate}
+                desc="Cobrança gerada via gateway BlackNosePay."
+              />
+              <TimelineItem
+                done={order.status === "paid"}
+                pulse={order.status === "pending"}
+                title={order.status === "paid" ? "Pagamento confirmado" : "Aguardando pagamento"}
+                meta={paidDate ?? "Em andamento"}
+                desc={
+                  order.status === "paid"
+                    ? "Pagamento PIX identificado e compensado."
+                    : "Assim que o PIX for compensado, o status muda automaticamente."
+                }
+              />
+              <TimelineItem
+                done={order.status === "paid"}
+                title="Produção e envio"
+                meta={order.status === "paid" ? "Em fila" : "Após confirmação"}
+                desc="Personalização das peças e envio para o endereço cadastrado."
+                last
+              />
             </div>
           </div>
 
