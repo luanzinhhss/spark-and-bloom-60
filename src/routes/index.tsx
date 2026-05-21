@@ -1220,7 +1220,7 @@ function Index() {
               <span style={{ color: YELLOW }}>Sua seleção.</span>
             </h1>
             <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-lg" style={{ color: MUTED }}>
-              Álbum oficial da Copa 2026 com figurinhas personalizadas — sua foto, seu nome e o seu time. Impressão premium, entrega rápida, pagamento via PIX.
+              Álbum oficial da Copa 2026 com figurinhas personalizadas com a sua foto, seu nome e o seu time. Impressão premium, entrega rápida, pagamento via PIX.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
