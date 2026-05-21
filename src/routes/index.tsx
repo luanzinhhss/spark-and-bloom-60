@@ -1000,7 +1000,7 @@ function Index() {
       </div>
 
       {/* WELCOME COUPON MODAL with countdown */}
-      {welcomeOpen && countdown && !countdown.expired && (
+      {welcomeOpen && (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setWelcomeOpen(false)}
